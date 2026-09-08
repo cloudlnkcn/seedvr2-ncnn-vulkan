@@ -23,4 +23,7 @@ fi
 VK_DRIVER_FILES="${icds[0]}" VK_ICD_FILENAMES="${icds[0]}" VK_INSTANCE_LAYERS=VK_LAYER_KHRONOS_validation \
   "$install/bin/seedvr2" engine self-test --backend vulkan --gpu 0 > "$evidence/mesa.json" 2> "$evidence/mesa.stderr"
 if rg -i 'vuid-|validation error' "$evidence/mesa.stderr"; then exit 1; fi
+VK_DRIVER_FILES="${icds[0]}" VK_ICD_FILENAMES="${icds[0]}" VK_INSTANCE_LAYERS=VK_LAYER_KHRONOS_validation \
+  ctest --test-dir "$build" -L vulkan --no-tests=error --output-on-failure > "$evidence/mesa-regressions.log" 2>&1
+if rg -i 'vuid-|validation error' "$evidence/mesa-regressions.log"; then exit 1; fi
 printf '{"scope":"Native Linux small tests and installed SDK; full 3B weights are a separate real-device protocol","full_model":"NOT_RUN_IN_CI"}\n' > "$evidence/scope.json"

@@ -72,9 +72,12 @@ Calibration: ${model.data.calibration_status}
 
 ${model.data.gates.map(g => `- ${g.id} ${g.title}: ${g.status}`).join('\n')}
 
+## Retained numerical checks
+
+On 2026-09-08, the retained 17-frame 128-pixel synthetic clip passed all 73 FP32-B checkpoints on both CPU and Vulkan after the attention and CPU encoder fixes. The original Vulkan 60/73 and CPU 70/73 failures remain archived. The official reference, shared noise and historical tolerances were not changed. See docs/VIDEO-NUMERICS.md for exact implementation identities, affected regressions and costs. These development results do not certify natural-video quality or the official BF16/FlashAttention execution path.
+
 ## Remaining work
 
-- One 6-frame 64-pixel clip passed 73/73 FP32-B checkpoints. The 17-frame 128-pixel clip failed strict intermediate checks (Vulkan 60/73, CPU 70/73); final decoded tensors passed in both. Inspect docs/video-validation.md for the exact builds and retained failures. These synthetic clips are not a quality benchmark.
 - Streaming causal cache, video chunk boundaries, audio retention and long-video consistency.
 - FP16/BF16 accuracy calibration, representative quality checks, measured memory budgets and performance profiling.
 - Larger image sizes, additional image metadata handling and portable worker adapters.

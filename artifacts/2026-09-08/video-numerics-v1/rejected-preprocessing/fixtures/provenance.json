@@ -1,0 +1,42 @@
+{
+  "schema_version": "seedvr2-preprocessing-reference-v1",
+  "torch_version": "2.9.0+cpu",
+  "source": "https://github.com/pytorch/pytorch/blob/v2.9.0/aten/src/ATen/native/cpu/UpSampleKernel.cpp",
+  "oracle": "PyTorch bicubic antialias FP32, align_corners=False; generated RGB texture",
+  "model_verified": false,
+  "cases": [
+    {
+      "name": "64-to-128",
+      "input_shape": [
+        64,
+        64,
+        3
+      ],
+      "output_shape": [
+        3,
+        128,
+        128
+      ]
+    },
+    {
+      "name": "128-to-64",
+      "input_shape": [
+        128,
+        128,
+        3
+      ],
+      "output_shape": [
+        3,
+        64,
+        64
+      ]
+    }
+  ],
+  "generator_sha256": "8b6bb9fbb95c78ce8c9c944ab880512930312a5700cdb3a85963689930e1c29a",
+  "files": {
+    "128-to-64.f32": "ec862c19e999b239a5a9aca0f1cf9bd5d9b569e2e351ebe3349dd8671b733bff",
+    "128-to-64.rgb8": "f748d8bfd305c3f3733d91aea75d499c2a47635d96369e897ddc33afe75d16fd",
+    "64-to-128.f32": "29e743674f73fa4316ad0ce04742b60f0dfde7439415bdf7966f3080cdb75f52",
+    "64-to-128.rgb8": "3dd50a5fccbc0c4f55ef4d13ad3bb19fa832b3093417009a56d9f39f078ebb7b"
+  }
+}

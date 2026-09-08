@@ -1,8 +1,8 @@
 # SeedVR2 ncnn Vulkan
 
-**0.6.0 原生预览：官方 SeedVR2 3B 已接通可安装的 C++ SDK、独立 CLI 和本地 Web，使用 ncnn CPU / Vulkan 完成真实图片与整段短片处理。** 新增模型包身份/完整性校验、参数预检、离线复制、外部 SDK 示例和原生 CI。安装版 SDK 已在禁网、隐藏源码和中文路径下完成真实图片推理；新的自然 JPEG 完整轨迹 73/73 通过官方 FP32-B 对照，输出最大相差 1。**17 帧视频仍有数值失败，单张自然图的全参考画质指标也低于插值基线，完整模型认证未通过。**
+**0.6.0 原生预览：官方 SeedVR2 3B 已接通可安装的 C++ SDK、独立 CLI 和本地 Web，使用 ncnn CPU / Vulkan 完成真实图片与整段短片处理。** 新增模型包身份/完整性校验、参数预检、离线复制、外部 SDK 示例和原生 CI。安装版 SDK 已在禁网、隐藏源码和中文路径下完成真实图片推理；新的自然 JPEG 完整轨迹 73/73 通过官方 FP32-B 对照，输出最大相差 1。**本轮修复后，保留的 17 帧视频 CPU/Vulkan 均达到 73/73 数值通过；单张自然图的全参考画质负结果仍保留，完整模型认证未通过。**
 
-[首次使用和离线搬移](docs/FIRST-RUN.md) · [架构与源码导航](docs/ARCHITECTURE.md) · [分项实测、失败和限制](docs/DELIVERY-RESULTS.md) · [可复用 Discussion 草稿](docs/DISCUSSION-DRAFT.md)
+[首次使用和离线搬移](docs/FIRST-RUN.md) · [架构与源码导航](docs/ARCHITECTURE.md) · [17 帧数值修复与代价](docs/VIDEO-NUMERICS.md) · [分项实测、失败和限制](docs/DELIVERY-RESULTS.md) · [可复用 Discussion 草稿](docs/DISCUSSION-DRAFT.md)
 
 React / TypeScript / Ant Design 界面内嵌于 Drogon C++ 服务。共享 C++20 推理核心，由独立 worker 执行，SQLite 保存任务与有序事件。运行时无需 Node、Python、云服务或 CDN。本机验证平台为 Linux x86_64 / RTX 4060 Laptop GPU；尚未形成跨平台便携发行版。
 

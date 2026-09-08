@@ -1,0 +1,81 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+[Detaching after vfork from child process 826528]
+[0 NVIDIA GeForce RTX 4060 Laptop GPU]  queueC=2[8]  queueT=1[2]  rebar=1  r-score=76
+[0 NVIDIA GeForce RTX 4060 Laptop GPU]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/1
+[0 NVIDIA GeForce RTX 4060 Laptop GPU]  subgroup=32(32~32)  ops=1/1/1/1/1/1/1/1/1/1
+[0 NVIDIA GeForce RTX 4060 Laptop GPU]  fp16-cm=16x16x16/16x8x16/16x8x8  int8-cm=16x16x32/16x8x32  bf16-cm=16x16x16  fp8-cm=16x16x32  fp6-cm=0  fp4-cm=0
+[1 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[1 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[1 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[1 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+[2 llvmpipe (LLVM 17.0.6, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[2 llvmpipe (LLVM 17.0.6, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[2 llvmpipe (LLVM 17.0.6, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/0/1/0/0
+[2 llvmpipe (LLVM 17.0.6, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+[New Thread 0x7ffff21f66c0 (LWP 826530)]
+[New Thread 0x7ffff13f36c0 (LWP 826531)]
+[New Thread 0x7ffff04f16c0 (LWP 826533)]
+[New Thread 0x7fffd0efd6c0 (LWP 826534)]
+[New Thread 0x7fffcfec96c0 (LWP 826545)]
+[New Thread 0x7fffcbdff6c0 (LWP 826546)]
+
+Thread 1 "seedvr2_awa_rop" received signal SIGSEGV, Segmentation fault.
+0x0000000001206487 in std::swap<std::_Any_data> (__a=..., __b=...) at /usr/bin/../lib/gcc/x86_64-redhat-linux/13/../../../../include/c++/13/bits/move.h:198
+warning: 198	/usr/bin/../lib/gcc/x86_64-redhat-linux/13/../../../../include/c++/13/bits/move.h: No such file or directory
+
+Thread 7 (Thread 0x7fffcbdff6c0 (LWP 826546) "seedvr2_awa_rop"):
+#0  0x00007ffff715b312 in __syscall_cancel_arch () from /lib64/libc.so.6
+#1  0x00007ffff714f52c in __internal_syscall_cancel () from /lib64/libc.so.6
+#2  0x00007ffff714f877 in __futex_abstimed_wait_cancelable64 () from /lib64/libc.so.6
+#3  0x00007ffff71520cc in pthread_cond_wait@@GLIBC_2.3.2 () from /lib64/libc.so.6
+#4  0x00007ffff74475a0 in std::condition_variable::wait(std::unique_lock<std::mutex>&) () from /lib64/libstdc++.so.6
+#5  0x00007fffc51e10f8 in vvl::Queue::ThreadFunc() () from /lib64/libVkLayer_khronos_validation.so
+
+Thread 6 (Thread 0x7fffcfec96c0 (LWP 826545) "seedvr2_awa_rop"):
+#0  0x00007ffff715b312 in __syscall_cancel_arch () from /lib64/libc.so.6
+#1  0x00007ffff714f52c in __internal_syscall_cancel () from /lib64/libc.so.6
+#2  0x00007ffff714f877 in __futex_abstimed_wait_cancelable64 () from /lib64/libc.so.6
+#3  0x00007ffff71522e2 in pthread_cond_timedwait@@GLIBC_2.3.2 () from /lib64/libc.so.6
+#4  0x00007fffddde5500 in ?? () from /lib64/libnvidia-eglcore.so.595.91.07
+#5  0x00007fffde2b7af1 in ?? () from /lib64/libnvidia-eglcore.so.595.91.07
+
+Thread 5 (Thread 0x7fffd0efd6c0 (LWP 826534) "[vkps] Update"):
+#0  0x00007ffff715b312 in __syscall_cancel_arch () from /lib64/libc.so.6
+#1  0x00007ffff714f52c in __internal_syscall_cancel () from /lib64/libc.so.6
+#2  0x00007ffff714f877 in __futex_abstimed_wait_cancelable64 () from /lib64/libc.so.6
+#3  0x00007ffff71522e2 in pthread_cond_timedwait@@GLIBC_2.3.2 () from /lib64/libc.so.6
+#4  0x00007fffddde5500 in ?? () from /lib64/libnvidia-eglcore.so.595.91.07
+#5  0x00007fffde157204 in ?? () from /lib64/libnvidia-eglcore.so.595.91.07
+
+Thread 4 (Thread 0x7ffff04f16c0 (LWP 826533) "[vkrt] Analysis"):
+#0  0x00007ffff715b312 in __syscall_cancel_arch () from /lib64/libc.so.6
+#1  0x00007ffff714f52c in __internal_syscall_cancel () from /lib64/libc.so.6
+#2  0x00007ffff714f877 in __futex_abstimed_wait_cancelable64 () from /lib64/libc.so.6
+#3  0x00007ffff71522e2 in pthread_cond_timedwait@@GLIBC_2.3.2 () from /lib64/libc.so.6
+#4  0x00007fffddde5500 in ?? () from /lib64/libnvidia-eglcore.so.595.91.07
+#5  0x00007fffde178b99 in ?? () from /lib64/libnvidia-eglcore.so.595.91.07
+
+Thread 3 (Thread 0x7ffff13f36c0 (LWP 826531) "[vkcf] Analysis"):
+#0  0x00007ffff715b312 in __syscall_cancel_arch () from /lib64/libc.so.6
+#1  0x00007ffff714f52c in __internal_syscall_cancel () from /lib64/libc.so.6
+#2  0x00007ffff714f877 in __futex_abstimed_wait_cancelable64 () from /lib64/libc.so.6
+#3  0x00007ffff71520cc in pthread_cond_wait@@GLIBC_2.3.2 () from /lib64/libc.so.6
+#4  0x00007fffddde549f in ?? () from /lib64/libnvidia-eglcore.so.595.91.07
+#5  0x00007fffde16de18 in ?? () from /lib64/libnvidia-eglcore.so.595.91.07
+
+Thread 2 (Thread 0x7ffff21f66c0 (LWP 826530) "seedvr2_awa_rop"):
+#0  0x00007ffff715b312 in __syscall_cancel_arch () from /lib64/libc.so.6
+#1  0x00007ffff714f52c in __internal_syscall_cancel () from /lib64/libc.so.6
+#2  0x00007ffff714f877 in __futex_abstimed_wait_cancelable64 () from /lib64/libc.so.6
+#3  0x00007ffff71522e2 in pthread_cond_timedwait@@GLIBC_2.3.2 () from /lib64/libc.so.6
+#4  0x00007fffddde5500 in ?? () from /lib64/libnvidia-eglcore.so.595.91.07
+#5  0x00007fffde15a46a in ?? () from /lib64/libnvidia-eglcore.so.595.91.07
+
+Thread 1 (Thread 0x7ffff7f73880 (LWP 826437) "seedvr2_awa_rop"):
+#0  0x0000000001206487 in std::swap<std::_Any_data> (__a=..., __b=...) at /usr/bin/../lib/gcc/x86_64-redhat-linux/13/../../../../include/c++/13/bits/move.h:198
+#1  0x0000000001206421 in std::function<void(spv_message_level_t, char const*, spv_position_t const&, char const*)>::swap (this=0x7fffffffb3a0, __x=...) at /usr/bin/../lib/gcc/x86_64-redhat-linux/13/../../../../include/c++/13/bits/std_function.h:558
+#2  0x00000000012063e2 in std::function<void(spv_message_level_t, char const*, spv_position_t const&, char const*)>::operator= (this=0x20, __x=...) at /usr/bin/../lib/gcc/x86_64-redhat-linux/13/../../../../include/c++/13/bits/std_function.h:489
+#3  0x00000000014f2eed in spvtools::SetContextMessageConsumer (context=0x0, consumer=...) at /home/mingshi/Project/SPIRV-Tools/source/table.cpp:67
+#4  0x00000000014e322e in spvtools::SpirvTools::SetMessageConsumer (this=0x7fffffffb4e8, consumer=...) at /home/mingshi/Project/SPIRV-Tools/source/libspirv.cpp:70
+#5  0x00000000011fe1cb in spvtools::Optimizer::Run (this=0x7fffffffb630, original_binary=0x356fb00, original_binary_size=8588, optimized_binary=0x7fffffffb690, opt_options=0x3556510) at /home/mingshi/Project/SPIRV-Tools/source/opt/optimizer.cpp:628

@@ -2,7 +2,7 @@
   "project_version": "0.6.0-native-preview",
   "architecture_version": "shared-native-sdk",
   "date": "2026-09-08",
-  "checked_at_utc": "2026-09-08T12:26:01.499353+00:00",
+  "checked_at_utc": "2026-09-08T16:01:36.281936+00:00",
   "product_policy": {
     "single_application": true,
     "testing_builtin": true,
@@ -98,6 +98,8 @@
   "model_policy_calibration": "NOT_FROZEN",
   "formal_gate_status": "12_MISSING_EVIDENCE; DEVELOPMENT_REPORTS_NOT_ASSEMBLED_IN_FORMAL_BUNDLE",
   "evidence": [
+    "VIDEO-NUMERICS.md",
+    "../artifacts/2026-09-08/video-numerics-v1/summary.json",
     "DELIVERY-RESULTS.md",
     "FIRST-RUN.md",
     "ARCHITECTURE.md",
@@ -108,7 +110,7 @@
     "../artifacts/2026-09-08/delivery-v1/weight-io-experiment.json"
   ],
   "next_implementation": [
-    "Investigate remaining 17-frame accumulated numerical differences without relaxing existing thresholds",
+    "Validate additional inputs and devices using retained numerical contracts",
     "Representative natural-video quality and temporal consistency",
     "Official BF16 reference A and separately reviewed low precision",
     "Demand-led high resolution, temporal cache, audio and long clips",
@@ -272,6 +274,125 @@
     "model_manifest_sha256": "fe38835c367a2a389c689d89ce85c952b0e347d1edfd879b008d796a65374028"
   },
   "video_numerical_validation": {
+    "status": "PASS_RETAINED_FP32_B_FIXTURES",
+    "whole_clip": [
+      {
+        "frames": 6,
+        "width": 64,
+        "height": 64,
+        "backend": "vulkan",
+        "passed": 73,
+        "total": 73,
+        "verdict": "PASS",
+        "report": "../artifacts/2026-09-08/video-numerics-v1/runs/video6-final-vulkan-v1/parity.json"
+      },
+      {
+        "frames": 17,
+        "width": 128,
+        "height": 128,
+        "backend": "vulkan",
+        "passed": 73,
+        "total": 73,
+        "verdict": "PASS",
+        "report": "../artifacts/2026-09-08/video-numerics-v1/runs/video17-final-vulkan-v1/parity.json"
+      },
+      {
+        "frames": 17,
+        "width": 128,
+        "height": 128,
+        "backend": "cpu",
+        "passed": 73,
+        "total": 73,
+        "verdict": "PASS",
+        "report": "../artifacts/2026-09-08/video-numerics-v1/runs/video17-final-cpu-v1/parity.json"
+      }
+    ],
+    "input_count": 1,
+    "input_kind": "Synthetic motion pattern; no natural-video quality acceptance",
+    "tolerance": {
+      "atol": 0.001,
+      "rtol": 0.001,
+      "calibration": "DIAGNOSTIC_NOT_MODEL_CERTIFICATION"
+    },
+    "final_decoded_pass_does_not_override_intermediate_failures": true,
+    "official_BF16_FlashAttention_A": "NOT_RUN",
+    "model_verified": false,
+    "implementation_sdk_sha256": "f683258f30962fb51ff7c958e814a72ebe8ce948545e6eb555ae80c8cf3b0196",
+    "vae_cpu_vulkan_historical": {
+      "passed": 16,
+      "total": 16,
+      "report": "video-vae-native-validation.json"
+    },
+    "vae_cpu_regression": {
+      "passed": 8,
+      "total": 8,
+      "report": "../artifacts/2026-09-08/video-numerics-v1/vae-cpu-regression.json",
+      "scope": "Final CPU temporal encoder direct convolution policy; original decoder policy"
+    }
+  },
+  "image_numerical_regression": {
+    "passed": 73,
+    "total": 73,
+    "input": "Single NASA natural JPEG, 128x128",
+    "output": [
+      256,
+      256
+    ],
+    "backend": "vulkan",
+    "pixel_max_abs": 1,
+    "pixel_mae": 0.00013224283854166666,
+    "report": "../artifacts/2026-09-08/video-numerics-v1/runs/natural-final-vulkan-v1/parity.json",
+    "model_verified": false,
+    "quality_acceptance": false
+  },
+  "runtime_requires_ffmpeg_shared_libraries": true,
+  "runtime_video_encoder": "libx264",
+  "ffmpeg_library_version": "8.0.1",
+  "functional_video_demo": {
+    "job_id": "eca7a5e64fd3b2319cea4bda24198407",
+    "frames": 17,
+    "input": [
+      64,
+      64
+    ],
+    "output": [
+      128,
+      128
+    ],
+    "backend": "ncnn-vulkan",
+    "total_ms": 37625.145649,
+    "quality_benchmark": false,
+    "report": "../artifacts/2026-09-08/video-numerics-v1/installed-web/job.json"
+  },
+  "converter_ncnn_commit": "6a1bf000f363714839a36793addc8c879d3d899e",
+  "delivery_0_6": {
+    "sdk_library_sha256": "a3a1e06c863bc1bb6cd83944733faaaf7e0bf96bf4adf80cd50bcda7f8eaaa4c",
+    "ctest": {
+      "passed": 6,
+      "total": 6
+    },
+    "image_jobs": {
+      "passed": 39,
+      "total": 39
+    },
+    "video_jobs": {
+      "passed": 49,
+      "total": 49
+    },
+    "natural_jpeg_numerical": {
+      "passed": 73,
+      "total": 73,
+      "max_uint8_error": 1
+    },
+    "natural_quality": "SINGLE_EXAMPLE; PSNR_SSIM_BELOW_BICUBIC_BASELINE",
+    "offline_full_sdk_image": true,
+    "full_model_certification": false,
+    "runtime_weight_io_default": "buffered",
+    "remote_native_ci": "CONFIGURED_NOT_RUN",
+    "full_model_ci": "SEPARATE_REAL_DEVICE_RECORDS",
+    "scope": "Initial 0.6.0 delivery batch; numerical follow-up and current SDK are recorded in numerics_update"
+  },
+  "video_numerical_validation_historical": {
     "status": "MIXED",
     "vae_cpu_vulkan": {
       "passed": 16,
@@ -321,7 +442,41 @@
     "official_BF16_FlashAttention_A": "NOT_RUN",
     "model_verified": false
   },
-  "image_numerical_regression": {
+  "numerics_update": {
+    "report": "VIDEO-NUMERICS.md",
+    "artifact_index": "../artifacts/2026-09-08/video-numerics-v1/index.json",
+    "full_model_certification": false,
+    "cpu_temporal_encoder_convolution": "direct",
+    "vulkan_tensor_fallback_to_cpu": false,
+    "preprocessing_fma_candidate": "REJECTED_NOT_DEFAULT",
+    "summary": "../artifacts/2026-09-08/video-numerics-v1/summary.json",
+    "installed_sdk_sha256": "dcddfd914118ffcfabb6b6e37cbc7fd423320aedad59c9abe9a533d93ad11992",
+    "installed_web_report": "../artifacts/2026-09-08/video-numerics-v1/installed-web/verification.json",
+    "native_ci": {
+      "passed": true,
+      "ctest": [
+        10,
+        10
+      ],
+      "mesa_regressions": [
+        2,
+        2
+      ],
+      "reference_contract": [
+        11,
+        11
+      ],
+      "installed_sdk": true,
+      "local_script": true,
+      "remote_dispatch": "NOT_RUN"
+    },
+    "awa_regression": {
+      "passed": 40,
+      "total": 40,
+      "report": "../artifacts/2026-09-08/video-numerics-v1/awa-regression.json"
+    }
+  },
+  "image_numerical_regression_historical": {
     "passed": 73,
     "total": 73,
     "output": [
@@ -331,10 +486,7 @@
     "pixel_max_abs": 1,
     "report": "video-image-parity-final.json"
   },
-  "runtime_requires_ffmpeg_shared_libraries": true,
-  "runtime_video_encoder": "libx264",
-  "ffmpeg_library_version": "8.0.1",
-  "functional_video_demo": {
+  "functional_video_demo_historical": {
     "job_id": "bc4fe196bf90bda25872d1cf23f93309",
     "frames": 17,
     "input": [
@@ -349,32 +501,5 @@
     "total_ms": 49084.996841,
     "quality_benchmark": false,
     "report": "examples/video-demo-job.json"
-  },
-  "converter_ncnn_commit": "6a1bf000f363714839a36793addc8c879d3d899e",
-  "delivery_0_6": {
-    "sdk_library_sha256": "a3a1e06c863bc1bb6cd83944733faaaf7e0bf96bf4adf80cd50bcda7f8eaaa4c",
-    "ctest": {
-      "passed": 6,
-      "total": 6
-    },
-    "image_jobs": {
-      "passed": 39,
-      "total": 39
-    },
-    "video_jobs": {
-      "passed": 49,
-      "total": 49
-    },
-    "natural_jpeg_numerical": {
-      "passed": 73,
-      "total": 73,
-      "max_uint8_error": 1
-    },
-    "natural_quality": "SINGLE_EXAMPLE; PSNR_SSIM_BELOW_BICUBIC_BASELINE",
-    "offline_full_sdk_image": true,
-    "full_model_certification": false,
-    "runtime_weight_io_default": "buffered",
-    "remote_native_ci": "CONFIGURED_NOT_RUN",
-    "full_model_ci": "SEPARATE_REAL_DEVICE_RECORDS"
   }
 }

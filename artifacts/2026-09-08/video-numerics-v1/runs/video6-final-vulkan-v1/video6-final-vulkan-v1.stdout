@@ -1,0 +1,1401 @@
+{
+  "backend": "ncnn-vulkan",
+  "build": "0.6.0",
+  "clip": {
+    "decoded_frames": 6,
+    "latent_frames": 3,
+    "padded_frames": 9,
+    "padding": "repeat last frame to 4n+1; crop output to decoded frame count",
+    "requested_max_frames": 6,
+    "streaming_cache": false,
+    "temporal_mode": "joint clip VAE + 3D adaptive window attention",
+    "truncated": true
+  },
+  "comparison_input": "comparison-input.mp4",
+  "converter_ncnn_commit": "6a1bf000f363714839a36793addc8c879d3d899e",
+  "device": {
+    "api_version": 4211017,
+    "device_id": 10464,
+    "driver_version": 2497102272,
+    "index": 0,
+    "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "subgroup_size": 32,
+    "vendor_id": 4318
+  },
+  "diagnostics": {
+    "block-00-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-00-text.f32",
+      "sha256": "e3739227ea2381f617ba72fe32fb876142cc83662cd3a9543513e439092e12d2",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-00-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-00-video.f32",
+      "sha256": "ccab6be17225d6a2e66d58e4279a92ad07f80ddf0869b1d4e8509648a118e6a4",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-01-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-01-text.f32",
+      "sha256": "5d7f00ba9753a58b3cf9edf995098c2c6a85fe9aa4dffc2003683133d767283c",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-01-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-01-video.f32",
+      "sha256": "5b0651e7a507512f6393f49f42f267b756370a4b9511a6bd71ca7714af12a946",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-02-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-02-text.f32",
+      "sha256": "ff06e8841631dccab877b3a226a41e0f124ff1d2274e04f55eb200ecdf1f2e7a",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-02-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-02-video.f32",
+      "sha256": "f17362749ee4a7e74768dd84de35243b33892b3c323b0e991fd1b92161dcd549",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-03-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-03-text.f32",
+      "sha256": "81d1436d39c3249c0a571086daa896bf5a7c6d941b4e3dcc40b0cdb7fd240c2f",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-03-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-03-video.f32",
+      "sha256": "75029501dada39b508cc97bbfd554738c6677eeb508308c097eecf865d809c01",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-04-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-04-text.f32",
+      "sha256": "26096420dfa7e488b5eb3c73cad73f76c66915f65f78831cada186e01fd49596",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-04-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-04-video.f32",
+      "sha256": "f7c36263e242f0d27813e5a0761a769dbfcb6b503a2b430b0815b8c85474c3e7",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-05-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-05-text.f32",
+      "sha256": "7123b66251e6dbfc9a828cd8bc003e23cc11bfcd45d26b7963c112083e131ed3",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-05-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-05-video.f32",
+      "sha256": "ba27e9d24467cf21050923ef8be392ecbbc41bba0e992fc0a826710cdfcdcc37",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-06-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-06-text.f32",
+      "sha256": "ca3b1dec09d8d19e9f22fa5e7ddc429f1e86b7556914b95fa8d8c1fa0cd06523",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-06-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-06-video.f32",
+      "sha256": "13aebd7e5498367a30e20757f4610ac8706c38336769e71938b93031b52037d9",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-07-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-07-text.f32",
+      "sha256": "a1d1b99d300355cee7dfda8df041c1fbae6c689a0154d5c8814e22c22595697a",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-07-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-07-video.f32",
+      "sha256": "3a3b43556a3bf86e54e6c5167493fa418d2313c3b8a458f80be413f24e84d8b8",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-08-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-08-text.f32",
+      "sha256": "124afb3f3468aaee4d640377562c2f86e3e57667b3291fe7ba3b07754d04b223",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-08-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-08-video.f32",
+      "sha256": "ffac9b222db99ca9a1a6c991884851936441aa88e4d10909a9fdd176ea05b23c",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-09-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-09-text.f32",
+      "sha256": "f0162c9dd16448b5cc246c2558e39875f7588185024967e2a3239a9a3c473db6",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-09-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-09-video.f32",
+      "sha256": "72dad1a8104af977c3a7de595556f45fae01a42a7e1d4bbf288b583d1fb83462",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-10-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-10-text.f32",
+      "sha256": "f4339e10cbf83d1e63336b62c06102ba0071681c352d209f2ea2facd1da957cd",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-10-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-10-video.f32",
+      "sha256": "7b465fa4eb4366338c0fd65e215f94a164fc60799096c787081d4657775974e1",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-11-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-11-text.f32",
+      "sha256": "58dc19a3a4d3c745eb778a24c602a157c3231267efed228fb6470149c75c7471",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-11-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-11-video.f32",
+      "sha256": "7c51616d291ffb489cc0a0692b0c574b89e644ad5cd7107887afbfbcb50bd5f8",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-12-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-12-text.f32",
+      "sha256": "30a317c4d89fd52224865fdeed83c063ed87e6e9654b2bbdc7fc626a72def14d",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-12-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-12-video.f32",
+      "sha256": "83750f0e9f69c26f4c1fd5d3fea5536323e3ae09e7cebc96a0aa5f5900d06879",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-13-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-13-text.f32",
+      "sha256": "1022c54c2dd4f3f671d50bbff4f4655ec5b4399d6288ac8e78127c7be2ebf41a",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-13-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-13-video.f32",
+      "sha256": "c2703ca38eebc6155e75cb339a32496160496e68546649b5cfa60fc0d4257e30",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-14-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-14-text.f32",
+      "sha256": "254cd4ccad3d286c78d7949563ea1da732b103935aa1823ecaf81ad96c85015c",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-14-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-14-video.f32",
+      "sha256": "65d92817608472762ad8204d1faaf1ea1a2a14aa30aae2a22d6ad95c58e61031",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-15-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-15-text.f32",
+      "sha256": "f064234ed2940131470a1eb37a1b11598598d6fbcde30cfa12367ba1f197d0c0",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-15-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-15-video.f32",
+      "sha256": "eb39ad23c9126b71bbd2bbf959aacefd1506cbd0987cd04f9227a79a75c43527",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-16-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-16-text.f32",
+      "sha256": "2b92a28631b0b4f99c9f976b234d3df693503d4e89d420e87708a88ab89caff4",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-16-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-16-video.f32",
+      "sha256": "e05290e2fb9207ffd6a184251369015ce5a135294e3fe57d03c346fff006ae30",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-17-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-17-text.f32",
+      "sha256": "7e974bb82599c7a9b3831783318b8bc666dfb1915c329aeafdf899c186467022",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-17-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-17-video.f32",
+      "sha256": "a4d290ea7082b7d93817096b95fb965cb0b817e47b8ce5aba55977875ab20bcf",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-18-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-18-text.f32",
+      "sha256": "14d7bf37131da3e5e018922bf906b4b38e8a7111ecdfc01cc222d4a0d4bbbec3",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-18-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-18-video.f32",
+      "sha256": "14de4d9432f096d96c14ee370826e9f048f2d849c4737e71614c10207bee9ebb",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-19-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-19-text.f32",
+      "sha256": "c4ca13d3c86dfeb72f2473f8485c2b4ae180e1bd26c5599b5a71df8f28dfdfc0",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-19-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-19-video.f32",
+      "sha256": "7a7766fe7fea75146cd22cf9c7f2c3472ce224a5bb31bee100b20ced99b6caca",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-20-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-20-text.f32",
+      "sha256": "d89164d6d545c2b2a7b55af78aec5660a746063b88a602df52441ac0f0a45e31",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-20-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-20-video.f32",
+      "sha256": "13a3679e0a869d7ca36157718f56af4d45933acc88dc7335b6d23aee8c69811d",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-21-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-21-text.f32",
+      "sha256": "2213b9156e686e2dc04d3f292c08920da10d3847a123e4b61252c8db0faf5c5d",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-21-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-21-video.f32",
+      "sha256": "0fc5cdd815cb6e7c40edbfa7bb833c2869082d0b5e6dba84adb8124c1246d5b7",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-22-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-22-text.f32",
+      "sha256": "b395a58d53756c9ca4d9ef8c2d3e8880afe99a0f1e6001ffd3e7fcc043c17a7a",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-22-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-22-video.f32",
+      "sha256": "09d97a829a6c8e24f6b208aca2b34c9a847443db7fd97d347e7f5565b7a8dc71",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-23-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-23-text.f32",
+      "sha256": "4c52460ea2dda9b3384623b0949c4f2e1a83dd15707994437228c6b5e220875e",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-23-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-23-video.f32",
+      "sha256": "d1952a346d895f34c1677c40532f0480d4e57413f03689c658ef1a03bab7d2fe",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-24-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-24-text.f32",
+      "sha256": "b005866dc2ef6ff1fe0b1bc6ec03eeae502d73a02ec25014880ca86d22dedc5e",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-24-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-24-video.f32",
+      "sha256": "b293bddc33f1fee6d54ca38829afb77eef9c25d53cc1e751625e20dd49a23402",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-25-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-25-text.f32",
+      "sha256": "2cc29ff6abcea08c2bf36795d1a70a9fcd4ea37b55c7ea904082e08af8b91363",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-25-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-25-video.f32",
+      "sha256": "4b6025a1278361be2d9163e2ab4aca01bc27a40838ef4b72a71c8d77bdca0bcd",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-26-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-26-text.f32",
+      "sha256": "3cd12886a418016f1c9a9aa684d12273433dfed4ad7b2a994aceb7bf1b4a168e",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-26-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-26-video.f32",
+      "sha256": "b9aa8630ddc2490b996c094be70246a8ef20ce9ea031331e71695711105d61bc",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-27-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-27-text.f32",
+      "sha256": "be5531c91d8acecb219fb41db8ef1bfffc1d4507f17a31f482878f00d03b0e88",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-27-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-27-video.f32",
+      "sha256": "e0d41ea0d23f6c5fca5d2d5719d9ac7b6b67ae1e6a2ade65dc107fdebc237ce0",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-28-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-28-text.f32",
+      "sha256": "f9639466ec84d8bd249d050472431bef6c26b7520807fbcc80ff26b2436cdfe0",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-28-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-28-video.f32",
+      "sha256": "2b39b2ef9539bbaaab425872920cdb3f350fef09be9407a484dd029d1adfe92d",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-29-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-29-text.f32",
+      "sha256": "8d13759aa72996759b7d2eea5552e36aea127c2221668ca065f236517ecf3348",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-29-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-29-video.f32",
+      "sha256": "e50ae663486b80fd99e3e11a021691b994c4f73c121c26bc71c78a4a334ee6ad",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-30-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-30-text.f32",
+      "sha256": "f9e72bf0cd8ef54fedbbbc36c0301f5eea41c2458ffd70115e72dbce3c79bf1a",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-30-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-30-video.f32",
+      "sha256": "f84bd208a700b39ed1d1ee00a22a547604f8d6696cff3abd87f7374ef98346ab",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "block-31-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-31-text.f32",
+      "sha256": "25fad4295ed8e8ad413d01b34cf2c6eeade5a829f8d70a87ff67a46cf125476e",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-31-video": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "block-31-video.f32",
+      "sha256": "e3f217b3c6eb53bf66568fea2a0833ad7cfeab49afc97f6b9e1f7a3a99f755f0",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "conditioned": {
+      "dtype": "f32le",
+      "elements": 3072,
+      "path": "conditioned.f32",
+      "sha256": "b8ece6151835fa86aa8b3bf53ca3a56dd50e8cda4c37fb74828891bc9cfecbab",
+      "shape": [
+        16,
+        3,
+        8,
+        8
+      ]
+    },
+    "decoded": {
+      "dtype": "f32le",
+      "elements": 110592,
+      "path": "decoded.f32",
+      "sha256": "cc655afea912e693517e578a1863d9f291270bb278d31656cf6f2cd005c0dcb6",
+      "shape": [
+        3,
+        9,
+        64,
+        64
+      ]
+    },
+    "latent": {
+      "dtype": "f32le",
+      "elements": 3072,
+      "path": "latent.f32",
+      "sha256": "2b27858a6050a378a2d1f260b5e3f6fd957fdedaa746c04900a0d4183a676b3d",
+      "shape": [
+        16,
+        3,
+        8,
+        8
+      ]
+    },
+    "noise": {
+      "dtype": "f32le",
+      "elements": 3072,
+      "path": "noise.f32",
+      "sha256": "34db04cc6f9ade114fdcb6153fa38bd58e8aec094f4259f363e4ece2b1125238",
+      "shape": [
+        16,
+        3,
+        8,
+        8
+      ]
+    },
+    "patch-in": {
+      "dtype": "f32le",
+      "elements": 122880,
+      "path": "patch-in.f32",
+      "sha256": "011110e5a744a29cd0226a54236042db36266ba7483075fab06f68383cd0dc99",
+      "shape": [
+        48,
+        2560
+      ]
+    },
+    "patch-out": {
+      "dtype": "f32le",
+      "elements": 3072,
+      "path": "patch-out.f32",
+      "sha256": "4c98f514b33c4f44b9db9ca56a13c0e915b56c1305bdb7e32d69770810d69fb5",
+      "shape": [
+        48,
+        64
+      ]
+    },
+    "patches": {
+      "dtype": "f32le",
+      "elements": 6336,
+      "path": "patches.f32",
+      "sha256": "575d2920fde119c59b2b77b17d2cb144bbeed513877d2e3edebaa539bdecc8bf",
+      "shape": [
+        48,
+        132
+      ]
+    },
+    "posterior": {
+      "dtype": "f32le",
+      "elements": 6144,
+      "path": "posterior.f32",
+      "sha256": "e181d7390841f33fed3a9bdfef6b76ae114393480190294fc6bd8d75dd3848ec",
+      "shape": [
+        32,
+        3,
+        8,
+        8
+      ]
+    },
+    "posterior-noise": {
+      "dtype": "f32le",
+      "elements": 3072,
+      "path": "posterior-noise.f32",
+      "sha256": "e9b68ee1c0dc8f9244829c57de794043c05d2142330182bdac756459af3a708c",
+      "shape": [
+        16,
+        3,
+        8,
+        8
+      ]
+    },
+    "prepared": {
+      "dtype": "f32le",
+      "elements": 110592,
+      "path": "prepared.f32",
+      "sha256": "3ca8f81168a5d089ad6940e1c02fc8d7a737196cb345bf1a1504e45e852f9e59",
+      "shape": [
+        3,
+        9,
+        64,
+        64
+      ]
+    },
+    "text-in": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "text-in.f32",
+      "sha256": "c7cecae53e4f83d60cab1ebddeca3bdf028c630ef33feb0cfd58d8c1ab50e42d",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "time-in": {
+      "dtype": "f32le",
+      "elements": 15360,
+      "path": "time-in.f32",
+      "sha256": "bd542b62115dab2f055c2ec0ff47df9ebdbe25a9bf1d287b7557c08d20c6e719",
+      "shape": [
+        2560,
+        6
+      ]
+    },
+    "velocity": {
+      "dtype": "f32le",
+      "elements": 3072,
+      "path": "velocity.f32",
+      "sha256": "71d39ee869c7873a660711ce71b3ade08036bad5bf6b9311da361ee1d391f2e6",
+      "shape": [
+        16,
+        3,
+        8,
+        8
+      ]
+    }
+  },
+  "dispatch": "EXPLICIT_PER_LAYER_NO_BACKEND_FALLBACK",
+  "executable_sha256": "412de27447c8b59d0e25aaf5a045facae60e2e1f7b6f4cdb480eef26384ddd09",
+  "host_operations": [
+    "video codecs",
+    "resizing",
+    "layouts",
+    "posterior sampling",
+    "Euler endpoint"
+  ],
+  "implementation": {
+    "executable_sha256": "412de27447c8b59d0e25aaf5a045facae60e2e1f7b6f4cdb480eef26384ddd09",
+    "sdk_library_sha256": "f683258f30962fb51ff7c958e814a72ebe8ce948545e6eb555ae80c8cf3b0196"
+  },
+  "input": {
+    "duration_seconds": 2.125,
+    "has_audio": false,
+    "height": 64,
+    "sha256": "71b061fb9277cfeccad53c9d739003929ac7004a24c5925707c144d0ffeabc67",
+    "width": 64
+  },
+  "media_version": "8.0.1",
+  "model_certificate": null,
+  "model_manifest_sha256": "fe38835c367a2a389c689d89ce85c952b0e347d1edfd879b008d796a65374028",
+  "model_verified": false,
+  "ncnn_commit": "3b7bdba7fc8aea8fd46779533eee027df77c639d",
+  "noise_algorithm": "splitmix64-box-muller-v1",
+  "numerical_validation": "NOT_PERFORMED_BY_RUNNER",
+  "output": {
+    "audio": false,
+    "codec": "H.264 / yuv420p / CRF 18",
+    "fps": 8.0,
+    "frames": 6,
+    "height": 64,
+    "path": "output.mp4",
+    "sha256": "b7c905261c84bee3159da62c0f8acbedfe2a7e0a18eac943703147f583de4e73",
+    "timestamps_90khz": [
+      0,
+      11250,
+      22500,
+      33750,
+      45000,
+      56250
+    ],
+    "width": 64
+  },
+  "package_authenticated": true,
+  "poster": "output.png",
+  "preprocessing": "FFmpeg RGB8 / bicubic antialias / center crop 16 / normalize [-1,1]",
+  "profile": "seedvr2-3b-video-fp32-b-v1",
+  "resources": {
+    "activation_peak_bytes": null,
+    "autoregressive_kv_cache": false,
+    "file_cache_peak_bytes": null,
+    "largest_graph_weight_bytes": 634534028,
+    "package_bytes": 21096916141,
+    "pipeline_cache": "per-run Vulkan shader pipelines; no model weights or autoregressive keys",
+    "process_lifetime_peak_rss_bytes": 1146834944,
+    "process_system_cpu_seconds": 13.252748,
+    "process_user_cpu_seconds": 14.714036,
+    "temporal_vae_cache": false,
+    "unmeasured_scope": "Allocator categories are not inferred from process RSS or whole-card VRAM",
+    "weight_residency": "one graph at a time",
+    "workspace_peak_bytes": null
+  },
+  "sampling": {
+    "cfg": 1,
+    "color_fix": "none",
+    "latent_scale": 0.9152,
+    "steps": 1,
+    "timestep": 1000
+  },
+  "schema_version": "seedvr2-video-run-v1",
+  "seed": 666,
+  "stages": [
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 0,
+      "awa_windows": 0,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 125.995916,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "encoder",
+      "layers": 98,
+      "load_ms": 1167.240232,
+      "vulkan_layers": 98,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 0,
+      "awa_windows": 0,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 1.11133,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "patch-in",
+      "layers": 1,
+      "load_ms": 44.305995,
+      "vulkan_layers": 1,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 46.422985,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-00",
+      "layers": 83,
+      "load_ms": 806.393809,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 46.173648,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-01",
+      "layers": 83,
+      "load_ms": 378.89011,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 46.218766,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-02",
+      "layers": 83,
+      "load_ms": 378.963724,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 63.773278,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-03",
+      "layers": 83,
+      "load_ms": 377.519943,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 76.285244,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-04",
+      "layers": 83,
+      "load_ms": 365.700184,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 70.460258,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-05",
+      "layers": 83,
+      "load_ms": 296.836869,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 58.445777,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-06",
+      "layers": 83,
+      "load_ms": 359.757652,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 58.971759,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-07",
+      "layers": 83,
+      "load_ms": 352.961438,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 58.417282,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-08",
+      "layers": 83,
+      "load_ms": 362.799563,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 57.025743,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-09",
+      "layers": 83,
+      "load_ms": 359.174679,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 70.177676,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-10",
+      "layers": 83,
+      "load_ms": 349.004104,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 67.214128,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-11",
+      "layers": 83,
+      "load_ms": 348.05781,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 69.185077,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-12",
+      "layers": 83,
+      "load_ms": 356.694369,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 66.613345,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-13",
+      "layers": 83,
+      "load_ms": 364.385821,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 71.443358,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-14",
+      "layers": 83,
+      "load_ms": 369.659892,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 69.074657,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-15",
+      "layers": 83,
+      "load_ms": 378.113603,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 63.417082,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-16",
+      "layers": 83,
+      "load_ms": 365.541082,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 64.727882,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-17",
+      "layers": 83,
+      "load_ms": 362.709327,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 63.335156,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-18",
+      "layers": 83,
+      "load_ms": 372.437032,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 65.010464,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-19",
+      "layers": 83,
+      "load_ms": 360.616083,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 70.529122,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-20",
+      "layers": 83,
+      "load_ms": 362.21184,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 67.349482,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-21",
+      "layers": 83,
+      "load_ms": 351.867917,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 66.193034,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-22",
+      "layers": 83,
+      "load_ms": 339.769136,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 69.915278,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-23",
+      "layers": 83,
+      "load_ms": 348.489995,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 69.509215,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-24",
+      "layers": 83,
+      "load_ms": 353.93504,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 65.170752,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-25",
+      "layers": 83,
+      "load_ms": 355.311142,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 65.129195,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-26",
+      "layers": 83,
+      "load_ms": 316.453754,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 66.752261,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-27",
+      "layers": 83,
+      "load_ms": 385.358624,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 68.098681,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-28",
+      "layers": 83,
+      "load_ms": 374.676315,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 64.577092,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-29",
+      "layers": 83,
+      "load_ms": 360.744314,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 65.781033,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-30",
+      "layers": 83,
+      "load_ms": 355.512987,
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 41.879115,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-31",
+      "layers": 51,
+      "load_ms": 253.629144,
+      "vulkan_layers": 51,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 0,
+      "awa_windows": 0,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 1.433094,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "patch-out",
+      "layers": 6,
+      "load_ms": 39.182714,
+      "vulkan_layers": 6,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 0,
+      "awa_windows": 0,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 432.920248,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "decoder",
+      "layers": 136,
+      "load_ms": 711.432036,
+      "vulkan_layers": 136,
+      "weight_io": "buffered"
+    }
+  ],
+  "status": "SUCCEEDED",
+  "timing": {
+    "graph_compute_ms": 2594.738413,
+    "graph_load_ms": 13786.338279000001,
+    "other_host_wait_and_cleanup_ms": 1028.296600999999,
+    "package_validation_ms": 13013.574096
+  },
+  "total_ms": 30422.947389,
+  "weight_io": "buffered"
+}

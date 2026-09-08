@@ -27,6 +27,6 @@ SeedVR2 **3B** 图片/视频修复，官方固定正向文本条件，单步 CFG
 - 已记录最新 ncnn 与旧版本差异，模型 revision 在线复核结果在本轮 artifacts 中。
 - 已完成共享 SDK/CLI/Web 接通、包认证与复制、参数预检、同输入组件定位、JPEG 修复与完整官方重放、禁网/中文路径/隐藏源码安装验证、真实 Web 图片/视频任务和四次权重读取测量。
 - 已完成本机原生 CI 脚本执行并配置远端 Linux CI。远端尚未运行；大模型与画质证据单独保存。
-- 17 帧数值失败、单图全参考画质负结果和未支持能力继续保留；具体结果、各版本证据与当前边界见 [DELIVERY-RESULTS.md](DELIVERY-RESULTS.md)。
+- 后续 17 帧数值修复已使 CPU/Vulkan 均通过 73/73；原始失败、单图全参考画质负结果和未支持能力继续保留。修复与测量见 [VIDEO-NUMERICS.md](VIDEO-NUMERICS.md)，初次交付记录见 [DELIVERY-RESULTS.md](DELIVERY-RESULTS.md)。
 
 证据目录：`artifacts/2026-09-08/delivery-v1/`。大模型/张量与构建继续保存在忽略目录。外部发布不属于本次本地交付操作。
