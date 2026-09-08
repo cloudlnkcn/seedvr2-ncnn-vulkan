@@ -20,6 +20,7 @@ from torch.nn import functional as F
 from export_vae_image import digest, tensor
 from image_reference import make_dit, endpoint
 from vae_reference import make_reference, evaluate, load_checkpoint, verify_sources
+from pipeline_contract import reference_contract
 
 ATOL, RTOL = 1e-3, 1e-3
 ROOT = Path(__file__).resolve().parents[1]
@@ -132,7 +133,8 @@ def main():
         scripts={n: digest(ROOT/'tools'/n) for n in ['check_image.py', 'image_reference.py', 'dit_block_reference.py', 'vae_reference.py', 'awa_reference.py']},
         stages=rows, output_identity_valid=output_ok,
         pixels=dict(max_abs=int(pixel_delta.max()), different=int(np.sum(pixel_delta != 0)), total=int(pixel_delta.size)))
-    (args.output/'report.json').write_text(json.dumps(report, indent=2)+'\n')
+    reference_contract(report, run, 'image')
+    (args.output/'report.json').write_text(json.dumps(report, indent=2, allow_nan=False)+'\n')
     print('Complete image parity', report['passed'], report['pixels'], flush=True)
     raise SystemExit(0 if report['passed'] else 1)
 

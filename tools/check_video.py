@@ -15,6 +15,7 @@ from torch.nn import functional as F
 from export_vae_image import digest,tensor
 from image_reference import make_dit,endpoint
 from vae_reference import ROOT,make_reference,load_checkpoint,verify_sources
+from pipeline_contract import reference_contract
 
 ATOL,RTOL=1e-3,1e-3
 
@@ -92,7 +93,8 @@ def main():
                 tolerance=dict(atol=ATOL,rtol=RTOL,calibration='DIAGNOSTIC_NOT_MODEL_CERTIFICATION'),
                 frames=frames,padded_frames=padded,latent_frames=lt,output_identity_valid=identity,native_run_sha256=digest(args.run/'run.json'),
                 original_sources=verify_sources(),scripts={n:digest(ROOT/'tools'/n) for n in ('check_video.py','image_reference.py','vae_reference.py','dit_block_reference.py')},stages=rows)
-    (args.output/'report.json').write_text(json.dumps(report,indent=2)+'\n');print('Complete temporal clip parity',report['passed'],flush=True)
+    reference_contract(report,run,'video')
+    (args.output/'report.json').write_text(json.dumps(report,indent=2,allow_nan=False)+'\n');print('Complete temporal clip parity',report['passed'],flush=True)
     raise SystemExit(0 if report['passed'] else 1)
 
 

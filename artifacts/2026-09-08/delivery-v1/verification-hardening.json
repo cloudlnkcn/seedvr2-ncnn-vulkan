@@ -1,0 +1,59 @@
+{
+  "scope": "Reviewed reference enforcement and actual same-input components, no math change",
+  "negative_tests": {
+    "status": "PASS",
+    "test_methods": 11,
+    "each_missing_boundary_subcases": 73
+  },
+  "replays": [
+    {
+      "run": "video-run-final-seventeen",
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "report": "artifacts/2026-09-08/delivery-v1/video-run-final-seventeen-reviewed-replay.json"
+    },
+    {
+      "run": "video-run-final-six",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "report": "artifacts/2026-09-08/delivery-v1/video-run-final-six-reviewed-replay.json"
+    },
+    {
+      "run": "image-run-final-256-vulkan",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "report": "artifacts/2026-09-08/delivery-v1/image-run-final-256-vulkan-reviewed-replay.json"
+    },
+    {
+      "run": "video-run-cpu-v1",
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "report": "artifacts/2026-09-08/delivery-v1/video-run-cpu-v1-reviewed-replay.json"
+    }
+  ],
+  "actual_component": {
+    "blocks": [
+      19,
+      31
+    ],
+    "geometry": [
+      5,
+      8,
+      8,
+      2560
+    ],
+    "backends": [
+      "cpu",
+      "vulkan"
+    ],
+    "passed": 4,
+    "total": 4,
+    "source": "reviewed original FP32-B 17-frame trajectory",
+    "conclusion": "These two components pass when fed official inputs. This supports accumulated-error investigation, but does not establish the root cause or turn full-video failure into a pass."
+  },
+  "tools": {
+    "pipeline_contract.py": "3d38a49e7cf9f9033f6fad5ca80dfcc9a32f3dc2dd72d02a8525a3f8346129f4",
+    "pipeline_replay.py": "a33cc4a45dab2557a202a6c7a49325c401efe66b1eea9860675a32f3fc75c8d5",
+    "prepare_boundary_cases.py": "cfd03108b710dac4ba110bec950eb3eb4719de28edaeb21bbf855e9c724e6f5a"
+  }
+}

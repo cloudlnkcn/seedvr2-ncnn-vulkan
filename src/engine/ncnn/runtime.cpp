@@ -227,7 +227,9 @@ Result<std::string> run_graph_case(const CaseRequest &request, bool dit) {
             integer(doc.at("block_index"), 0, 31);
             if (!input_specs.is_array() || input_specs.size() != 3)
                 throw std::runtime_error("DiT block requires video, text and timestep embedding");
-            const std::vector<std::vector<int>> bounds = {{4, 16, 16, 2560}, {256, 2560}, {2560, 6}};
+            // A 17-frame clip has five temporal latents. Keep the existing
+            // total-token bound while permitting its actual component inputs.
+            const std::vector<std::vector<int>> bounds = {{5, 16, 16, 2560}, {256, 2560}, {2560, 6}};
             for (std::size_t i = 0; i < bounds.size(); ++i) {
                 const auto &value = input_specs.at(i).at("shape");
                 if (!value.is_array() || value.size() != bounds[i].size())
