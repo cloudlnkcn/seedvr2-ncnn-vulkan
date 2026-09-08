@@ -1,0 +1,38 @@
+{
+  "schema_version": "seedvr2-memory-delivery-v1",
+  "status": "PASS_WITH_DECLARED_LIMITS",
+  "model_verified": false,
+  "version": "0.7.0",
+  "implementation": {
+    "executable_sha256": "2c2d08ac27d1a35ce2f2a8a92d32c307f7774ab00398999b6173d672893112b6",
+    "ncnn_runtime_patches": [
+      {
+        "compiled_allocator_sha256": "b8398e0d5ef5a367f80c5d2f13af1c8f170a83a39d0a1b458a40100924a55320",
+        "id": "host-buffer-v1",
+        "original_allocator_sha256": "601d69dab40823366fa6aa2be00c8e37bb0f1e960fe96323c36daed887c4fda2",
+        "scope": "Imported-host buffer declaration and weight-buffer transfer-source usage"
+      }
+    ],
+    "sdk_library_sha256": "ff86dcd0b05ea66f5ab384701701aced273582e0ee95fc0cfa12c9c4608f30f2"
+  },
+  "counts": {
+    "native_tests": 14,
+    "mesa_vulkan_tests": 5,
+    "awa_comparisons": 40,
+    "real_component_comparisons": 27,
+    "video_boundary_comparisons": 146,
+    "image_boundary_comparisons": 73,
+    "first_use_checks": 20,
+    "web_contracts": 58
+  },
+  "full_video_output_sha256": "43a15cd3eea6da3db932ef3bc20c0206bda4def0d484cc978806d8b302189550",
+  "live_web_job": "a63c7fa9ae59c51618d920edd1a16a47",
+  "invalidated_sdk_evidence": "sdk-cache-failure.json",
+  "limits": [
+    "FP32-B diagnostic thresholds, not model certification",
+    "17 frames at 128x128 retained video",
+    "No activation offload, OOM recovery or RAM hard cap",
+    "One observation per placement mode; desktop GPU and file caches not controlled",
+    "Other hardware and remote CI not run"
+  ]
+}

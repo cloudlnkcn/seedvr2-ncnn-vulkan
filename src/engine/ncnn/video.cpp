@@ -145,6 +145,7 @@ Result<std::string> run_video(const VideoRequest &request,ImageObserver observer
         report["implementation"]=implementation_identity();
         if (report["implementation"].contains("executable_sha256")) report["executable_sha256"]=report["implementation"]["executable_sha256"];
         report["resources"]=process_resources();
+        report["resources"]["weight_placement"]=memory_summary(stages);
         report["weight_io"]=request.mapped_weights?"mapped":"buffered";
         const auto &preflight=std::get<Preflight>(ready);
         report["resources"]["package_bytes"]=preflight.package_bytes;

@@ -59,7 +59,7 @@ Result<std::string> Application::self_test_and_save(std::string_view request) {
 }
 std::string application_capabilities() {
     return Json{{"schema_version", "1.0"},
-                {"build", "0.6.0-native-preview"},
+                {"build", "0.7.0-native-preview"},
                 {"architecture", "shared-native-sdk"},
                 {"installed_cpp_sdk",true},
                 {"reviewed_package_identity",true},

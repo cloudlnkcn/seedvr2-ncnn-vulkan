@@ -30,3 +30,5 @@ SeedVR2 **3B** 图片/视频修复，官方固定正向文本条件，单步 CFG
 - 后续 17 帧数值修复已使 CPU/Vulkan 均通过 73/73；原始失败、单图全参考画质负结果和未支持能力继续保留。修复与测量见 [VIDEO-NUMERICS.md](VIDEO-NUMERICS.md)，初次交付记录见 [DELIVERY-RESULTS.md](DELIVERY-RESULTS.md)。
 
 证据目录：`artifacts/2026-09-08/delivery-v1/`。大模型/张量与构建继续保存在忽略目录。外部发布不属于本次本地交付操作。
+
+本轮 0.7.0 内存策略与算子验证在 [MEMORY-VALIDATION.md](MEMORY-VALIDATION.md)，沿用上面的验收顺序与历史参考，不重新生成已通过的官方基线。

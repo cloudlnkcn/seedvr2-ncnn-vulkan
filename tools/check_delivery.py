@@ -32,6 +32,16 @@ def main():
         run('first-run-help',[],0,lambda d:'run-video' in d and 'models' in d,False)
         run('preflight-missing-model',base,2,lambda d:d['error']['field']=='model')
         run('preflight-invalid-size',[*base,'--size','129'],2,lambda d:d['error']['field']=='parameters')
+        for flags in (['--weights','host'],['--weights','device'],['--gpu-reserve-mib','1']):
+            run('cpu-memory-option-'+flags[-1],[*base,*flags],2,
+                lambda d:d['error']['field']=='parameters' and 'require the Vulkan backend' in d['error']['message'])
+        for name, flags in [('unknown-placement',['--weights','magic']),
+                            ('negative-reserve',['--gpu-reserve-mib','-1']),
+                            ('reserve-overflow',['--gpu-reserve-mib',str(2**64//(1024*1024))])]:
+            run(name,[*base,*flags],2,lambda d:d['error']['code']=='CLI_USAGE')
+        vulkan_base=list(base);vulkan_base[vulkan_base.index('--backend')+1]='vulkan'
+        run('conflicting-host-reserve',[*vulkan_base,'--weights','host','--gpu-reserve-mib','1'],2,
+            lambda d:d['error']['field']=='parameters' and 'requires automatic' in d['error']['message'])
         missing_input=list(base);missing_input[missing_input.index('--input')+1]=folder/'missing.png'
         run('preflight-missing-input',missing_input,2,lambda d:d['error']['field']=='input')
         output.mkdir();keep=output/'keep.txt';keep.write_text('keep')

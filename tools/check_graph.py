@@ -41,6 +41,8 @@ def main():
     parser.add_argument('--gpu', type=int, default=0)
     parser.add_argument('--validation-layer', action='store_true')
     parser.add_argument('--weight-io', choices=['buffered','mapped'], default='buffered')
+    parser.add_argument('--weights', choices=['auto','device','host'], default='auto')
+    parser.add_argument('--gpu-reserve-mib', type=int, default=0)
     args = parser.parse_args()
     if args.output.exists() and any(args.output.iterdir()):
         raise SystemExit('Output must be empty')
@@ -59,6 +61,7 @@ def main():
                        '--output', str(folder.resolve()), '--backend', backend, '--gpu', str(args.gpu)]
             env = os.environ.copy()
             if args.weight_io!='buffered': command += ['--weight-io',args.weight_io]
+            if backend=='vulkan': command += ['--weights',args.weights,'--gpu-reserve-mib',str(args.gpu_reserve_mib)]
             if args.validation_layer:
                 env['VK_INSTANCE_LAYERS'] = 'VK_LAYER_KHRONOS_validation'
             result = subprocess.run(command, capture_output=True, text=True, timeout=180, env=env)

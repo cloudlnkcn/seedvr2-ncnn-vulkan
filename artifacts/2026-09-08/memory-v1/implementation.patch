@@ -1,0 +1,472 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ff6de9c..23b51a7 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -87,6 +87,7 @@ find_package(ncnn CONFIG REQUIRED PATHS "${SEEDVR2_NCNN_PREFIX}/lib/cmake/ncnn"
+ if(NOT NCNN_VULKAN)
+     message(FATAL_ERROR "The AWA backend requires a Vulkan-enabled ncnn build")
+ endif()
++include(cmake/SeedVR2NcnnAllocator.cmake)
+ find_package(Python3 COMPONENTS Interpreter REQUIRED)
+ find_program(SEEDVR2_GLSLANG_VALIDATOR glslangValidator REQUIRED)
+ set(SEEDVR2_AWA_SPV)
+@@ -112,7 +113,7 @@ add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_fixture.cpp
+     COMMAND Python3::Interpreter "${CMAKE_CURRENT_SOURCE_DIR}/tools/embed_awa_fixture.py"
+         "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/awa" "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_fixture.cpp"
+     DEPENDS ${AWA_FIXTURES} tools/embed_awa_fixture.py VERBATIM)
+-add_library(seedvr2_engine SHARED src/engine/ncnn/awa.cpp src/engine/ncnn/constant.cpp src/engine/ncnn/runtime.cpp
++add_library(seedvr2_engine SHARED src/runtime/memory_policy.cpp src/engine/ncnn/awa.cpp src/engine/ncnn/constant.cpp src/engine/ncnn/runtime.cpp
+     src/engine/ncnn/package.cpp src/engine/ncnn/pipeline.cpp
+     src/engine/ncnn/image.cpp src/engine/ncnn/image_io.cpp src/engine/ncnn/video_layers.cpp
+     src/engine/ncnn/video.cpp src/engine/ncnn/video_io.cpp
+@@ -125,7 +126,7 @@ target_include_directories(seedvr2_engine PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURR
+     PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated" src/engine/ncnn)
+ target_include_directories(seedvr2_engine SYSTEM PRIVATE third_party)
+ target_include_directories(seedvr2_engine SYSTEM PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/.deps/src/ncnn-${SEEDVR2_NCNN_COMMIT}/src")
+-target_link_libraries(seedvr2_engine PRIVATE seedvr2_planning ncnn OpenSSL::Crypto JPEG::JPEG PkgConfig::SEEDVR2_MEDIA)
++target_link_libraries(seedvr2_engine PRIVATE seedvr2_planning seedvr2_ncnn_runtime OpenSSL::Crypto JPEG::JPEG PkgConfig::SEEDVR2_MEDIA)
+ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+     # Keep embedded glslang/SPIRV-Tools symbols out of the dynamic symbol table.
+     # Otherwise a Vulkan validation layer can bind to a different static ABI.
+@@ -169,11 +170,27 @@ target_link_libraries(seedvr2-worker PRIVATE seedvr2_engine CLI11::CLI11)
+ install(TARGETS seedvr2-worker RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+ 
+ if(BUILD_TESTING)
++    add_executable(seedvr2_memory_policy_tests tests/memory_policy_tests.cpp src/runtime/memory_policy.cpp)
++    target_include_directories(seedvr2_memory_policy_tests PRIVATE src/runtime)
++    target_link_libraries(seedvr2_memory_policy_tests PRIVATE seedvr2_options)
++    target_include_directories(seedvr2_memory_policy_tests PRIVATE include)
++    add_test(NAME engine.memory-policy COMMAND seedvr2_memory_policy_tests)
++    add_executable(seedvr2_memory_vulkan_tests tests/memory_vulkan_tests.cpp src/runtime/memory_policy.cpp)
++    target_include_directories(seedvr2_memory_vulkan_tests PRIVATE include src/engine/ncnn)
++    target_include_directories(seedvr2_memory_vulkan_tests SYSTEM PRIVATE third_party
++        "${CMAKE_CURRENT_SOURCE_DIR}/.deps/src/ncnn-${SEEDVR2_NCNN_COMMIT}/src"
++        "${CMAKE_CURRENT_SOURCE_DIR}/.deps/src/ncnn-${SEEDVR2_NCNN_COMMIT}/src/layer")
++    target_link_libraries(seedvr2_memory_vulkan_tests PRIVATE seedvr2_ncnn_runtime OpenSSL::Crypto)
++    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
++        target_link_options(seedvr2_memory_vulkan_tests PRIVATE "-Wl,--exclude-libs,ALL")
++    endif()
++    add_test(NAME engine.memory-vulkan COMMAND seedvr2_memory_vulkan_tests)
++    set_tests_properties(engine.memory-vulkan PROPERTIES SKIP_RETURN_CODE 77 LABELS "vulkan" TIMEOUT 60)
+     add_executable(seedvr2_awa_rope_tests tests/awa_rope_tests.cpp src/engine/ncnn/awa.cpp
+         "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp")
+     target_include_directories(seedvr2_awa_rope_tests PRIVATE src/engine/ncnn "${CMAKE_CURRENT_BINARY_DIR}/generated")
+     target_include_directories(seedvr2_awa_rope_tests SYSTEM PRIVATE third_party)
+-    target_link_libraries(seedvr2_awa_rope_tests PRIVATE seedvr2_planning ncnn OpenSSL::Crypto)
++    target_link_libraries(seedvr2_awa_rope_tests PRIVATE seedvr2_planning seedvr2_ncnn_runtime OpenSSL::Crypto)
+     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+         target_link_options(seedvr2_awa_rope_tests PRIVATE "-Wl,--exclude-libs,ALL")
+     endif()
+@@ -181,16 +198,20 @@ if(BUILD_TESTING)
+     add_test(NAME engine.awa-rope-vulkan COMMAND seedvr2_awa_rope_tests vulkan)
+     add_test(NAME engine.awa-sdpa-fp32-cpu COMMAND seedvr2_awa_rope_tests cpu sdpa)
+     add_test(NAME engine.awa-sdpa-fp32-vulkan COMMAND seedvr2_awa_rope_tests vulkan sdpa)
+-    set_tests_properties(engine.awa-rope-vulkan engine.awa-sdpa-fp32-vulkan PROPERTIES SKIP_RETURN_CODE 77 LABELS "vulkan")
++    add_test(NAME engine.awa-rope-vulkan-host COMMAND seedvr2_awa_rope_tests vulkan host)
++    add_test(NAME engine.awa-sdpa-fp32-vulkan-host COMMAND seedvr2_awa_rope_tests vulkan sdpa host)
++    set_tests_properties(engine.awa-rope-vulkan engine.awa-sdpa-fp32-vulkan
++        engine.awa-rope-vulkan-host engine.awa-sdpa-fp32-vulkan-host PROPERTIES SKIP_RETURN_CODE 77 LABELS "vulkan")
+     set_tests_properties(engine.awa-rope-cpu engine.awa-rope-vulkan
+-        engine.awa-sdpa-fp32-cpu engine.awa-sdpa-fp32-vulkan PROPERTIES TIMEOUT 60)
++        engine.awa-sdpa-fp32-cpu engine.awa-sdpa-fp32-vulkan
++        engine.awa-rope-vulkan-host engine.awa-sdpa-fp32-vulkan-host PROPERTIES TIMEOUT 60)
+     # Explicit developer target: real per-layer diagnostics, not a default model test.
+     add_executable(seedvr2-dit-trace EXCLUDE_FROM_ALL tools/trace_dit_layers.cpp
+         src/engine/ncnn/awa.cpp src/engine/ncnn/constant.cpp
+         "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp")
+     target_include_directories(seedvr2-dit-trace PRIVATE src/engine/ncnn "${CMAKE_CURRENT_BINARY_DIR}/generated")
+     target_include_directories(seedvr2-dit-trace SYSTEM PRIVATE third_party)
+-    target_link_libraries(seedvr2-dit-trace PRIVATE seedvr2_planning ncnn OpenSSL::Crypto)
++    target_link_libraries(seedvr2-dit-trace PRIVATE seedvr2_planning seedvr2_ncnn_runtime OpenSSL::Crypto)
+     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+         target_link_options(seedvr2-dit-trace PRIVATE "-Wl,--exclude-libs,ALL")
+     endif()
+@@ -198,17 +219,17 @@ if(BUILD_TESTING)
+         src/engine/ncnn/video_layers.cpp "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp")
+     target_include_directories(seedvr2-vae-trace PRIVATE src/engine/ncnn "${CMAKE_CURRENT_BINARY_DIR}/generated")
+     target_include_directories(seedvr2-vae-trace SYSTEM PRIVATE third_party)
+-    target_link_libraries(seedvr2-vae-trace PRIVATE seedvr2_planning ncnn OpenSSL::Crypto)
++    target_link_libraries(seedvr2-vae-trace PRIVATE seedvr2_planning seedvr2_ncnn_runtime OpenSSL::Crypto)
+     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+         target_link_options(seedvr2-vae-trace PRIVATE "-Wl,--exclude-libs,ALL")
+     endif()
+     add_executable(seedvr2_image_io_tests tests/image_io_tests.cpp)
+     target_include_directories(seedvr2_image_io_tests PRIVATE src/engine/ncnn)
+-    target_link_libraries(seedvr2_image_io_tests PRIVATE seedvr2_engine ncnn)
++    target_link_libraries(seedvr2_image_io_tests PRIVATE seedvr2_engine seedvr2_ncnn_runtime)
+     add_test(NAME engine.image-decode COMMAND seedvr2_image_io_tests "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/natural")
+     add_executable(seedvr2_weight_io_tests tests/weight_io_tests.cpp)
+     target_include_directories(seedvr2_weight_io_tests PRIVATE src/engine/ncnn)
+-    target_link_libraries(seedvr2_weight_io_tests PRIVATE ncnn seedvr2_options)
++    target_link_libraries(seedvr2_weight_io_tests PRIVATE seedvr2_ncnn_runtime seedvr2_options)
+     add_test(NAME engine.mapped-reader COMMAND seedvr2_weight_io_tests)
+     set_tests_properties(engine.mapped-reader PROPERTIES SKIP_RETURN_CODE 77)
+     add_executable(seedvr2_core_tests tests/core_tests.cpp)
+@@ -221,13 +242,16 @@ if(BUILD_TESTING)
+     set_tests_properties(worker.capability-boundary PROPERTIES PASS_REGULAR_EXPRESSION "seedvr2-worker-v1")
+     add_test(NAME engine.awa-cpu COMMAND seedvr2 engine self-test --backend cpu)
+     set_tests_properties(engine.awa-cpu PROPERTIES TIMEOUT 30)
++    set_tests_properties(engine.memory-vulkan engine.awa-rope-vulkan engine.awa-sdpa-fp32-vulkan
++        engine.awa-rope-vulkan-host engine.awa-sdpa-fp32-vulkan-host
++        PROPERTIES FAIL_REGULAR_EXPRESSION "VUID-;Validation Error")
+ endif()
+ 
+ install(TARGETS seedvr2 RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+ install(TARGETS seedvr2_engine EXPORT seedvr2Targets
+     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+-install(FILES include/seedvr2/pipeline.hpp include/seedvr2/result.hpp include/seedvr2/path.hpp include/seedvr2/media.hpp
++install(FILES include/seedvr2/pipeline.hpp include/seedvr2/result.hpp include/seedvr2/path.hpp include/seedvr2/media.hpp include/seedvr2/memory.hpp
+     include/seedvr2/image.hpp include/seedvr2/video.hpp include/seedvr2/engine.hpp
+     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/seedvr2)
+ include(CMakePackageConfigHelpers)
+diff --git a/apps/cli/main.cpp b/apps/cli/main.cpp
+index 59d2490..44b94bc 100644
+--- a/apps/cli/main.cpp
++++ b/apps/cli/main.cpp
+@@ -63,6 +63,8 @@ int main_impl(int argc, char **argv) {
+     std::uint64_t image_seed = 666;
+     bool image_diagnostics = false, check_only = false;
+     std::string image_weight_io="buffered",diagnostic_weight_io="buffered";
++    std::string weight_placement="auto";
++    std::uint64_t gpu_reserve_mib=0;
+     run->add_option("--model", image_model, "Directory containing the complete model package")->required();
+     run->add_option("--input", image_input, "PNG or JPEG input")->required();
+     run->add_option("--output", image_output, "New output directory")->required();
+@@ -97,6 +99,17 @@ int main_impl(int argc, char **argv) {
+     auto graph = engine_cli->add_subcommand("graph", "Run a hashed VAE submodel case with explicit backend dispatch");
+     auto block = engine_cli->add_subcommand("block", "Run a complete exported DiT block with explicit backend dispatch");
+     auto self_test = engine_cli->add_subcommand("self-test", "Run embedded AWA numerical diagnostics offline");
++    for (auto *command : {run,video_run,graph,block}) {
++        command->add_option("--weights",weight_placement,"Vulkan weights: auto (default), device or host (RAM)")
++            ->check(CLI::IsMember({"auto","device","host"}));
++        command->add_option("--gpu-reserve-mib",gpu_reserve_mib,"Auto placement margin; 0 uses 1/4 of the current heap budget")
++            ->check(CLI::Range(std::uint64_t(0),UINT64_MAX/(1024*1024)));
++    }
++    const auto memory_options=[&] {
++        return MemoryOptions{weight_placement=="host"?WeightPlacement::host:
++            weight_placement=="device"?WeightPlacement::device:WeightPlacement::automatic,
++            gpu_reserve_mib*1024*1024};
++    };
+     for (auto *command : {graph,block})
+         command->add_option("--weight-io",diagnostic_weight_io)->check(CLI::IsMember({"buffered","mapped"}));
+     std::string case_file, output_directory, backend = "cpu";
+@@ -190,11 +203,11 @@ int main_impl(int argc, char **argv) {
+     if (*graph)
+         return print(engine::run_graph({seedvr2::utf8_path(case_file),
+                                        seedvr2::utf8_path(output_directory),
+-                                       backend == "vulkan", gpu_index, threads,diagnostic_weight_io=="mapped"}));
++                                       backend == "vulkan", gpu_index, threads,diagnostic_weight_io=="mapped",memory_options()}));
+     if (*block)
+         return print(engine::run_dit_block({seedvr2::utf8_path(case_file),
+                                            seedvr2::utf8_path(output_directory),
+-                                           backend == "vulkan", gpu_index, threads,diagnostic_weight_io=="mapped"}));
++                                           backend == "vulkan", gpu_index, threads,diagnostic_weight_io=="mapped",memory_options()}));
+     if (*self_test) {
+         const auto result = save_self_test
+             ? Application(db()).self_test_and_save("{\"backend\":\"" + backend + "\",\"gpu\":" + std::to_string(gpu_index) + "}")
+@@ -215,7 +228,7 @@ int main_impl(int argc, char **argv) {
+         const RestoreRequest settings{utf8_path(image_model),utf8_path(image_input),utf8_path(image_output),
+             *video_run?MediaKind::video:MediaKind::image,image_backend=="vulkan"?Backend::vulkan:Backend::cpu,
+             image_gpu,image_threads,*video_run?video_size:image_size,video_frames,image_seed,image_diagnostics,
+-            image_weight_io=="mapped"?WeightIO::mapped:WeightIO::buffered};
++            image_weight_io=="mapped"?WeightIO::mapped:WeightIO::buffered,memory_options()};
+         if (check_only) {
+             const auto result=preflight(settings);
+             if (is_error(result)) return fail(std::get<Error>(result));
+diff --git a/include/seedvr2/engine.hpp b/include/seedvr2/engine.hpp
+index a1dea50..c0dff2a 100644
+--- a/include/seedvr2/engine.hpp
++++ b/include/seedvr2/engine.hpp
+@@ -1,5 +1,6 @@
+ #pragma once
+ #include "seedvr2/result.hpp"
++#include "seedvr2/memory.hpp"
+ #include <filesystem>
+ #include <string>
+ 
+@@ -11,6 +12,7 @@ struct CaseRequest {
+     int gpu_index = -1;
+     int threads = 4;
+     bool mapped_weights = false;
++    MemoryOptions memory{};
+ };
+ std::string build_status();
+ Result<std::string> devices();
+diff --git a/include/seedvr2/image.hpp b/include/seedvr2/image.hpp
+index 72ed0d4..b59856d 100644
+--- a/include/seedvr2/image.hpp
++++ b/include/seedvr2/image.hpp
+@@ -18,6 +18,7 @@ struct ImageRequest {
+     std::uint64_t seed = 666;
+     bool diagnostic_tensors = false;
+     bool mapped_weights = false;
++    MemoryOptions memory{};
+ };
+ using ImageProgress = seedvr2::Progress;
+ using ImageObserver = seedvr2::ProgressObserver;
+diff --git a/include/seedvr2/pipeline.hpp b/include/seedvr2/pipeline.hpp
+index be94e85..82c08a5 100644
+--- a/include/seedvr2/pipeline.hpp
++++ b/include/seedvr2/pipeline.hpp
+@@ -1,6 +1,7 @@
+ #pragma once
+ #include "seedvr2/result.hpp"
+ #include "seedvr2/media.hpp"
++#include "seedvr2/memory.hpp"
+ #include <cstdint>
+ #include <filesystem>
+ #include <functional>
+@@ -19,6 +20,7 @@ struct RestoreRequest {
+     std::uint64_t seed = 666;
+     bool diagnostic_tensors = false;
+     WeightIO weight_io = WeightIO::buffered;
++    MemoryOptions memory{};
+ };
+ struct Progress {
+     std::string stage;
+diff --git a/src/engine/engine_build.hpp.in b/src/engine/engine_build.hpp.in
+index 93c92e2..fc81d4f 100644
+--- a/src/engine/engine_build.hpp.in
++++ b/src/engine/engine_build.hpp.in
+@@ -1,3 +1,5 @@
+ #pragma once
+ #define SEEDVR2_NCNN_COMMIT "@SEEDVR2_NCNN_COMMIT@"
+ #define SEEDVR2_BUILD_VERSION "@PROJECT_VERSION@"
++#define SEEDVR2_NCNN_ALLOCATOR_ORIGINAL_SHA "@SEEDVR2_NCNN_ALLOCATOR_ORIGINAL_SHA@"
++#define SEEDVR2_NCNN_ALLOCATOR_PATCHED_SHA "@SEEDVR2_NCNN_ALLOCATOR_PATCHED_SHA@"
+diff --git a/src/engine/ncnn/image.cpp b/src/engine/ncnn/image.cpp
+index 2725672..3002ab7 100644
+--- a/src/engine/ncnn/image.cpp
++++ b/src/engine/ncnn/image.cpp
+@@ -180,6 +180,7 @@ Result<std::string> run_image(const ImageRequest &request, ImageObserver observe
+         report["implementation"]=implementation_identity();
+         if (report["implementation"].contains("executable_sha256")) report["executable_sha256"]=report["implementation"]["executable_sha256"];
+         report["resources"]=process_resources();
++        report["resources"]["weight_placement"]=memory_summary(stages);
+         report["weight_io"]=request.mapped_weights?"mapped":"buffered";
+         const auto &preflight=std::get<Preflight>(ready);
+         report["resources"]["package_bytes"]=preflight.package_bytes;
+diff --git a/src/engine/ncnn/inference.hpp b/src/engine/ncnn/inference.hpp
+index 8850bc1..247e79c 100644
+--- a/src/engine/ncnn/inference.hpp
++++ b/src/engine/ncnn/inference.hpp
+@@ -6,6 +6,7 @@
+ #include "graph.hpp"
+ #include "package.hpp"
+ #include "weight_io.hpp"
++#include "memory.hpp"
+ #include "seedvr2/image.hpp"
+ #include <algorithm>
+ #include <numbers>
+@@ -44,7 +45,8 @@ inline std::vector<ncnn::Mat> execute_graph(const GraphFiles &files, const std::
+     const auto started = Clock::now();
+     ExecutionTrace awa;
+     std::unique_ptr<MappedWeights> mapped;
+-    ncnn::Net net;
++    auto owner = std::make_unique<ncnn::Net>();
++    auto &net = *owner;
+     net.opt.use_vulkan_compute = request.vulkan;
+     net.opt.use_packing_layout = false;
+     net.opt.use_fp16_storage = net.opt.use_fp16_packed = net.opt.use_fp16_arithmetic = false;
+@@ -79,10 +81,13 @@ inline std::vector<ncnn::Mat> execute_graph(const GraphFiles &files, const std::
+         (awa.heads != 20 || awa.shifted != std::stoi(id.substr(6))%2)))
+         throw std::runtime_error("Adaptive attention graph metadata mismatch");
+     check();
++    auto memory_report = configure_memory(net,files.weights,request.memory);
+     if (request.mapped_weights) mapped=std::make_unique<MappedWeights>(files.weights);
+     if ((mapped?net.load_model(*mapped):net.load_model(files.weights.string().c_str())) != 0 || (mapped && !mapped->consumed()))
+         throw std::runtime_error("Cannot load graph weights: "+id);
+     const auto loaded = Clock::now();
++    const auto *device = request.vulkan ? net.vulkan_device() : nullptr;
++    memory_report["after_load"] = budget_json(device_budget(device));
+     check();
+     std::vector<ncnn::Mat> outputs(net.output_indexes().size());
+     Json layers = Json::array();
+@@ -115,7 +120,13 @@ inline std::vector<ncnn::Mat> execute_graph(const GraphFiles &files, const std::
+                                 (awa.cpu_calls != 1 || awa.vulkan_calls != 0)))
+         throw std::runtime_error("Requested attention backend did not execute exclusively");
+     const auto end = Clock::now();
++    // Net destruction releases its weight allocator. clear() alone can retain
++    // backing allocations; no graph command or device output survives here.
++    owner.reset();
++    mapped.reset();
++    memory_report["after_release"] = budget_json(device_budget(device));
+     report.push_back({{"id", id}, {"backend", request.vulkan ? "ncnn-vulkan" : "ncnn-cpu"},
++        {"memory",memory_report},
+         {"weight_io",request.mapped_weights?"mapped":"buffered"},
+         {"cpu_temporal_encoder_direct_convolution",direct_encoder},
+         {"load_ms", std::chrono::duration<double, std::milli>(loaded-started).count()},
+diff --git a/src/engine/ncnn/package.cpp b/src/engine/ncnn/package.cpp
+index 9d2be4c..b6b52a2 100644
+--- a/src/engine/ncnn/package.cpp
++++ b/src/engine/ncnn/package.cpp
+@@ -68,6 +68,6 @@ Package::Package(const std::filesystem::path &root, const std::function<void()>
+ RestoreRequest public_request(const ImageRequest &r, bool video, int frames) {
+     return {r.model_directory,r.input_file,r.output_directory,video?MediaKind::video:MediaKind::image,
+             r.vulkan?Backend::vulkan:Backend::cpu,r.gpu_index,r.threads,r.long_side,frames,r.seed,r.diagnostic_tensors,
+-            r.mapped_weights?WeightIO::mapped:WeightIO::buffered};
++            r.mapped_weights?WeightIO::mapped:WeightIO::buffered,r.memory};
+ }
+ } // namespace seedvr2::engine::inference
+diff --git a/src/engine/ncnn/pipeline.cpp b/src/engine/ncnn/pipeline.cpp
+index ed68b05..ab0792c 100644
+--- a/src/engine/ncnn/pipeline.cpp
++++ b/src/engine/ncnn/pipeline.cpp
+@@ -3,6 +3,7 @@
+ #include "seedvr2/video.hpp"
+ #include "package.hpp"
+ #include "video_io.hpp"
++#include "memory.hpp"
+ #include <bit>
+ #if defined(__unix__)
+ #include <unistd.h>
+@@ -37,6 +38,7 @@ Result<Preflight> preflight(const RestoreRequest &r) {
+     std::string field="parameters";
+     try {
+         const bool video=is_video(r.kind);
++        memory::validate(r.memory,r.backend==Backend::vulkan);
+         if (r.weight_io!=WeightIO::buffered && r.weight_io!=WeightIO::mapped) throw std::runtime_error("Unknown weight reader");
+ #if !defined(__linux__)
+         if (r.weight_io==WeightIO::mapped) throw std::runtime_error("Mapped weight loading requires Linux");
+@@ -81,6 +83,8 @@ Result<Preflight> preflight(const RestoreRequest &r) {
+             {"model",{{"manifest_sha256",p.identity},{"profile",p.document.at("profile")},{"package_bytes",p.bytes},
+                 {"largest_graph_bytes",p.largest_graph_bytes},{"manifest_authenticated",true},{"weight_hashes_verified",false}}},
+             {"model_verified",false}};
++        report["memory"]={{"weight_policy",memory::name(r.memory.weights)},
++            {"gpu_reserve_bytes",r.memory.gpu_reserve_bytes},{"scope","rechecked before each graph; not a peak-memory guarantee"}};
+         return Preflight{prepared.w,prepared.h,frames,p.bytes,p.largest_graph_bytes,reserve,p.identity,report.dump(2)};
+     } catch (const std::exception &e) { return Error{"PREFLIGHT_FAILED",field,e.what()}; }
+ }
+@@ -94,6 +98,7 @@ Result<RunResult> restore(const RestoreRequest &r, ProgressObserver observer, Ca
+         native.vulkan=r.backend==Backend::vulkan; native.gpu_index=r.gpu_index; native.threads=r.threads;
+         native.long_side=r.long_side; native.max_frames=r.max_frames; native.seed=r.seed; native.diagnostic_tensors=r.diagnostic_tensors;
+         native.mapped_weights=r.weight_io==WeightIO::mapped;
++        native.memory=r.memory;
+         if (r.weight_io!=WeightIO::buffered && r.weight_io!=WeightIO::mapped) return Error{"PREFLIGHT_FAILED","weight_io","Unknown weight reader"};
+         if (r.backend!=Backend::cpu && r.backend!=Backend::vulkan) return Error{"PREFLIGHT_FAILED","backend","Unknown backend"};
+         auto value=video?engine::run_video(native,observer,cancelled):engine::run_image(native,observer,cancelled);
+diff --git a/src/engine/ncnn/provenance.hpp b/src/engine/ncnn/provenance.hpp
+index 4b17ea9..9ca7225 100644
+--- a/src/engine/ncnn/provenance.hpp
++++ b/src/engine/ncnn/provenance.hpp
+@@ -1,6 +1,7 @@
+ #pragma once
+ #include "graph.hpp"
+ #include "seedvr2/pipeline.hpp"
++#include "engine_build.hpp"
+ #if defined(__linux__)
+ #include <dlfcn.h>
+ #include <sys/resource.h>
+@@ -8,6 +9,10 @@
+ namespace seedvr2::engine::detail {
+ inline Json implementation_identity() {
+     Json result=Json::object();
++    result["ncnn_runtime_patches"]=Json::array({{{"id","host-buffer-v1"},
++        {"original_allocator_sha256",SEEDVR2_NCNN_ALLOCATOR_ORIGINAL_SHA},
++        {"compiled_allocator_sha256",SEEDVR2_NCNN_ALLOCATOR_PATCHED_SHA},
++        {"scope","Imported-host buffer declaration and weight-buffer transfer-source usage"}}});
+ #if defined(__linux__)
+     result["executable_sha256"]=hash("/proc/self/exe");
+     Dl_info info{};
+diff --git a/src/engine/ncnn/runtime.cpp b/src/engine/ncnn/runtime.cpp
+index 70f14fa..54d87f5 100644
+--- a/src/engine/ncnn/runtime.cpp
++++ b/src/engine/ncnn/runtime.cpp
+@@ -1,5 +1,6 @@
+ #include "provenance.hpp"
+ #include "weight_io.hpp"
++#include "memory.hpp"
+ #include "awa.hpp"
+ #include "video_layers.hpp"
+ #include "graph.hpp"
+@@ -206,6 +207,7 @@ Result<std::string> run_awa(const CaseRequest &request) {
+ namespace {
+ Result<std::string> run_graph_case(const CaseRequest &request, bool dit) {
+     try {
++        memory::validate(request.memory,request.vulkan);
+         if constexpr (std::endian::native != std::endian::little)
+             throw std::runtime_error("f32le input requires a little endian host");
+         std::lock_guard lock(engine_mutex);
+@@ -328,12 +330,14 @@ Result<std::string> run_graph_case(const CaseRequest &request, bool dit) {
+         if (dit && (awa_count != 1 || awa_trace.heads != 20 ||
+                     awa_trace.shifted != doc.at("block_index").get<int>() % 2))
+             throw std::runtime_error("A complete DiT block must contain exactly one AWA");
++        auto memory_report=configure_memory(net,binary,request.memory);
+         if (request.mapped_weights) mapped=std::make_unique<MappedWeights>(binary);
+         if ((mapped?net.load_model(*mapped):net.load_model(binary.string().c_str())) != 0 || (mapped && !mapped->consumed()))
+             throw std::runtime_error("Cannot load graph weights");
+         std::vector<ncnn::Mat> outputs(expected_shapes.size());
+         Json trace = Json::array();
+         const auto compute_start = Clock::now();
++        memory_report["after_load"]=budget_json(device_budget(request.vulkan?net.vulkan_device():nullptr));
+         if (request.vulkan) {
+             const auto *device = net.vulkan_device();
+             VulkanAllocators allocators(device);
+@@ -381,6 +385,7 @@ Result<std::string> run_graph_case(const CaseRequest &request, bool dit) {
+             {"vulkan_calls", request.vulkan ? trace.size() : 0},
+             {"dispatch", "EXPLICIT_PER_LAYER_NO_BACKEND_FALLBACK"}, {"model_verified", false},
+             {"numerical_validation", "NOT_PERFORMED_BY_RUNNER"},
++            {"memory",memory_report},
+             {"timing_ms", {{"compute_including_transfers",
+                 std::chrono::duration<double, std::milli>(compute_end-compute_start).count()},
+                 {"total", std::chrono::duration<double, std::milli>(Clock::now()-started).count()}}}};
+diff --git a/src/engine/ncnn/video.cpp b/src/engine/ncnn/video.cpp
+index 927d698..83d0a2b 100644
+--- a/src/engine/ncnn/video.cpp
++++ b/src/engine/ncnn/video.cpp
+@@ -145,6 +145,7 @@ Result<std::string> run_video(const VideoRequest &request,ImageObserver observer
+         report["implementation"]=implementation_identity();
+         if (report["implementation"].contains("executable_sha256")) report["executable_sha256"]=report["implementation"]["executable_sha256"];
+         report["resources"]=process_resources();
++        report["resources"]["weight_placement"]=memory_summary(stages);
+         report["weight_io"]=request.mapped_weights?"mapped":"buffered";
+         const auto &preflight=std::get<Preflight>(ready);
+         report["resources"]["package_bytes"]=preflight.package_bytes;
+diff --git a/tests/awa_rope_tests.cpp b/tests/awa_rope_tests.cpp
+index 2026f67..56db5f2 100644
+--- a/tests/awa_rope_tests.cpp
++++ b/tests/awa_rope_tests.cpp
+@@ -13,8 +13,11 @@ namespace d = seedvr2::engine::detail;
+ int main(int argc, char **argv) {
+     try {
+         const bool gpu = argc >= 2 && std::string(argv[1]) == "vulkan";
+-        const bool stability = argc == 3 && std::string(argv[2]) == "sdpa";
+-        if ((argc != 2 && !stability) || (!gpu && std::string(argv[1]) != "cpu")) return 2;
++        const bool stability = argc >= 3 && std::string(argv[2]) == "sdpa";
++        const bool host = (argc == 3 && std::string(argv[2]) == "host") ||
++            (argc == 4 && stability && std::string(argv[3]) == "host");
++        if (argc < 2 || argc > 4 || (argc != 2 && !stability && !host) ||
++            (argc == 4 && !host) || (!gpu && std::string(argv[1]) != "cpu") || (host && !gpu)) return 2;
+         if (gpu) {
+             try { d::init_gpu(); }
+             catch (const std::exception &e) { std::cout << "SKIP: " << e.what() << '\n'; return 77; }
+@@ -31,6 +34,7 @@ int main(int argc, char **argv) {
+             opt.use_fp16_storage = opt.use_fp16_packed = opt.use_fp16_arithmetic = false;
+             opt.use_bf16_storage = opt.use_bf16_packed = false;
+             opt.use_cooperative_matrix = false;
++            opt.use_weights_in_host_memory = host;
+             opt.num_threads = 2;
+             if (gpu) net.set_vulkan_device(0);
+             constexpr char param[] = "7767517\n3 4\nInput in0 0 1 in0\nInput in1 0 1 in1\n"
+diff --git a/tools/check_graph.py b/tools/check_graph.py
+index d5515d1..56aa276 100644
+--- a/tools/check_graph.py
++++ b/tools/check_graph.py
+@@ -41,6 +41,8 @@ def main():
+     parser.add_argument('--gpu', type=int, default=0)
+     parser.add_argument('--validation-layer', action='store_true')
+     parser.add_argument('--weight-io', choices=['buffered','mapped'], default='buffered')
++    parser.add_argument('--weights', choices=['auto','device','host'], default='auto')
++    parser.add_argument('--gpu-reserve-mib', type=int, default=0)
+     args = parser.parse_args()
+     if args.output.exists() and any(args.output.iterdir()):
+         raise SystemExit('Output must be empty')
+@@ -59,6 +61,7 @@ def main():
+                        '--output', str(folder.resolve()), '--backend', backend, '--gpu', str(args.gpu)]
+             env = os.environ.copy()
+             if args.weight_io!='buffered': command += ['--weight-io',args.weight_io]
++            if backend=='vulkan': command += ['--weights',args.weights,'--gpu-reserve-mib',str(args.gpu_reserve_mib)]
+             if args.validation_layer:
+                 env['VK_INSTANCE_LAYERS'] = 'VK_LAYER_KHRONOS_validation'
+             result = subprocess.run(command, capture_output=True, text=True, timeout=180, env=env)

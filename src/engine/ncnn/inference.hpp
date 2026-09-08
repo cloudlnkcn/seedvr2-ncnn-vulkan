@@ -6,6 +6,7 @@
 #include "graph.hpp"
 #include "package.hpp"
 #include "weight_io.hpp"
+#include "memory.hpp"
 #include "seedvr2/image.hpp"
 #include <algorithm>
 #include <numbers>
@@ -44,7 +45,8 @@ inline std::vector<ncnn::Mat> execute_graph(const GraphFiles &files, const std::
     const auto started = Clock::now();
     ExecutionTrace awa;
     std::unique_ptr<MappedWeights> mapped;
-    ncnn::Net net;
+    auto owner = std::make_unique<ncnn::Net>();
+    auto &net = *owner;
     net.opt.use_vulkan_compute = request.vulkan;
     net.opt.use_packing_layout = false;
     net.opt.use_fp16_storage = net.opt.use_fp16_packed = net.opt.use_fp16_arithmetic = false;
@@ -79,10 +81,13 @@ inline std::vector<ncnn::Mat> execute_graph(const GraphFiles &files, const std::
         (awa.heads != 20 || awa.shifted != std::stoi(id.substr(6))%2)))
         throw std::runtime_error("Adaptive attention graph metadata mismatch");
     check();
+    auto memory_report = configure_memory(net,files.weights,request.memory);
     if (request.mapped_weights) mapped=std::make_unique<MappedWeights>(files.weights);
     if ((mapped?net.load_model(*mapped):net.load_model(files.weights.string().c_str())) != 0 || (mapped && !mapped->consumed()))
         throw std::runtime_error("Cannot load graph weights: "+id);
     const auto loaded = Clock::now();
+    const auto *device = request.vulkan ? net.vulkan_device() : nullptr;
+    memory_report["after_load"] = budget_json(device_budget(device));
     check();
     std::vector<ncnn::Mat> outputs(net.output_indexes().size());
     Json layers = Json::array();
@@ -115,7 +120,13 @@ inline std::vector<ncnn::Mat> execute_graph(const GraphFiles &files, const std::
                                 (awa.cpu_calls != 1 || awa.vulkan_calls != 0)))
         throw std::runtime_error("Requested attention backend did not execute exclusively");
     const auto end = Clock::now();
+    // Net destruction releases its weight allocator. clear() alone can retain
+    // backing allocations; no graph command or device output survives here.
+    owner.reset();
+    mapped.reset();
+    memory_report["after_release"] = budget_json(device_budget(device));
     report.push_back({{"id", id}, {"backend", request.vulkan ? "ncnn-vulkan" : "ncnn-cpu"},
+        {"memory",memory_report},
         {"weight_io",request.mapped_weights?"mapped":"buffered"},
         {"cpu_temporal_encoder_direct_convolution",direct_encoder},
         {"load_ms", std::chrono::duration<double, std::milli>(loaded-started).count()},

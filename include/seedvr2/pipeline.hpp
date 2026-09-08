@@ -1,6 +1,7 @@
 #pragma once
 #include "seedvr2/result.hpp"
 #include "seedvr2/media.hpp"
+#include "seedvr2/memory.hpp"
 #include <cstdint>
 #include <filesystem>
 #include <functional>
@@ -19,6 +20,7 @@ struct RestoreRequest {
     std::uint64_t seed = 666;
     bool diagnostic_tensors = false;
     WeightIO weight_io = WeightIO::buffered;
+    MemoryOptions memory{};
 };
 struct Progress {
     std::string stage;

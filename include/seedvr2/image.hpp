@@ -18,6 +18,7 @@ struct ImageRequest {
     std::uint64_t seed = 666;
     bool diagnostic_tensors = false;
     bool mapped_weights = false;
+    MemoryOptions memory{};
 };
 using ImageProgress = seedvr2::Progress;
 using ImageObserver = seedvr2::ProgressObserver;

@@ -63,6 +63,8 @@ int main_impl(int argc, char **argv) {
     std::uint64_t image_seed = 666;
     bool image_diagnostics = false, check_only = false;
     std::string image_weight_io="buffered",diagnostic_weight_io="buffered";
+    std::string weight_placement="auto";
+    std::uint64_t gpu_reserve_mib=0;
     run->add_option("--model", image_model, "Directory containing the complete model package")->required();
     run->add_option("--input", image_input, "PNG or JPEG input")->required();
     run->add_option("--output", image_output, "New output directory")->required();
@@ -97,6 +99,17 @@ int main_impl(int argc, char **argv) {
     auto graph = engine_cli->add_subcommand("graph", "Run a hashed VAE submodel case with explicit backend dispatch");
     auto block = engine_cli->add_subcommand("block", "Run a complete exported DiT block with explicit backend dispatch");
     auto self_test = engine_cli->add_subcommand("self-test", "Run embedded AWA numerical diagnostics offline");
+    for (auto *command : {run,video_run,graph,block}) {
+        command->add_option("--weights",weight_placement,"Vulkan weights: auto (default), device or host (RAM)")
+            ->check(CLI::IsMember({"auto","device","host"}));
+        command->add_option("--gpu-reserve-mib",gpu_reserve_mib,"Auto placement margin; 0 uses 1/4 of the current heap budget")
+            ->check(CLI::Range(std::uint64_t(0),UINT64_MAX/(1024*1024)));
+    }
+    const auto memory_options=[&] {
+        return MemoryOptions{weight_placement=="host"?WeightPlacement::host:
+            weight_placement=="device"?WeightPlacement::device:WeightPlacement::automatic,
+            gpu_reserve_mib*1024*1024};
+    };
     for (auto *command : {graph,block})
         command->add_option("--weight-io",diagnostic_weight_io)->check(CLI::IsMember({"buffered","mapped"}));
     std::string case_file, output_directory, backend = "cpu";
@@ -169,7 +182,7 @@ int main_impl(int argc, char **argv) {
         return fail({"CLI_USAGE", "command", "Unknown or missing arguments. Use --help"});
     }
     if (*version) {
-        std::cout << "0.6.0-native-preview; sdk=installed-cpp; ncnn=linked; "
+        std::cout << "0.7.0-native-preview; sdk=installed-cpp; ncnn=linked; "
                      "awa=cpu+vulkan; restoration=image+short-video; model=not-certified\n";
         return 0;
     }
@@ -190,11 +203,11 @@ int main_impl(int argc, char **argv) {
     if (*graph)
         return print(engine::run_graph({seedvr2::utf8_path(case_file),
                                        seedvr2::utf8_path(output_directory),
-                                       backend == "vulkan", gpu_index, threads,diagnostic_weight_io=="mapped"}));
+                                       backend == "vulkan", gpu_index, threads,diagnostic_weight_io=="mapped",memory_options()}));
     if (*block)
         return print(engine::run_dit_block({seedvr2::utf8_path(case_file),
                                            seedvr2::utf8_path(output_directory),
-                                           backend == "vulkan", gpu_index, threads,diagnostic_weight_io=="mapped"}));
+                                           backend == "vulkan", gpu_index, threads,diagnostic_weight_io=="mapped",memory_options()}));
     if (*self_test) {
         const auto result = save_self_test
             ? Application(db()).self_test_and_save("{\"backend\":\"" + backend + "\",\"gpu\":" + std::to_string(gpu_index) + "}")
@@ -215,7 +228,7 @@ int main_impl(int argc, char **argv) {
         const RestoreRequest settings{utf8_path(image_model),utf8_path(image_input),utf8_path(image_output),
             *video_run?MediaKind::video:MediaKind::image,image_backend=="vulkan"?Backend::vulkan:Backend::cpu,
             image_gpu,image_threads,*video_run?video_size:image_size,video_frames,image_seed,image_diagnostics,
-            image_weight_io=="mapped"?WeightIO::mapped:WeightIO::buffered};
+            image_weight_io=="mapped"?WeightIO::mapped:WeightIO::buffered,memory_options()};
         if (check_only) {
             const auto result=preflight(settings);
             if (is_error(result)) return fail(std::get<Error>(result));

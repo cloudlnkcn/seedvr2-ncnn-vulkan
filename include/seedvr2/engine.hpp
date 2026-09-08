@@ -1,5 +1,6 @@
 #pragma once
 #include "seedvr2/result.hpp"
+#include "seedvr2/memory.hpp"
 #include <filesystem>
 #include <string>
 
@@ -11,6 +12,7 @@ struct CaseRequest {
     int gpu_index = -1;
     int threads = 4;
     bool mapped_weights = false;
+    MemoryOptions memory{};
 };
 std::string build_status();
 Result<std::string> devices();

@@ -1,0 +1,5505 @@
+{
+  "schema_version": "ncnn-graph-validation-v1",
+  "scope": "Whole-clip original causal VAE, B=1, memory disabled; no streaming cache",
+  "reference_profile": "FP32-B",
+  "checkpoint": {
+    "sha256": "c7df8a67e68b7f9aca3d5d2153d2ce8ab4373687741a0f9ce87cb356ace51cac",
+    "tensors": 250,
+    "revision": "37255ff8cccfb01071b87f635a5948ca8d53117c"
+  },
+  "weight_io": "buffered",
+  "suite_sha256": "153948a150d0538835a816b76b2880b2cfe69cd6bcb181150b7a06bd93e4e865",
+  "binary_sha256": "2c2d08ac27d1a35ce2f2a8a92d32c307f7774ab00398999b6173d672893112b6",
+  "threshold": {
+    "atol": 0.0001,
+    "rtol": 0.001,
+    "calibration": "DIAGNOSTIC_NOT_MODEL_CERTIFICATION"
+  },
+  "validation_layer_requested": true,
+  "cases": [
+    {
+      "case_id": "vae-video-encoder-t1-32x48",
+      "backend": "vulkan",
+      "exit_code": 0,
+      "passed": true,
+      "execution": {
+        "backend": "ncnn-vulkan",
+        "case_id": "vae-video-encoder-t1-32x48",
+        "case_sha256": "8b54ba756cff7ad1703aa9f9e44926736b65dd0c85b45801b6a46ccf0a7e049d",
+        "component": "vae-video-encoder",
+        "cpu_calls": 0,
+        "device": {
+          "api_version": 4211017,
+          "device_id": 10464,
+          "driver_version": 2497102272,
+          "index": 0,
+          "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+          "subgroup_size": 32,
+          "vendor_id": 4318
+        },
+        "dispatch": "EXPLICIT_PER_LAYER_NO_BACKEND_FALLBACK",
+        "implementation": {
+          "executable_sha256": "2c2d08ac27d1a35ce2f2a8a92d32c307f7774ab00398999b6173d672893112b6",
+          "ncnn_runtime_patches": [
+            {
+              "compiled_allocator_sha256": "b8398e0d5ef5a367f80c5d2f13af1c8f170a83a39d0a1b458a40100924a55320",
+              "id": "host-buffer-v1",
+              "original_allocator_sha256": "601d69dab40823366fa6aa2be00c8e37bb0f1e960fe96323c36daed887c4fda2",
+              "scope": "Imported-host buffer declaration and weight-buffer transfer-source usage"
+            }
+          ],
+          "sdk_library_sha256": "ff86dcd0b05ea66f5ab384701701aced273582e0ee95fc0cfa12c9c4608f30f2"
+        },
+        "layers": [
+          {
+            "backend": "vulkan",
+            "name": "conv_in",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_0",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "norm1",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_0",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "conv1",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_0",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_1",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_1",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_0",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_1",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_2",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_2",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_3",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_4",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_3",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_5",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_1",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_6",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_2",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "shortcut",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_7",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_4",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_8",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_9",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_5",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_10",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_2",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_3",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_11",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_6",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_12",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_13",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_7",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_14",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_3",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_15",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_4",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_16",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_17",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_8",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_18",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_19",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_9",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_20",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_4",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_5",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_21",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_10",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_22",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_23",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_11",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_24",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_5",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_25",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_6",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_26",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_12",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_27",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_28",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_13",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_29",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_6",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_7",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_30",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_14",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_31",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_32",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_15",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_33",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_7",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_8",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_34",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_16",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_35",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_36",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_17",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_37",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_8",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_9",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "norm",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_10",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "q",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_38",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_39",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "attention",
+            "type": "SeedVR2FrameSDPA"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_40",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_9",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_11",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_41",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_18",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_42",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_43",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_19",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_44",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_10",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_45",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_20",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_46",
+            "type": "SeedVR2TemporalConv"
+          }
+        ],
+        "memory": {
+          "activation_offload": false,
+          "actual_weight_memory": "not_instrumented",
+          "after_load": {
+            "budget_bytes": 6050283520,
+            "heap_index": 0,
+            "source": "VK_EXT_memory_budget_estimate",
+            "usage_bytes": 430178304
+          },
+          "available_bytes": 6033178624,
+          "before_load": {
+            "budget_bytes": 6050283520,
+            "heap_index": 0,
+            "source": "VK_EXT_memory_budget_estimate",
+            "usage_bytes": 17104896
+          },
+          "estimated_weight_bytes": 800371968,
+          "oom_recovery": false,
+          "policy": "auto",
+          "reason": "budget_available",
+          "requested_memory": "device",
+          "reserve_bytes": 1512570880,
+          "reserve_policy": "quarter_heap_budget",
+          "scope": "weight placement before graph loading"
+        },
+        "model_verified": false,
+        "ncnn_commit": "3b7bdba7fc8aea8fd46779533eee027df77c639d",
+        "numerical_validation": "NOT_PERFORMED_BY_RUNNER",
+        "output": {
+          "dtype": "f32le",
+          "elements": 768,
+          "path": "output.f32",
+          "sha256": "925bfcf9c4cec3c9ce1fceff689e10b0e84ed73da03e699dbdf2fdccb8d330ab",
+          "shape": [
+            32,
+            1,
+            4,
+            6
+          ]
+        },
+        "precision": "fp32",
+        "schema_version": "ncnn-graph-execution-v1",
+        "status": "EXECUTED",
+        "timing_ms": {
+          "compute_including_transfers": 35.458106,
+          "total": 2202.481004
+        },
+        "vulkan_calls": 98
+      },
+      "comparison": {
+        "reference_sha256": "47dc6438559f3a982ae29dfef0abbd50bb6bbeac94db59813d284614086acc58",
+        "candidate_sha256": "925bfcf9c4cec3c9ce1fceff689e10b0e84ed73da03e699dbdf2fdccb8d330ab",
+        "shape": [
+          32,
+          1,
+          4,
+          6
+        ],
+        "max_abs": 5.0067901611328125e-05,
+        "rmse": 6.361218641401612e-06,
+        "violations": 0,
+        "finite": true,
+        "passed": true
+      }
+    },
+    {
+      "case_id": "vae-video-encoder-t5-32x48",
+      "backend": "vulkan",
+      "exit_code": 0,
+      "passed": true,
+      "execution": {
+        "backend": "ncnn-vulkan",
+        "case_id": "vae-video-encoder-t5-32x48",
+        "case_sha256": "c21bc2f2c80ddb256867093ec951859628687cc849eb852283c1152fc192b631",
+        "component": "vae-video-encoder",
+        "cpu_calls": 0,
+        "device": {
+          "api_version": 4211017,
+          "device_id": 10464,
+          "driver_version": 2497102272,
+          "index": 0,
+          "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+          "subgroup_size": 32,
+          "vendor_id": 4318
+        },
+        "dispatch": "EXPLICIT_PER_LAYER_NO_BACKEND_FALLBACK",
+        "implementation": {
+          "executable_sha256": "2c2d08ac27d1a35ce2f2a8a92d32c307f7774ab00398999b6173d672893112b6",
+          "ncnn_runtime_patches": [
+            {
+              "compiled_allocator_sha256": "b8398e0d5ef5a367f80c5d2f13af1c8f170a83a39d0a1b458a40100924a55320",
+              "id": "host-buffer-v1",
+              "original_allocator_sha256": "601d69dab40823366fa6aa2be00c8e37bb0f1e960fe96323c36daed887c4fda2",
+              "scope": "Imported-host buffer declaration and weight-buffer transfer-source usage"
+            }
+          ],
+          "sdk_library_sha256": "ff86dcd0b05ea66f5ab384701701aced273582e0ee95fc0cfa12c9c4608f30f2"
+        },
+        "layers": [
+          {
+            "backend": "vulkan",
+            "name": "conv_in",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_0",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "norm1",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_0",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "conv1",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_0",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_1",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_1",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_0",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_1",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_2",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_2",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_3",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_4",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_3",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_5",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_1",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_6",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_2",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "shortcut",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_7",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_4",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_8",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_9",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_5",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_10",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_2",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_3",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_11",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_6",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_12",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_13",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_7",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_14",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_3",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_15",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_4",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_16",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_17",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_8",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_18",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_19",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_9",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_20",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_4",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_5",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_21",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_10",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_22",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_23",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_11",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_24",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_5",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_25",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_6",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_26",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_12",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_27",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_28",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_13",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_29",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_6",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_7",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_30",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_14",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_31",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_32",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_15",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_33",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_7",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_8",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_34",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_16",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_35",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_36",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_17",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_37",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_8",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_9",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "norm",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_10",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "q",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_38",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_39",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "attention",
+            "type": "SeedVR2FrameSDPA"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_40",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_9",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_11",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_41",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_18",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_42",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_43",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_19",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_44",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_10",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_45",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_20",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_46",
+            "type": "SeedVR2TemporalConv"
+          }
+        ],
+        "memory": {
+          "activation_offload": false,
+          "actual_weight_memory": "not_instrumented",
+          "after_load": {
+            "budget_bytes": 6052773888,
+            "heap_index": 0,
+            "source": "VK_EXT_memory_budget_estimate",
+            "usage_bytes": 430178304
+          },
+          "available_bytes": 6033047552,
+          "before_load": {
+            "budget_bytes": 6050152448,
+            "heap_index": 0,
+            "source": "VK_EXT_memory_budget_estimate",
+            "usage_bytes": 17104896
+          },
+          "estimated_weight_bytes": 800371968,
+          "oom_recovery": false,
+          "policy": "auto",
+          "reason": "budget_available",
+          "requested_memory": "device",
+          "reserve_bytes": 1512538112,
+          "reserve_policy": "quarter_heap_budget",
+          "scope": "weight placement before graph loading"
+        },
+        "model_verified": false,
+        "ncnn_commit": "3b7bdba7fc8aea8fd46779533eee027df77c639d",
+        "numerical_validation": "NOT_PERFORMED_BY_RUNNER",
+        "output": {
+          "dtype": "f32le",
+          "elements": 1536,
+          "path": "output.f32",
+          "sha256": "27bf9fe9f1c4fbe6aabc025f9ce3e2753c02a260c5342bbd68d344acfefa10c6",
+          "shape": [
+            32,
+            2,
+            4,
+            6
+          ]
+        },
+        "precision": "fp32",
+        "schema_version": "ncnn-graph-execution-v1",
+        "status": "EXECUTED",
+        "timing_ms": {
+          "compute_including_transfers": 50.937188,
+          "total": 2236.805219
+        },
+        "vulkan_calls": 98
+      },
+      "comparison": {
+        "reference_sha256": "603202920bf2880ba0b5f99fcaaa49b91ba7eaabad15115c1dde1f44cc3ad160",
+        "candidate_sha256": "27bf9fe9f1c4fbe6aabc025f9ce3e2753c02a260c5342bbd68d344acfefa10c6",
+        "shape": [
+          32,
+          2,
+          4,
+          6
+        ],
+        "max_abs": 2.765655517578125e-05,
+        "rmse": 4.099075136748139e-06,
+        "violations": 0,
+        "finite": true,
+        "passed": true
+      }
+    },
+    {
+      "case_id": "vae-video-encoder-t9-48x32",
+      "backend": "vulkan",
+      "exit_code": 0,
+      "passed": true,
+      "execution": {
+        "backend": "ncnn-vulkan",
+        "case_id": "vae-video-encoder-t9-48x32",
+        "case_sha256": "8a3abcfc49d4b4ae0972b75b7faf4793e7feba6edf37a6ffc126cc6d37bcec8e",
+        "component": "vae-video-encoder",
+        "cpu_calls": 0,
+        "device": {
+          "api_version": 4211017,
+          "device_id": 10464,
+          "driver_version": 2497102272,
+          "index": 0,
+          "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+          "subgroup_size": 32,
+          "vendor_id": 4318
+        },
+        "dispatch": "EXPLICIT_PER_LAYER_NO_BACKEND_FALLBACK",
+        "implementation": {
+          "executable_sha256": "2c2d08ac27d1a35ce2f2a8a92d32c307f7774ab00398999b6173d672893112b6",
+          "ncnn_runtime_patches": [
+            {
+              "compiled_allocator_sha256": "b8398e0d5ef5a367f80c5d2f13af1c8f170a83a39d0a1b458a40100924a55320",
+              "id": "host-buffer-v1",
+              "original_allocator_sha256": "601d69dab40823366fa6aa2be00c8e37bb0f1e960fe96323c36daed887c4fda2",
+              "scope": "Imported-host buffer declaration and weight-buffer transfer-source usage"
+            }
+          ],
+          "sdk_library_sha256": "ff86dcd0b05ea66f5ab384701701aced273582e0ee95fc0cfa12c9c4608f30f2"
+        },
+        "layers": [
+          {
+            "backend": "vulkan",
+            "name": "conv_in",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_0",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "norm1",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_0",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "conv1",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_0",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_1",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_1",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_0",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_1",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_2",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_2",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_3",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_4",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_3",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_5",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_1",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_6",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_2",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "shortcut",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_7",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_4",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_8",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_9",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_5",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_10",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_2",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_3",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_11",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_6",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_12",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_13",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_7",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_14",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_3",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_15",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_4",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_16",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_17",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_8",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_18",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_19",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_9",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_20",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_4",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_5",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_21",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_10",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_22",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_23",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_11",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_24",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_5",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_25",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_6",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_26",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_12",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_27",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_28",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_13",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_29",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_6",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_7",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_30",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_14",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_31",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_32",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_15",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_33",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_7",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_8",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_34",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_16",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_35",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_36",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_17",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_37",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_8",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_9",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "norm",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_10",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "q",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_38",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_39",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "attention",
+            "type": "SeedVR2FrameSDPA"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_40",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_9",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_11",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_41",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_18",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_42",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_43",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_19",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_44",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_10",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_45",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_20",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_46",
+            "type": "SeedVR2TemporalConv"
+          }
+        ],
+        "memory": {
+          "activation_offload": false,
+          "actual_weight_memory": "not_instrumented",
+          "after_load": {
+            "budget_bytes": 6050217984,
+            "heap_index": 0,
+            "source": "VK_EXT_memory_budget_estimate",
+            "usage_bytes": 430178304
+          },
+          "available_bytes": 6033178624,
+          "before_load": {
+            "budget_bytes": 6050283520,
+            "heap_index": 0,
+            "source": "VK_EXT_memory_budget_estimate",
+            "usage_bytes": 17104896
+          },
+          "estimated_weight_bytes": 800371968,
+          "oom_recovery": false,
+          "policy": "auto",
+          "reason": "budget_available",
+          "requested_memory": "device",
+          "reserve_bytes": 1512570880,
+          "reserve_policy": "quarter_heap_budget",
+          "scope": "weight placement before graph loading"
+        },
+        "model_verified": false,
+        "ncnn_commit": "3b7bdba7fc8aea8fd46779533eee027df77c639d",
+        "numerical_validation": "NOT_PERFORMED_BY_RUNNER",
+        "output": {
+          "dtype": "f32le",
+          "elements": 2304,
+          "path": "output.f32",
+          "sha256": "f6269b5b57501dcd7c3eff9489bc2c607c6500fa64df2566472554360e8f82bb",
+          "shape": [
+            32,
+            3,
+            6,
+            4
+          ]
+        },
+        "precision": "fp32",
+        "schema_version": "ncnn-graph-execution-v1",
+        "status": "EXECUTED",
+        "timing_ms": {
+          "compute_including_transfers": 69.800132,
+          "total": 2280.679045
+        },
+        "vulkan_calls": 98
+      },
+      "comparison": {
+        "reference_sha256": "01f3dba6f62fefe97fe1dc2619cd227def022d9cca4ad2e4428b5203b50ba3dc",
+        "candidate_sha256": "f6269b5b57501dcd7c3eff9489bc2c607c6500fa64df2566472554360e8f82bb",
+        "shape": [
+          32,
+          3,
+          6,
+          4
+        ],
+        "max_abs": 3.1948089599609375e-05,
+        "rmse": 4.251619139702435e-06,
+        "violations": 0,
+        "finite": true,
+        "passed": true
+      }
+    },
+    {
+      "case_id": "vae-video-encoder-t17-32x32",
+      "backend": "vulkan",
+      "exit_code": 0,
+      "passed": true,
+      "execution": {
+        "backend": "ncnn-vulkan",
+        "case_id": "vae-video-encoder-t17-32x32",
+        "case_sha256": "c475327c73fefe07889111ea5a3e1261110930e904034ec0bf36361a871f2a22",
+        "component": "vae-video-encoder",
+        "cpu_calls": 0,
+        "device": {
+          "api_version": 4211017,
+          "device_id": 10464,
+          "driver_version": 2497102272,
+          "index": 0,
+          "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+          "subgroup_size": 32,
+          "vendor_id": 4318
+        },
+        "dispatch": "EXPLICIT_PER_LAYER_NO_BACKEND_FALLBACK",
+        "implementation": {
+          "executable_sha256": "2c2d08ac27d1a35ce2f2a8a92d32c307f7774ab00398999b6173d672893112b6",
+          "ncnn_runtime_patches": [
+            {
+              "compiled_allocator_sha256": "b8398e0d5ef5a367f80c5d2f13af1c8f170a83a39d0a1b458a40100924a55320",
+              "id": "host-buffer-v1",
+              "original_allocator_sha256": "601d69dab40823366fa6aa2be00c8e37bb0f1e960fe96323c36daed887c4fda2",
+              "scope": "Imported-host buffer declaration and weight-buffer transfer-source usage"
+            }
+          ],
+          "sdk_library_sha256": "ff86dcd0b05ea66f5ab384701701aced273582e0ee95fc0cfa12c9c4608f30f2"
+        },
+        "layers": [
+          {
+            "backend": "vulkan",
+            "name": "conv_in",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_0",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "norm1",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_0",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "conv1",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_0",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_1",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_1",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_0",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_1",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_2",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_2",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_3",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_4",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_3",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_5",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_1",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_6",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_2",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "shortcut",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_7",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_4",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_8",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_9",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_5",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_10",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_2",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_3",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_11",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_6",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_12",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_13",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_7",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_14",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_3",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_15",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_4",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_16",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_17",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_8",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_18",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_19",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_9",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_20",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_4",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_5",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_21",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_10",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_22",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_23",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_11",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_24",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_5",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_25",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_6",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_26",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_12",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_27",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_28",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_13",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_29",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_6",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_7",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_30",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_14",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_31",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_32",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_15",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_33",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_7",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_8",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_34",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_16",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_35",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_36",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_17",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_37",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_8",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_9",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "norm",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_10",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "q",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_38",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_39",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "attention",
+            "type": "SeedVR2FrameSDPA"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_40",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_9",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_11",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_41",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_18",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_42",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_43",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_19",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_44",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_10",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_45",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_20",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_46",
+            "type": "SeedVR2TemporalConv"
+          }
+        ],
+        "memory": {
+          "activation_offload": false,
+          "actual_weight_memory": "not_instrumented",
+          "after_load": {
+            "budget_bytes": 6052904960,
+            "heap_index": 0,
+            "source": "VK_EXT_memory_budget_estimate",
+            "usage_bytes": 430178304
+          },
+          "available_bytes": 6033047552,
+          "before_load": {
+            "budget_bytes": 6050152448,
+            "heap_index": 0,
+            "source": "VK_EXT_memory_budget_estimate",
+            "usage_bytes": 17104896
+          },
+          "estimated_weight_bytes": 800371968,
+          "oom_recovery": false,
+          "policy": "auto",
+          "reason": "budget_available",
+          "requested_memory": "device",
+          "reserve_bytes": 1512538112,
+          "reserve_policy": "quarter_heap_budget",
+          "scope": "weight placement before graph loading"
+        },
+        "model_verified": false,
+        "ncnn_commit": "3b7bdba7fc8aea8fd46779533eee027df77c639d",
+        "numerical_validation": "NOT_PERFORMED_BY_RUNNER",
+        "output": {
+          "dtype": "f32le",
+          "elements": 2560,
+          "path": "output.f32",
+          "sha256": "89fa94a39df804ee06c2017566da65bad12948e401ccfdecffaf4ac4396e2c2d",
+          "shape": [
+            32,
+            5,
+            4,
+            4
+          ]
+        },
+        "precision": "fp32",
+        "schema_version": "ncnn-graph-execution-v1",
+        "status": "EXECUTED",
+        "timing_ms": {
+          "compute_including_transfers": 82.090074,
+          "total": 2257.332784
+        },
+        "vulkan_calls": 98
+      },
+      "comparison": {
+        "reference_sha256": "be97c95e7f9a26051694ffeb45115267b53ddb4fc8039e0fc620c6750b60adba",
+        "candidate_sha256": "89fa94a39df804ee06c2017566da65bad12948e401ccfdecffaf4ac4396e2c2d",
+        "shape": [
+          32,
+          5,
+          4,
+          4
+        ],
+        "max_abs": 2.6226043701171875e-05,
+        "rmse": 4.041389096120725e-06,
+        "violations": 0,
+        "finite": true,
+        "passed": true
+      }
+    },
+    {
+      "case_id": "vae-video-decoder-t1-32x48",
+      "backend": "vulkan",
+      "exit_code": 0,
+      "passed": true,
+      "execution": {
+        "backend": "ncnn-vulkan",
+        "case_id": "vae-video-decoder-t1-32x48",
+        "case_sha256": "69f316fd939eb4dceaa4686db338fd488923ea73f023b65c7d9178035b517305",
+        "component": "vae-video-decoder",
+        "cpu_calls": 0,
+        "device": {
+          "api_version": 4211017,
+          "device_id": 10464,
+          "driver_version": 2497102272,
+          "index": 0,
+          "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+          "subgroup_size": 32,
+          "vendor_id": 4318
+        },
+        "dispatch": "EXPLICIT_PER_LAYER_NO_BACKEND_FALLBACK",
+        "implementation": {
+          "executable_sha256": "2c2d08ac27d1a35ce2f2a8a92d32c307f7774ab00398999b6173d672893112b6",
+          "ncnn_runtime_patches": [
+            {
+              "compiled_allocator_sha256": "b8398e0d5ef5a367f80c5d2f13af1c8f170a83a39d0a1b458a40100924a55320",
+              "id": "host-buffer-v1",
+              "original_allocator_sha256": "601d69dab40823366fa6aa2be00c8e37bb0f1e960fe96323c36daed887c4fda2",
+              "scope": "Imported-host buffer declaration and weight-buffer transfer-source usage"
+            }
+          ],
+          "sdk_library_sha256": "ff86dcd0b05ea66f5ab384701701aced273582e0ee95fc0cfa12c9c4608f30f2"
+        },
+        "layers": [
+          {
+            "backend": "vulkan",
+            "name": "conv_in",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_0",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "norm1",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_0",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "conv1",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_0",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_1",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_1",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_0",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_1",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "norm",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_2",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "q",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_2",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_3",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "attention",
+            "type": "SeedVR2FrameSDPA"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_4",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_1",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_3",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_5",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_2",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_6",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_7",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_3",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_8",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_2",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_4",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_9",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_4",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_10",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_11",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_5",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_12",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_3",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_5",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_13",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_6",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_14",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_15",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_7",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_16",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_4",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_6",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_17",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_8",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_18",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_19",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_9",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_20",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_5",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "upscale",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "shuffle",
+            "type": "SeedVR2TemporalShuffle"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_21",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_7",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_22",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_10",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_23",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_24",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_11",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_25",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_6",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_8",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_26",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_12",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_27",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_28",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_13",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_29",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_7",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_9",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_30",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_14",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_31",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_32",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_15",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_33",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_8",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_34",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_35",
+            "type": "SeedVR2TemporalShuffle"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_36",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_10",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "shortcut",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_37",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_16",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_38",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_39",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_17",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_40",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_9",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_11",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_41",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_18",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_42",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_43",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_19",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_44",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_10",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_12",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_45",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_20",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_46",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_47",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_21",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_48",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_11",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_49",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_50",
+            "type": "SeedVR2TemporalShuffle"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_51",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_13",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_52",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_53",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_22",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_54",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_55",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_23",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_56",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_12",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_14",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_57",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_24",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_58",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_59",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_25",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_60",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_13",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_15",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_61",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_26",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_62",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_63",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_27",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_64",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_14",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_65",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_28",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_66",
+            "type": "SeedVR2TemporalConv"
+          }
+        ],
+        "memory": {
+          "activation_offload": false,
+          "actual_weight_memory": "not_instrumented",
+          "after_load": {
+            "budget_bytes": 6042353664,
+            "heap_index": 0,
+            "source": "VK_EXT_memory_budget_estimate",
+            "usage_bytes": 633602048
+          },
+          "available_bytes": 6033113088,
+          "before_load": {
+            "budget_bytes": 6050217984,
+            "heap_index": 0,
+            "source": "VK_EXT_memory_budget_estimate",
+            "usage_bytes": 17104896
+          },
+          "estimated_weight_bytes": 1204813848,
+          "oom_recovery": false,
+          "policy": "auto",
+          "reason": "budget_available",
+          "requested_memory": "device",
+          "reserve_bytes": 1512554496,
+          "reserve_policy": "quarter_heap_budget",
+          "scope": "weight placement before graph loading"
+        },
+        "model_verified": false,
+        "ncnn_commit": "3b7bdba7fc8aea8fd46779533eee027df77c639d",
+        "numerical_validation": "NOT_PERFORMED_BY_RUNNER",
+        "output": {
+          "dtype": "f32le",
+          "elements": 4608,
+          "path": "output.f32",
+          "sha256": "5b1cb2b7fabdf235075fa5f61068284376bec564a3dfd60ed8ca9d1344c2f7ab",
+          "shape": [
+            3,
+            1,
+            32,
+            48
+          ]
+        },
+        "precision": "fp32",
+        "schema_version": "ncnn-graph-execution-v1",
+        "status": "EXECUTED",
+        "timing_ms": {
+          "compute_including_transfers": 47.92496,
+          "total": 2612.013577
+        },
+        "vulkan_calls": 136
+      },
+      "comparison": {
+        "reference_sha256": "b540529d139a6362147d7bb5dcc7dc2e2994efb462762a046400dbfed909bc41",
+        "candidate_sha256": "5b1cb2b7fabdf235075fa5f61068284376bec564a3dfd60ed8ca9d1344c2f7ab",
+        "shape": [
+          3,
+          1,
+          32,
+          48
+        ],
+        "max_abs": 3.337860107421875e-06,
+        "rmse": 4.892287068397563e-07,
+        "violations": 0,
+        "finite": true,
+        "passed": true
+      }
+    },
+    {
+      "case_id": "vae-video-decoder-t5-32x48",
+      "backend": "vulkan",
+      "exit_code": 0,
+      "passed": true,
+      "execution": {
+        "backend": "ncnn-vulkan",
+        "case_id": "vae-video-decoder-t5-32x48",
+        "case_sha256": "ab4878b8f5ff0849dab62feae46d2d08defce34f4fe9606d3ec2ac19c7bb4964",
+        "component": "vae-video-decoder",
+        "cpu_calls": 0,
+        "device": {
+          "api_version": 4211017,
+          "device_id": 10464,
+          "driver_version": 2497102272,
+          "index": 0,
+          "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+          "subgroup_size": 32,
+          "vendor_id": 4318
+        },
+        "dispatch": "EXPLICIT_PER_LAYER_NO_BACKEND_FALLBACK",
+        "implementation": {
+          "executable_sha256": "2c2d08ac27d1a35ce2f2a8a92d32c307f7774ab00398999b6173d672893112b6",
+          "ncnn_runtime_patches": [
+            {
+              "compiled_allocator_sha256": "b8398e0d5ef5a367f80c5d2f13af1c8f170a83a39d0a1b458a40100924a55320",
+              "id": "host-buffer-v1",
+              "original_allocator_sha256": "601d69dab40823366fa6aa2be00c8e37bb0f1e960fe96323c36daed887c4fda2",
+              "scope": "Imported-host buffer declaration and weight-buffer transfer-source usage"
+            }
+          ],
+          "sdk_library_sha256": "ff86dcd0b05ea66f5ab384701701aced273582e0ee95fc0cfa12c9c4608f30f2"
+        },
+        "layers": [
+          {
+            "backend": "vulkan",
+            "name": "conv_in",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_0",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "norm1",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_0",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "conv1",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_0",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_1",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_1",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_0",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_1",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "norm",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_2",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "q",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_2",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_3",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "attention",
+            "type": "SeedVR2FrameSDPA"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_4",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_1",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_3",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_5",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_2",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_6",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_7",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_3",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_8",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_2",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_4",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_9",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_4",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_10",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_11",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_5",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_12",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_3",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_5",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_13",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_6",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_14",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_15",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_7",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_16",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_4",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_6",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_17",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_8",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_18",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_19",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_9",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_20",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_5",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "upscale",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "shuffle",
+            "type": "SeedVR2TemporalShuffle"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_21",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_7",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_22",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_10",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_23",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_24",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_11",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_25",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_6",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_8",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_26",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_12",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_27",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_28",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_13",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_29",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_7",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_9",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_30",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_14",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_31",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_32",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_15",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_33",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_8",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_34",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_35",
+            "type": "SeedVR2TemporalShuffle"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_36",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_10",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "shortcut",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_37",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_16",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_38",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_39",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_17",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_40",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_9",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_11",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_41",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_18",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_42",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_43",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_19",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_44",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_10",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_12",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_45",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_20",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_46",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_47",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_21",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_48",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_11",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_49",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_50",
+            "type": "SeedVR2TemporalShuffle"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_51",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_13",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_52",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_53",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_22",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_54",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_55",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_23",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_56",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_12",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_14",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_57",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_24",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_58",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_59",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_25",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_60",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_13",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_15",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_61",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_26",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_62",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_63",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_27",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_64",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_14",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_65",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_28",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_66",
+            "type": "SeedVR2TemporalConv"
+          }
+        ],
+        "memory": {
+          "activation_offload": false,
+          "actual_weight_memory": "not_instrumented",
+          "after_load": {
+            "budget_bytes": 6047203328,
+            "heap_index": 0,
+            "source": "VK_EXT_memory_budget_estimate",
+            "usage_bytes": 633602048
+          },
+          "available_bytes": 6025379840,
+          "before_load": {
+            "budget_bytes": 6042484736,
+            "heap_index": 0,
+            "source": "VK_EXT_memory_budget_estimate",
+            "usage_bytes": 17104896
+          },
+          "estimated_weight_bytes": 1204813848,
+          "oom_recovery": false,
+          "policy": "auto",
+          "reason": "budget_available",
+          "requested_memory": "device",
+          "reserve_bytes": 1510621184,
+          "reserve_policy": "quarter_heap_budget",
+          "scope": "weight placement before graph loading"
+        },
+        "model_verified": false,
+        "ncnn_commit": "3b7bdba7fc8aea8fd46779533eee027df77c639d",
+        "numerical_validation": "NOT_PERFORMED_BY_RUNNER",
+        "output": {
+          "dtype": "f32le",
+          "elements": 23040,
+          "path": "output.f32",
+          "sha256": "4360d9db9e5923dd5f84b08add6a2ef285f50b491955dfcf2b3a3ab4a323e282",
+          "shape": [
+            3,
+            5,
+            32,
+            48
+          ]
+        },
+        "precision": "fp32",
+        "schema_version": "ncnn-graph-execution-v1",
+        "status": "EXECUTED",
+        "timing_ms": {
+          "compute_including_transfers": 91.745355,
+          "total": 2559.530499
+        },
+        "vulkan_calls": 136
+      },
+      "comparison": {
+        "reference_sha256": "e4ee95bafde7e4a7cb7b76176d2a36cdce1e62f57f1f6fab52c6515e8556dd9f",
+        "candidate_sha256": "4360d9db9e5923dd5f84b08add6a2ef285f50b491955dfcf2b3a3ab4a323e282",
+        "shape": [
+          3,
+          5,
+          32,
+          48
+        ],
+        "max_abs": 2.8796494007110596e-06,
+        "rmse": 3.7576851173329525e-07,
+        "violations": 0,
+        "finite": true,
+        "passed": true
+      }
+    },
+    {
+      "case_id": "vae-video-decoder-t9-48x32",
+      "backend": "vulkan",
+      "exit_code": 0,
+      "passed": true,
+      "execution": {
+        "backend": "ncnn-vulkan",
+        "case_id": "vae-video-decoder-t9-48x32",
+        "case_sha256": "37cd086261e31e7abcd0b39e57be2ccf0b165335d81438db02fda5a35bb56bef",
+        "component": "vae-video-decoder",
+        "cpu_calls": 0,
+        "device": {
+          "api_version": 4211017,
+          "device_id": 10464,
+          "driver_version": 2497102272,
+          "index": 0,
+          "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+          "subgroup_size": 32,
+          "vendor_id": 4318
+        },
+        "dispatch": "EXPLICIT_PER_LAYER_NO_BACKEND_FALLBACK",
+        "implementation": {
+          "executable_sha256": "2c2d08ac27d1a35ce2f2a8a92d32c307f7774ab00398999b6173d672893112b6",
+          "ncnn_runtime_patches": [
+            {
+              "compiled_allocator_sha256": "b8398e0d5ef5a367f80c5d2f13af1c8f170a83a39d0a1b458a40100924a55320",
+              "id": "host-buffer-v1",
+              "original_allocator_sha256": "601d69dab40823366fa6aa2be00c8e37bb0f1e960fe96323c36daed887c4fda2",
+              "scope": "Imported-host buffer declaration and weight-buffer transfer-source usage"
+            }
+          ],
+          "sdk_library_sha256": "ff86dcd0b05ea66f5ab384701701aced273582e0ee95fc0cfa12c9c4608f30f2"
+        },
+        "layers": [
+          {
+            "backend": "vulkan",
+            "name": "conv_in",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_0",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "norm1",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_0",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "conv1",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_0",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_1",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_1",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_0",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_1",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "norm",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_2",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "q",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_2",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_3",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "attention",
+            "type": "SeedVR2FrameSDPA"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_4",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_1",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_3",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_5",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_2",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_6",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_7",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_3",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_8",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_2",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_4",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_9",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_4",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_10",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_11",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_5",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_12",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_3",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_5",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_13",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_6",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_14",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_15",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_7",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_16",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_4",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_6",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_17",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_8",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_18",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_19",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_9",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_20",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_5",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "upscale",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "shuffle",
+            "type": "SeedVR2TemporalShuffle"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_21",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_7",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_22",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_10",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_23",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_24",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_11",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_25",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_6",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_8",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_26",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_12",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_27",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_28",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_13",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_29",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_7",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_9",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_30",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_14",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_31",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_32",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_15",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_33",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_8",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_34",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_35",
+            "type": "SeedVR2TemporalShuffle"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_36",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_10",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "shortcut",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_37",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_16",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_38",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_39",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_17",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_40",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_9",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_11",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_41",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_18",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_42",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_43",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_19",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_44",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_10",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_12",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_45",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_20",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_46",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_47",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_21",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_48",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_11",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_49",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_50",
+            "type": "SeedVR2TemporalShuffle"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_51",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_13",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_52",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_53",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_22",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_54",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_55",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_23",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_56",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_12",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_14",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_57",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_24",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_58",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_59",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_25",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_60",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_13",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_15",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_61",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_26",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_62",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_63",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_27",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_64",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_14",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_65",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_28",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_66",
+            "type": "SeedVR2TemporalConv"
+          }
+        ],
+        "memory": {
+          "activation_offload": false,
+          "actual_weight_memory": "not_instrumented",
+          "after_load": {
+            "budget_bytes": 6046613504,
+            "heap_index": 0,
+            "source": "VK_EXT_memory_budget_estimate",
+            "usage_bytes": 633602048
+          },
+          "available_bytes": 6025248768,
+          "before_load": {
+            "budget_bytes": 6042353664,
+            "heap_index": 0,
+            "source": "VK_EXT_memory_budget_estimate",
+            "usage_bytes": 17104896
+          },
+          "estimated_weight_bytes": 1204813848,
+          "oom_recovery": false,
+          "policy": "auto",
+          "reason": "budget_available",
+          "requested_memory": "device",
+          "reserve_bytes": 1510588416,
+          "reserve_policy": "quarter_heap_budget",
+          "scope": "weight placement before graph loading"
+        },
+        "model_verified": false,
+        "ncnn_commit": "3b7bdba7fc8aea8fd46779533eee027df77c639d",
+        "numerical_validation": "NOT_PERFORMED_BY_RUNNER",
+        "output": {
+          "dtype": "f32le",
+          "elements": 41472,
+          "path": "output.f32",
+          "sha256": "7df4c727c4b4a5ae64c9a609285acd32ae39b834db4e9c244862bef2504a00ae",
+          "shape": [
+            3,
+            9,
+            48,
+            32
+          ]
+        },
+        "precision": "fp32",
+        "schema_version": "ncnn-graph-execution-v1",
+        "status": "EXECUTED",
+        "timing_ms": {
+          "compute_including_transfers": 124.936869,
+          "total": 2656.283968
+        },
+        "vulkan_calls": 136
+      },
+      "comparison": {
+        "reference_sha256": "ea795006b349bdc6cd6c68af626ba8cb7762a1d6a7bfba63a492bef69c1de1b2",
+        "candidate_sha256": "7df4c727c4b4a5ae64c9a609285acd32ae39b834db4e9c244862bef2504a00ae",
+        "shape": [
+          3,
+          9,
+          48,
+          32
+        ],
+        "max_abs": 5.781650543212891e-06,
+        "rmse": 4.0492123224091896e-07,
+        "violations": 0,
+        "finite": true,
+        "passed": true
+      }
+    },
+    {
+      "case_id": "vae-video-decoder-t17-32x32",
+      "backend": "vulkan",
+      "exit_code": 0,
+      "passed": true,
+      "execution": {
+        "backend": "ncnn-vulkan",
+        "case_id": "vae-video-decoder-t17-32x32",
+        "case_sha256": "6df4c0a8d2e6748a701d3fb65594fd911a4a9a99cfe5018f8b293bd4f14b73c8",
+        "component": "vae-video-decoder",
+        "cpu_calls": 0,
+        "device": {
+          "api_version": 4211017,
+          "device_id": 10464,
+          "driver_version": 2497102272,
+          "index": 0,
+          "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+          "subgroup_size": 32,
+          "vendor_id": 4318
+        },
+        "dispatch": "EXPLICIT_PER_LAYER_NO_BACKEND_FALLBACK",
+        "implementation": {
+          "executable_sha256": "2c2d08ac27d1a35ce2f2a8a92d32c307f7774ab00398999b6173d672893112b6",
+          "ncnn_runtime_patches": [
+            {
+              "compiled_allocator_sha256": "b8398e0d5ef5a367f80c5d2f13af1c8f170a83a39d0a1b458a40100924a55320",
+              "id": "host-buffer-v1",
+              "original_allocator_sha256": "601d69dab40823366fa6aa2be00c8e37bb0f1e960fe96323c36daed887c4fda2",
+              "scope": "Imported-host buffer declaration and weight-buffer transfer-source usage"
+            }
+          ],
+          "sdk_library_sha256": "ff86dcd0b05ea66f5ab384701701aced273582e0ee95fc0cfa12c9c4608f30f2"
+        },
+        "layers": [
+          {
+            "backend": "vulkan",
+            "name": "conv_in",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_0",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "norm1",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_0",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "conv1",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_0",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_1",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_1",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_0",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_1",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "norm",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_2",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "q",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_2",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_3",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "attention",
+            "type": "SeedVR2FrameSDPA"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_4",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_1",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_3",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_5",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_2",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_6",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_7",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_3",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_8",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_2",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_4",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_9",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_4",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_10",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_11",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_5",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_12",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_3",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_5",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_13",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_6",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_14",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_15",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_7",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_16",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_4",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_6",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_17",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_8",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_18",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_19",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_9",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_20",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_5",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "upscale",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "shuffle",
+            "type": "SeedVR2TemporalShuffle"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_21",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_7",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_22",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_10",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_23",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_24",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_11",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_25",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_6",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_8",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_26",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_12",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_27",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_28",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_13",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_29",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_7",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_9",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_30",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_14",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_31",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_32",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_15",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_33",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_8",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_34",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_35",
+            "type": "SeedVR2TemporalShuffle"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_36",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_10",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "shortcut",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_37",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_16",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_38",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_39",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_17",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_40",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_9",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_11",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_41",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_18",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_42",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_43",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_19",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_44",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_10",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_12",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_45",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_20",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_46",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_47",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_21",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_48",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_11",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_49",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_50",
+            "type": "SeedVR2TemporalShuffle"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_51",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_13",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_52",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_53",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_22",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_54",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_55",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_23",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_56",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_12",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_14",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_57",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_24",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_58",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_59",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_25",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_60",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_13",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_15",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_61",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_26",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_62",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_63",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_27",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_64",
+            "type": "SeedVR2TemporalConv"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_14",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_65",
+            "type": "SeedVR2FrameNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_28",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_66",
+            "type": "SeedVR2TemporalConv"
+          }
+        ],
+        "memory": {
+          "activation_offload": false,
+          "actual_weight_memory": "not_instrumented",
+          "after_load": {
+            "budget_bytes": 6027411456,
+            "heap_index": 0,
+            "source": "VK_EXT_memory_budget_estimate",
+            "usage_bytes": 633602048
+          },
+          "available_bytes": 6012010496,
+          "before_load": {
+            "budget_bytes": 6029115392,
+            "heap_index": 0,
+            "source": "VK_EXT_memory_budget_estimate",
+            "usage_bytes": 17104896
+          },
+          "estimated_weight_bytes": 1204813848,
+          "oom_recovery": false,
+          "policy": "auto",
+          "reason": "budget_available",
+          "requested_memory": "device",
+          "reserve_bytes": 1507278848,
+          "reserve_policy": "quarter_heap_budget",
+          "scope": "weight placement before graph loading"
+        },
+        "model_verified": false,
+        "ncnn_commit": "3b7bdba7fc8aea8fd46779533eee027df77c639d",
+        "numerical_validation": "NOT_PERFORMED_BY_RUNNER",
+        "output": {
+          "dtype": "f32le",
+          "elements": 52224,
+          "path": "output.f32",
+          "sha256": "0183590918af3d287c857ff1b018ee4266ef040165b43c38a968f389316acb2a",
+          "shape": [
+            3,
+            17,
+            32,
+            32
+          ]
+        },
+        "precision": "fp32",
+        "schema_version": "ncnn-graph-execution-v1",
+        "status": "EXECUTED",
+        "timing_ms": {
+          "compute_including_transfers": 157.461109,
+          "total": 2587.668781
+        },
+        "vulkan_calls": 136
+      },
+      "comparison": {
+        "reference_sha256": "ff635d0be14adcc50bff778d0e6599a96ab36483ae83d9a3c513d1f50ee0ba80",
+        "candidate_sha256": "0183590918af3d287c857ff1b018ee4266ef040165b43c38a968f389316acb2a",
+        "shape": [
+          3,
+          17,
+          32,
+          32
+        ],
+        "max_abs": 4.738569259643555e-06,
+        "rmse": 3.7642083016689627e-07,
+        "violations": 0,
+        "finite": true,
+        "passed": true
+      }
+    }
+  ],
+  "passed": true,
+  "passed_count": 8,
+  "total": 8,
+  "model_verified": false
+}

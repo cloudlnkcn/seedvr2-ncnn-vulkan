@@ -1,6 +1,6 @@
 # 原生架构与源码导航
 
-0.6.0，2026-09-08。目标是一个易测试的单机应用：本地 Web、独立 CLI、可安装 SDK 共用计算实现，避免引入额外服务或未有需求的扩展框架。
+0.7.0，2026-09-08。目标是一个易测试的单机应用：本地 Web、独立 CLI、可安装 SDK 共用计算实现，避免引入额外服务或未有需求的扩展框架。
 
 ```mermaid
 flowchart LR
@@ -34,6 +34,7 @@ flowchart LR
 | 共有推理数学 | `src/engine/ncnn/inference.hpp` | 后验采样、布局、噪声、条件与 Euler；不含 Web 状态 |
 | 包认证 | `src/engine/ncnn/package.cpp`、`package.hpp`、`policies/reviewed-packages.json` | 审阅过的有效载荷身份、相对路径、文件大小与 SHA-256 |
 | 图执行与权重生命周期 | `graph.hpp`、`weight_io.hpp` | 一次一图、CPU/Vulkan 明确选择、可选只读 mmap |
+| 权重放置预算 | `include/seedvr2/memory.hpp`、`src/runtime/memory_policy.*`、`src/engine/ncnn/memory.hpp` | 纯策略与设备查询分开；每图重读预算，不把放置请求冒充实际驻留 |
 | 自定义数学 | `awa.cpp`、`constant.cpp`、`video_layers.cpp`、`shaders` | AWA 窗口与 RoPE、文本平均、常量、时序 VAE 变换 |
 | 输入输出 | `image_io.cpp`、`video_io.cpp` | 有界解码、预处理、PNG/MP4、输入类型/色彩范围拒绝 |
 | 当前实现身份和资源 | `provenance.hpp` | 可执行文件与实际加载 SDK 的 SHA；RSS 不冒充激活或工作区 |
@@ -68,3 +69,5 @@ AWA 的 pnnx 边界保留官方自适应窗口含义：窗口 gather、Q/K 归�
 先按当前尺寸提供可用输入、结果和错误，再由明确需求和测量选择扩展。继续研究的事项包括更多输入与设备的误差传播、官方 BF16 路径、代表性自然视频质量、时间缓存/长片边界和更大分辨率。它们不妨碍交付有边界的当前预览，也不能被当前小型自测替代验收。没有预先加入插件系统、常驻全模型缓存或通用分布式调度器。
 
 17 帧数值修复及开发诊断工具导航见 [VIDEO-NUMERICS.md](VIDEO-NUMERICS.md)。共享执行层的内部 observer 默认关闭；启用后会下载并保存指定边界，改变执行时序，因此其性能不能代替正常流水线测量。CPU 时序编码器单独采用直接卷积，解码器保留原有路径；该策略同时用于完整执行与组件诊断。
+
+0.7.0 增加公共内存设置，SDK SONAME 为 `libseedvr2.so.0.7`，旧 SDK 使用程序需重新编译。GPU/RAM 选择、实际 Vulkan 分配问题的编译副本修复及 ERNIE 复用边界见 [MEMORY-VALIDATION.md](MEMORY-VALIDATION.md)。官方 ncnn 源目录不变；应用实际运行时包含报告中列出的 `host-buffer-v1` 修正。

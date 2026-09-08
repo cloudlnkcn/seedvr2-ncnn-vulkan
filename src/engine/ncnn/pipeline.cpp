@@ -3,6 +3,7 @@
 #include "seedvr2/video.hpp"
 #include "package.hpp"
 #include "video_io.hpp"
+#include "memory.hpp"
 #include <bit>
 #if defined(__unix__)
 #include <unistd.h>
@@ -37,6 +38,7 @@ Result<Preflight> preflight(const RestoreRequest &r) {
     std::string field="parameters";
     try {
         const bool video=is_video(r.kind);
+        memory::validate(r.memory,r.backend==Backend::vulkan);
         if (r.weight_io!=WeightIO::buffered && r.weight_io!=WeightIO::mapped) throw std::runtime_error("Unknown weight reader");
 #if !defined(__linux__)
         if (r.weight_io==WeightIO::mapped) throw std::runtime_error("Mapped weight loading requires Linux");
@@ -81,6 +83,8 @@ Result<Preflight> preflight(const RestoreRequest &r) {
             {"model",{{"manifest_sha256",p.identity},{"profile",p.document.at("profile")},{"package_bytes",p.bytes},
                 {"largest_graph_bytes",p.largest_graph_bytes},{"manifest_authenticated",true},{"weight_hashes_verified",false}}},
             {"model_verified",false}};
+        report["memory"]={{"weight_policy",memory::name(r.memory.weights)},
+            {"gpu_reserve_bytes",r.memory.gpu_reserve_bytes},{"scope","rechecked before each graph; not a peak-memory guarantee"}};
         return Preflight{prepared.w,prepared.h,frames,p.bytes,p.largest_graph_bytes,reserve,p.identity,report.dump(2)};
     } catch (const std::exception &e) { return Error{"PREFLIGHT_FAILED",field,e.what()}; }
 }
@@ -94,6 +98,7 @@ Result<RunResult> restore(const RestoreRequest &r, ProgressObserver observer, Ca
         native.vulkan=r.backend==Backend::vulkan; native.gpu_index=r.gpu_index; native.threads=r.threads;
         native.long_side=r.long_side; native.max_frames=r.max_frames; native.seed=r.seed; native.diagnostic_tensors=r.diagnostic_tensors;
         native.mapped_weights=r.weight_io==WeightIO::mapped;
+        native.memory=r.memory;
         if (r.weight_io!=WeightIO::buffered && r.weight_io!=WeightIO::mapped) return Error{"PREFLIGHT_FAILED","weight_io","Unknown weight reader"};
         if (r.backend!=Backend::cpu && r.backend!=Backend::vulkan) return Error{"PREFLIGHT_FAILED","backend","Unknown backend"};
         auto value=video?engine::run_video(native,observer,cancelled):engine::run_image(native,observer,cancelled);

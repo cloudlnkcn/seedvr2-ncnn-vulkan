@@ -1,6 +1,7 @@
 #pragma once
 #include "graph.hpp"
 #include "seedvr2/pipeline.hpp"
+#include "engine_build.hpp"
 #if defined(__linux__)
 #include <dlfcn.h>
 #include <sys/resource.h>
@@ -8,6 +9,10 @@
 namespace seedvr2::engine::detail {
 inline Json implementation_identity() {
     Json result=Json::object();
+    result["ncnn_runtime_patches"]=Json::array({{{"id","host-buffer-v1"},
+        {"original_allocator_sha256",SEEDVR2_NCNN_ALLOCATOR_ORIGINAL_SHA},
+        {"compiled_allocator_sha256",SEEDVR2_NCNN_ALLOCATOR_PATCHED_SHA},
+        {"scope","Imported-host buffer declaration and weight-buffer transfer-source usage"}}});
 #if defined(__linux__)
     result["executable_sha256"]=hash("/proc/self/exe");
     Dl_info info{};

@@ -1,0 +1,16 @@
+{
+  "status": "INVALID_FOR_NEW_SDK_ACCEPTANCE",
+  "scope": "Only the first external SDK smoke and natural image run; native CLI component/video runs are unaffected",
+  "expected_sdk_sha256": "ff86dcd0b05ea66f5ab384701701aced273582e0ee95fc0cfa12c9c4608f30f2",
+  "observed_sdk_sha256": "dcddfd914118ffcfabb6b6e37cbc7fd423320aedad59c9abe9a533d93ad11992",
+  "detected_by": "Post-run comparison of actual loaded SDK identity",
+  "cause": "CMake seedvr2_DIR cached dist/seedvr2-0.6.0 despite a new CMAKE_PREFIX_PATH; example also still requested 0.6",
+  "affected": [
+    "native-ci/sdk-smoke.json",
+    "native-ci/sdk-build.log",
+    "image-sdk-auto-measurement.json",
+    "image-sdk-auto-parity.json",
+    "image-sdk-auto/run.json"
+  ],
+  "fix": "CMake --fresh, example requires 0.7, native_ci compares example and CLI sdk_library_sha256"
+}

@@ -68,6 +68,6 @@ Package::Package(const std::filesystem::path &root, const std::function<void()> 
 RestoreRequest public_request(const ImageRequest &r, bool video, int frames) {
     return {r.model_directory,r.input_file,r.output_directory,video?MediaKind::video:MediaKind::image,
             r.vulkan?Backend::vulkan:Backend::cpu,r.gpu_index,r.threads,r.long_side,frames,r.seed,r.diagnostic_tensors,
-            r.mapped_weights?WeightIO::mapped:WeightIO::buffered};
+            r.mapped_weights?WeightIO::mapped:WeightIO::buffered,r.memory};
 }
 } // namespace seedvr2::engine::inference

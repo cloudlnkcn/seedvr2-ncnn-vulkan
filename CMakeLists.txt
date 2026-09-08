@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(seedvr2_ncnn_vulkan VERSION 0.6.0 LANGUAGES CXX)
+project(seedvr2_ncnn_vulkan VERSION 0.7.0 LANGUAGES CXX)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -74,7 +74,8 @@ target_include_directories(seedvr2_application PUBLIC include)
 target_include_directories(seedvr2_application SYSTEM PRIVATE third_party)
 target_link_libraries(seedvr2_application PUBLIC seedvr2_protocol seedvr2_validation seedvr2_storage)
 
-# The model backend uses an independently pinned, unmodified upstream dependency.
+# Upstream source/archive are pinned and unchanged. The authenticated allocator
+# overlay below is part of this application's reported runtime identity.
 set(SEEDVR2_NCNN_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/.deps/ncnn-install" CACHE PATH "Prepared ncnn install")
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/engine-dependencies.lock.json" SEEDVR2_ENGINE_LOCK)
 string(JSON SEEDVR2_NCNN_COMMIT GET "${SEEDVR2_ENGINE_LOCK}" ncnn commit)
@@ -87,6 +88,7 @@ find_package(ncnn CONFIG REQUIRED PATHS "${SEEDVR2_NCNN_PREFIX}/lib/cmake/ncnn" 
 if(NOT NCNN_VULKAN)
     message(FATAL_ERROR "The AWA backend requires a Vulkan-enabled ncnn build")
 endif()
+include(cmake/SeedVR2NcnnAllocator.cmake)
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
 find_program(SEEDVR2_GLSLANG_VALIDATOR glslangValidator REQUIRED)
 set(SEEDVR2_AWA_SPV)
@@ -112,20 +114,21 @@ add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_fixture.cpp
     COMMAND Python3::Interpreter "${CMAKE_CURRENT_SOURCE_DIR}/tools/embed_awa_fixture.py"
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/awa" "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_fixture.cpp"
     DEPENDS ${AWA_FIXTURES} tools/embed_awa_fixture.py VERBATIM)
-add_library(seedvr2_engine SHARED src/engine/ncnn/awa.cpp src/engine/ncnn/constant.cpp src/engine/ncnn/runtime.cpp
+add_library(seedvr2_engine SHARED src/runtime/memory_policy.cpp src/engine/ncnn/awa.cpp src/engine/ncnn/constant.cpp src/engine/ncnn/runtime.cpp
     src/engine/ncnn/package.cpp src/engine/ncnn/pipeline.cpp
     src/engine/ncnn/image.cpp src/engine/ncnn/image_io.cpp src/engine/ncnn/video_layers.cpp
     src/engine/ncnn/video.cpp src/engine/ncnn/video_io.cpp
     "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_fixture.cpp"
     "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp")
 add_library(seedvr2::sdk ALIAS seedvr2_engine)
-set_target_properties(seedvr2_engine PROPERTIES OUTPUT_NAME seedvr2 EXPORT_NAME sdk VERSION ${PROJECT_VERSION} SOVERSION 0)
+set_target_properties(seedvr2_engine PROPERTIES OUTPUT_NAME seedvr2 EXPORT_NAME sdk
+    VERSION ${PROJECT_VERSION} SOVERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
 target_compile_features(seedvr2_engine PUBLIC cxx_std_20)
 target_include_directories(seedvr2_engine PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>" "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
     PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated" src/engine/ncnn)
 target_include_directories(seedvr2_engine SYSTEM PRIVATE third_party)
 target_include_directories(seedvr2_engine SYSTEM PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/.deps/src/ncnn-${SEEDVR2_NCNN_COMMIT}/src")
-target_link_libraries(seedvr2_engine PRIVATE seedvr2_planning ncnn OpenSSL::Crypto JPEG::JPEG PkgConfig::SEEDVR2_MEDIA)
+target_link_libraries(seedvr2_engine PRIVATE seedvr2_planning seedvr2_ncnn_runtime OpenSSL::Crypto JPEG::JPEG PkgConfig::SEEDVR2_MEDIA)
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     # Keep embedded glslang/SPIRV-Tools symbols out of the dynamic symbol table.
     # Otherwise a Vulkan validation layer can bind to a different static ABI.
@@ -169,11 +172,27 @@ target_link_libraries(seedvr2-worker PRIVATE seedvr2_engine CLI11::CLI11)
 install(TARGETS seedvr2-worker RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 if(BUILD_TESTING)
+    add_executable(seedvr2_memory_policy_tests tests/memory_policy_tests.cpp src/runtime/memory_policy.cpp)
+    target_include_directories(seedvr2_memory_policy_tests PRIVATE src/runtime)
+    target_link_libraries(seedvr2_memory_policy_tests PRIVATE seedvr2_options)
+    target_include_directories(seedvr2_memory_policy_tests PRIVATE include)
+    add_test(NAME engine.memory-policy COMMAND seedvr2_memory_policy_tests)
+    add_executable(seedvr2_memory_vulkan_tests tests/memory_vulkan_tests.cpp src/runtime/memory_policy.cpp)
+    target_include_directories(seedvr2_memory_vulkan_tests PRIVATE include src/engine/ncnn)
+    target_include_directories(seedvr2_memory_vulkan_tests SYSTEM PRIVATE third_party
+        "${CMAKE_CURRENT_SOURCE_DIR}/.deps/src/ncnn-${SEEDVR2_NCNN_COMMIT}/src"
+        "${CMAKE_CURRENT_SOURCE_DIR}/.deps/src/ncnn-${SEEDVR2_NCNN_COMMIT}/src/layer")
+    target_link_libraries(seedvr2_memory_vulkan_tests PRIVATE seedvr2_ncnn_runtime OpenSSL::Crypto)
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        target_link_options(seedvr2_memory_vulkan_tests PRIVATE "-Wl,--exclude-libs,ALL")
+    endif()
+    add_test(NAME engine.memory-vulkan COMMAND seedvr2_memory_vulkan_tests)
+    set_tests_properties(engine.memory-vulkan PROPERTIES SKIP_RETURN_CODE 77 LABELS "vulkan" TIMEOUT 60)
     add_executable(seedvr2_awa_rope_tests tests/awa_rope_tests.cpp src/engine/ncnn/awa.cpp
         "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp")
     target_include_directories(seedvr2_awa_rope_tests PRIVATE src/engine/ncnn "${CMAKE_CURRENT_BINARY_DIR}/generated")
     target_include_directories(seedvr2_awa_rope_tests SYSTEM PRIVATE third_party)
-    target_link_libraries(seedvr2_awa_rope_tests PRIVATE seedvr2_planning ncnn OpenSSL::Crypto)
+    target_link_libraries(seedvr2_awa_rope_tests PRIVATE seedvr2_planning seedvr2_ncnn_runtime OpenSSL::Crypto)
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         target_link_options(seedvr2_awa_rope_tests PRIVATE "-Wl,--exclude-libs,ALL")
     endif()
@@ -181,16 +200,20 @@ if(BUILD_TESTING)
     add_test(NAME engine.awa-rope-vulkan COMMAND seedvr2_awa_rope_tests vulkan)
     add_test(NAME engine.awa-sdpa-fp32-cpu COMMAND seedvr2_awa_rope_tests cpu sdpa)
     add_test(NAME engine.awa-sdpa-fp32-vulkan COMMAND seedvr2_awa_rope_tests vulkan sdpa)
-    set_tests_properties(engine.awa-rope-vulkan engine.awa-sdpa-fp32-vulkan PROPERTIES SKIP_RETURN_CODE 77 LABELS "vulkan")
+    add_test(NAME engine.awa-rope-vulkan-host COMMAND seedvr2_awa_rope_tests vulkan host)
+    add_test(NAME engine.awa-sdpa-fp32-vulkan-host COMMAND seedvr2_awa_rope_tests vulkan sdpa host)
+    set_tests_properties(engine.awa-rope-vulkan engine.awa-sdpa-fp32-vulkan
+        engine.awa-rope-vulkan-host engine.awa-sdpa-fp32-vulkan-host PROPERTIES SKIP_RETURN_CODE 77 LABELS "vulkan")
     set_tests_properties(engine.awa-rope-cpu engine.awa-rope-vulkan
-        engine.awa-sdpa-fp32-cpu engine.awa-sdpa-fp32-vulkan PROPERTIES TIMEOUT 60)
+        engine.awa-sdpa-fp32-cpu engine.awa-sdpa-fp32-vulkan
+        engine.awa-rope-vulkan-host engine.awa-sdpa-fp32-vulkan-host PROPERTIES TIMEOUT 60)
     # Explicit developer target: real per-layer diagnostics, not a default model test.
     add_executable(seedvr2-dit-trace EXCLUDE_FROM_ALL tools/trace_dit_layers.cpp
         src/engine/ncnn/awa.cpp src/engine/ncnn/constant.cpp
         "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp")
     target_include_directories(seedvr2-dit-trace PRIVATE src/engine/ncnn "${CMAKE_CURRENT_BINARY_DIR}/generated")
     target_include_directories(seedvr2-dit-trace SYSTEM PRIVATE third_party)
-    target_link_libraries(seedvr2-dit-trace PRIVATE seedvr2_planning ncnn OpenSSL::Crypto)
+    target_link_libraries(seedvr2-dit-trace PRIVATE seedvr2_planning seedvr2_ncnn_runtime OpenSSL::Crypto)
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         target_link_options(seedvr2-dit-trace PRIVATE "-Wl,--exclude-libs,ALL")
     endif()
@@ -198,17 +221,17 @@ if(BUILD_TESTING)
         src/engine/ncnn/video_layers.cpp "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp")
     target_include_directories(seedvr2-vae-trace PRIVATE src/engine/ncnn "${CMAKE_CURRENT_BINARY_DIR}/generated")
     target_include_directories(seedvr2-vae-trace SYSTEM PRIVATE third_party)
-    target_link_libraries(seedvr2-vae-trace PRIVATE seedvr2_planning ncnn OpenSSL::Crypto)
+    target_link_libraries(seedvr2-vae-trace PRIVATE seedvr2_planning seedvr2_ncnn_runtime OpenSSL::Crypto)
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         target_link_options(seedvr2-vae-trace PRIVATE "-Wl,--exclude-libs,ALL")
     endif()
     add_executable(seedvr2_image_io_tests tests/image_io_tests.cpp)
     target_include_directories(seedvr2_image_io_tests PRIVATE src/engine/ncnn)
-    target_link_libraries(seedvr2_image_io_tests PRIVATE seedvr2_engine ncnn)
+    target_link_libraries(seedvr2_image_io_tests PRIVATE seedvr2_engine seedvr2_ncnn_runtime)
     add_test(NAME engine.image-decode COMMAND seedvr2_image_io_tests "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/natural")
     add_executable(seedvr2_weight_io_tests tests/weight_io_tests.cpp)
     target_include_directories(seedvr2_weight_io_tests PRIVATE src/engine/ncnn)
-    target_link_libraries(seedvr2_weight_io_tests PRIVATE ncnn seedvr2_options)
+    target_link_libraries(seedvr2_weight_io_tests PRIVATE seedvr2_ncnn_runtime seedvr2_options)
     add_test(NAME engine.mapped-reader COMMAND seedvr2_weight_io_tests)
     set_tests_properties(engine.mapped-reader PROPERTIES SKIP_RETURN_CODE 77)
     add_executable(seedvr2_core_tests tests/core_tests.cpp)
@@ -221,13 +244,16 @@ if(BUILD_TESTING)
     set_tests_properties(worker.capability-boundary PROPERTIES PASS_REGULAR_EXPRESSION "seedvr2-worker-v1")
     add_test(NAME engine.awa-cpu COMMAND seedvr2 engine self-test --backend cpu)
     set_tests_properties(engine.awa-cpu PROPERTIES TIMEOUT 30)
+    set_tests_properties(engine.memory-vulkan engine.awa-rope-vulkan engine.awa-sdpa-fp32-vulkan
+        engine.awa-rope-vulkan-host engine.awa-sdpa-fp32-vulkan-host
+        PROPERTIES FAIL_REGULAR_EXPRESSION "VUID-;Validation Error")
 endif()
 
 install(TARGETS seedvr2 RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 install(TARGETS seedvr2_engine EXPORT seedvr2Targets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-install(FILES include/seedvr2/pipeline.hpp include/seedvr2/result.hpp include/seedvr2/path.hpp include/seedvr2/media.hpp
+install(FILES include/seedvr2/pipeline.hpp include/seedvr2/result.hpp include/seedvr2/path.hpp include/seedvr2/media.hpp include/seedvr2/memory.hpp
     include/seedvr2/image.hpp include/seedvr2/video.hpp include/seedvr2/engine.hpp
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/seedvr2)
 include(CMakePackageConfigHelpers)
@@ -246,6 +272,7 @@ install(DIRECTORY docs/ DESTINATION ${CMAKE_INSTALL_DATADIR}/seedvr2/docs
     FILES_MATCHING PATTERN "*.md" PATTERN "*.json" PATTERN "*.png" PATTERN "*.mp4")
 install(FILES README.md DESTINATION ${CMAKE_INSTALL_DATADIR}/seedvr2)
 install(DIRECTORY artifacts/2026-09-08/delivery-v1 artifacts/2026-09-08/video-numerics-v1
+    artifacts/2026-09-08/memory-v1
     DESTINATION ${CMAKE_INSTALL_DATADIR}/seedvr2/artifacts/2026-09-08)
 install(DIRECTORY third_party/engine/ DESTINATION ${CMAKE_INSTALL_DATADIR}/seedvr2/licenses/engine)
 install(DIRECTORY third_party/media/ DESTINATION ${CMAKE_INSTALL_DATADIR}/seedvr2/licenses/media)

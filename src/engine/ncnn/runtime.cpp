@@ -1,5 +1,6 @@
 #include "provenance.hpp"
 #include "weight_io.hpp"
+#include "memory.hpp"
 #include "awa.hpp"
 #include "video_layers.hpp"
 #include "graph.hpp"
@@ -206,6 +207,7 @@ Result<std::string> run_awa(const CaseRequest &request) {
 namespace {
 Result<std::string> run_graph_case(const CaseRequest &request, bool dit) {
     try {
+        memory::validate(request.memory,request.vulkan);
         if constexpr (std::endian::native != std::endian::little)
             throw std::runtime_error("f32le input requires a little endian host");
         std::lock_guard lock(engine_mutex);
@@ -328,12 +330,14 @@ Result<std::string> run_graph_case(const CaseRequest &request, bool dit) {
         if (dit && (awa_count != 1 || awa_trace.heads != 20 ||
                     awa_trace.shifted != doc.at("block_index").get<int>() % 2))
             throw std::runtime_error("A complete DiT block must contain exactly one AWA");
+        auto memory_report=configure_memory(net,binary,request.memory);
         if (request.mapped_weights) mapped=std::make_unique<MappedWeights>(binary);
         if ((mapped?net.load_model(*mapped):net.load_model(binary.string().c_str())) != 0 || (mapped && !mapped->consumed()))
             throw std::runtime_error("Cannot load graph weights");
         std::vector<ncnn::Mat> outputs(expected_shapes.size());
         Json trace = Json::array();
         const auto compute_start = Clock::now();
+        memory_report["after_load"]=budget_json(device_budget(request.vulkan?net.vulkan_device():nullptr));
         if (request.vulkan) {
             const auto *device = net.vulkan_device();
             VulkanAllocators allocators(device);
@@ -381,6 +385,7 @@ Result<std::string> run_graph_case(const CaseRequest &request, bool dit) {
             {"vulkan_calls", request.vulkan ? trace.size() : 0},
             {"dispatch", "EXPLICIT_PER_LAYER_NO_BACKEND_FALLBACK"}, {"model_verified", false},
             {"numerical_validation", "NOT_PERFORMED_BY_RUNNER"},
+            {"memory",memory_report},
             {"timing_ms", {{"compute_including_transfers",
                 std::chrono::duration<double, std::milli>(compute_end-compute_start).count()},
                 {"total", std::chrono::duration<double, std::milli>(Clock::now()-started).count()}}}};

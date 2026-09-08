@@ -13,8 +13,11 @@ namespace d = seedvr2::engine::detail;
 int main(int argc, char **argv) {
     try {
         const bool gpu = argc >= 2 && std::string(argv[1]) == "vulkan";
-        const bool stability = argc == 3 && std::string(argv[2]) == "sdpa";
-        if ((argc != 2 && !stability) || (!gpu && std::string(argv[1]) != "cpu")) return 2;
+        const bool stability = argc >= 3 && std::string(argv[2]) == "sdpa";
+        const bool host = (argc == 3 && std::string(argv[2]) == "host") ||
+            (argc == 4 && stability && std::string(argv[3]) == "host");
+        if (argc < 2 || argc > 4 || (argc != 2 && !stability && !host) ||
+            (argc == 4 && !host) || (!gpu && std::string(argv[1]) != "cpu") || (host && !gpu)) return 2;
         if (gpu) {
             try { d::init_gpu(); }
             catch (const std::exception &e) { std::cout << "SKIP: " << e.what() << '\n'; return 77; }
@@ -31,6 +34,7 @@ int main(int argc, char **argv) {
             opt.use_fp16_storage = opt.use_fp16_packed = opt.use_fp16_arithmetic = false;
             opt.use_bf16_storage = opt.use_bf16_packed = false;
             opt.use_cooperative_matrix = false;
+            opt.use_weights_in_host_memory = host;
             opt.num_threads = 2;
             if (gpu) net.set_vulkan_device(0);
             constexpr char param[] = "7767517\n3 4\nInput in0 0 1 in0\nInput in1 0 1 in1\n"
