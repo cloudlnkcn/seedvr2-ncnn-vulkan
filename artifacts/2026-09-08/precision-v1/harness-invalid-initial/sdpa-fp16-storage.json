@@ -1,0 +1,122 @@
+{
+  "case": "sdpa",
+  "device": {
+    "api_version": 4211017,
+    "device_id": 10464,
+    "driver_version": 2497102272,
+    "index": 0,
+    "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "subgroup_size": 32,
+    "vendor_id": 4318
+  },
+  "dispatch": "EXPLICIT_VULKAN_NO_CPU_FALLBACK",
+  "effective_options": {
+    "bf16_packed": false,
+    "bf16_storage": false,
+    "cooperative_matrix": false,
+    "fp16_arithmetic": false,
+    "fp16_packed": false,
+    "fp16_storage": true,
+    "fp16_uniform": false,
+    "subgroups": true
+  },
+  "gpu_output_layout": {
+    "c": 20,
+    "d": 1,
+    "dims": 3,
+    "elempack": 1,
+    "elemsize": 2,
+    "h": 65,
+    "scalar_storage_bits": 16,
+    "w": 128
+  },
+  "inputs": [
+    {
+      "dtype": "f32le",
+      "elements": 166400,
+      "path": "input-0.f32",
+      "sha256": "c5b949937a892c09e2116b57c063da6e6d6bf55224378c32c0b7225e5ea67a4a"
+    },
+    {
+      "dtype": "f32le",
+      "elements": 166400,
+      "path": "input-1.f32",
+      "sha256": "b090e0cd5f67b78a5ca5691229a4ddb118ba108cfde9202ed90f6eee895c4cca"
+    },
+    {
+      "dtype": "f32le",
+      "elements": 166400,
+      "path": "input-2.f32",
+      "sha256": "93c7448a972f445bf35d0fe9d1e62123d11ad7d391fdf421d4e8c6f42d340878"
+    }
+  ],
+  "layers": [
+    {
+      "backend": "vulkan",
+      "name": "attention",
+      "type": "SDPA"
+    }
+  ],
+  "load_upload_compute_download_ms": 2278.171916,
+  "model_verified": false,
+  "ncnn_commit": "3b7bdba7fc8aea8fd46779533eee027df77c639d",
+  "ncnn_library_sha256": "262495dd7de62b9bf8cf94a56e3e28e6331c2d21b8428e2983c730569cd493b9",
+  "precision": "fp16-storage",
+  "reason": "Output is not unpacked FP32",
+  "reference": {
+    "dtype": "f32le",
+    "elements": 166400,
+    "path": "reference.f32",
+    "sha256": "6277f20038d012f6d10ac7ecd156ad04b67eb54822131d254f94fc90f19c6a39"
+  },
+  "reference_kind": "ANALYTIC_FP64_SYNTHETIC_20_HEADS_128_WIDTH_NOT_OFFICIAL_AWA",
+  "requested_options": {
+    "bf16_packed": false,
+    "bf16_storage": false,
+    "cooperative_matrix": false,
+    "fp16_arithmetic": false,
+    "fp16_packed": false,
+    "fp16_storage": true,
+    "fp16_uniform": false,
+    "subgroups": true
+  },
+  "schema_version": "ncnn-precision-probe-v1",
+  "status": "ERROR",
+  "tolerance": {
+    "atol": 0.001,
+    "calibration": "FP32_DIAGNOSTIC_NOT_LOW_PRECISION_CERTIFICATION",
+    "rtol": 0.001
+  },
+  "uploaded_layouts": [
+    {
+      "c": 5,
+      "d": 1,
+      "dims": 3,
+      "elempack": 4,
+      "elemsize": 8,
+      "h": 65,
+      "scalar_storage_bits": 16,
+      "w": 128
+    },
+    {
+      "c": 5,
+      "d": 1,
+      "dims": 3,
+      "elempack": 4,
+      "elemsize": 8,
+      "h": 65,
+      "scalar_storage_bits": 16,
+      "w": 128
+    },
+    {
+      "c": 5,
+      "d": 1,
+      "dims": 3,
+      "elempack": 4,
+      "elemsize": 8,
+      "h": 65,
+      "scalar_storage_bits": 16,
+      "w": 128
+    }
+  ]
+}

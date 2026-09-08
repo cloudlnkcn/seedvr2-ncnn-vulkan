@@ -98,6 +98,7 @@ cmake --build --preset cli --parallel 4
 已完成两种尺寸的官方 FP32-B 全链路对比：每条轨迹 73 个中间结果逐元素通过，8 位输出最大相差 1。CPU 与最终优化后的 Vulkan 构建也对保留参考进行了复核。**这些是有明确范围的开发数值证据，不是图像质量验收或完整模型认证。** 视频新增时序 VAE：16/16 个 CPU/Vulkan 子模型检查通过；6 帧 64×64 完整轨迹 73/73 通过；17 帧 128×128 完整轨迹 Vulkan 60/73、CPU 70/73，严格判失败，最终解码张量通过不覆盖这些中间层失败。官方 BF16/FlashAttention、长视频和正式验收阈值尚未完成。
 
 - [短视频运行时](docs/video-runtime.md) / [包含负结果的视频验证](docs/video-validation.md)
+- [最新 ncnn 的 FP16/BF16 实测与真实组件误差](docs/PRECISION-VALIDATION.md)
 - [完整单图链路、模型包与复现命令](docs/image-runtime.md)
 - [当前验证报告与限制](docs/image-validation.md) / [机器可读状态](docs/status.json)
 - [应用框架和模块职责](docs/full-stack-framework.md) / [任务架构决定](docs/adr/0007-image-runtime-and-jobs.md)

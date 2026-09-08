@@ -1,0 +1,321 @@
+[0 NVIDIA GeForce RTX 4060 Laptop GPU]  queueC=2[8]  queueT=1[2]  rebar=1  r-score=76
+[0 NVIDIA GeForce RTX 4060 Laptop GPU]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/1
+[0 NVIDIA GeForce RTX 4060 Laptop GPU]  subgroup=32(32~32)  ops=1/1/1/1/1/1/1/1/1/1
+[0 NVIDIA GeForce RTX 4060 Laptop GPU]  fp16-cm=16x16x16/16x8x16/16x8x8  int8-cm=16x16x32/16x8x32  bf16-cm=16x16x16  fp8-cm=16x16x32  fp6-cm=0  fp4-cm=0
+[1 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[1 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[1 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[1 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+[2 llvmpipe (LLVM 17.0.6, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[2 llvmpipe (LLVM 17.0.6, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[2 llvmpipe (LLVM 17.0.6, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/0/1/0/0
+[2 llvmpipe (LLVM 17.0.6, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+compile spir-v module failed
+ERROR: 4:66: 'subgroup op' : requires SPIR-V 1.3 
+ERROR: 4:66: '' : missing #endif 
+ERROR: 4:66: '' : compilation terminated 
+ERROR: 3 compilation errors.  No code generated.
+
+
+
+1:	#if ncnn_subgroup_basic && ncnn_subgroup_arithmetic && (!NCNN_fp16_arithmetic || ncnn_shaderSubgroupExtendedTypes)
+2:	#extension GL_KHR_shader_subgroup_basic : enable
+3:	#extension GL_KHR_shader_subgroup_arithmetic : enable
+4:	#if NCNN_fp16_arithmetic && !NCNN_bf16_storage && !NCNN_bf16_packed
+5:	#extension GL_EXT_shader_subgroup_extended_types_float16 : require
+6:	#endif
+7:	#endif
+8:	layout(constant_id = 0) const int op = 0;
+9:	layout(binding = 0) writeonly buffer top_blob { sfp top_blob_data[]; };
+10:	layout(binding = 1) readonly buffer bottom_blob { sfp bottom_blob_data[]; };
+11:	layout(push_constant) uniform parameter
+12:	{
+13:	int in_w;
+14:	int in_h;
+15:	int in_d;
+16:	int in_c;
+17:	int in_cstep;
+18:	int in_dims;
+19:	int out_w;
+20:	int out_h;
+21:	int out_d;
+22:	int out_c;
+23:	int out_dims;
+24:	int out_cstep;
+25:	int reduce_w;
+26:	int reduce_h;
+27:	int reduce_d;
+28:	int reduce_c;
+29:	int map_out_w;
+30:	int map_out_h;
+31:	int map_out_d;
+32:	int map_out_c;
+33:	float coeff;
+34:	} p;
+35:	shared lfp sdata[256];
+36:	const float FLT_MAX_VALUE = 3.402823466e+38;
+37:	const float FLT_MIN_VALUE = 1.175494351e-38;
+38:	afp init_acc()
+39:	{
+40:	if (op == 6) return afp(1.f);
+41:	if (op == 4) return afp(-FLT_MAX_VALUE);
+42:	if (op == 5) return afp(FLT_MAX_VALUE);
+43:	return afp(0.f);
+44:	}
+45:	afp element_accum(afp acc, afp v)
+46:	{
+47:	if (op == 0 || op == 3 || op == 9) return acc + v;
+48:	if (op == 1 || op == 7) return acc + abs(v);
+49:	if (op == 2 || op == 8) return acc + v * v;
+50:	if (op == 4) return max(acc, v);
+51:	if (op == 5) return min(acc, v);
+52:	if (op == 6) return acc * v;
+53:	if (op == 10) return acc + exp(v);
+54:	return acc + v;
+55:	}
+56:	afp combine_accum(afp a, afp b)
+57:	{
+58:	if (op == 4) return max(a, b);
+59:	if (op == 5) return min(a, b);
+60:	if (op == 6) return a * b;
+61:	return a + b;
+62:	}
+63:	#if ncnn_subgroup_basic && ncnn_subgroup_arithmetic && (!NCNN_fp16_arithmetic || ncnn_shaderSubgroupExtendedTypes)
+64:	afp subgroup_reduce_acc(afp v)
+65:	{
+66:	if (op == 4) return subgroupMax(v);
+67:	if (op == 5) return subgroupMin(v);
+68:	if (op == 6) return subgroupMul(v);
+69:	return subgroupAdd(v);
+70:	}
+71:	#endif
+72:	void decode_out(int out_index, out int ow, out int oh, out int od, out int oc)
+73:	{
+74:	ow = 0;
+75:	oh = 0;
+76:	od = 0;
+77:	oc = 0;
+78:	if (p.out_dims == 1)
+79:	{
+80:	ow = out_index;
+81:	}
+82:	else if (p.out_dims == 2)
+83:	{
+84:	ow = out_index % p.out_w;
+85:	oh = out_index / p.out_w;
+86:	}
+87:	else if (p.out_dims == 3)
+88:	{
+89:	ow = out_index % p.out_w;
+90:	int t = out_index / p.out_w;
+91:	oh = t % p.out_h;
+92:	oc = t / p.out_h;
+93:	}
+94:	else
+95:	{
+96:	ow = out_index % p.out_w;
+97:	int t0 = out_index / p.out_w;
+98:	oh = t0 % p.out_h;
+99:	int t1 = t0 / p.out_h;
+100:	od = t1 % p.out_d;
+101:	oc = t1 / p.out_d;
+102:	}
+103:	}
+104:	int in_index(int iw, int ih, int id, int ic)
+105:	{
+106:	if (p.in_dims == 1) return iw;
+107:	if (p.in_dims == 2) return ih * p.in_w + iw;
+108:	if (p.in_dims == 3) return ic * p.in_cstep + ih * p.in_w + iw;
+109:	int in_dstep = p.in_w * p.in_h;
+110:	if (p.in_d > 1) in_dstep = p.in_cstep / p.in_d;
+111:	return ic * p.in_cstep + id * in_dstep + ih * p.in_w + iw;
+112:	}
+113:	int out_offset(int ow, int oh, int od, int oc)
+114:	{
+115:	if (p.out_dims == 1) return ow;
+116:	if (p.out_dims == 2) return oh * p.out_w + ow;
+117:	if (p.out_dims == 3) return oc * p.out_cstep + oh * p.out_w + ow;
+118:	int out_dstep = p.out_w * p.out_h;
+119:	if (p.out_d > 1) out_dstep = p.out_cstep / p.out_d;
+120:	return oc * p.out_cstep + od * out_dstep + oh * p.out_w + ow;
+121:	}
+122:	afp finalize_out(afp outv)
+123:	{
+124:	if (op == 9 || op == 10) outv = log(outv);
+125:	if (op == 8) outv = sqrt(outv < afp(FLT_MIN_VALUE) ? afp(0.f) : outv);
+126:	if (p.coeff != 1.f) outv = outv * afp(p.coeff);
+127:	return outv;
+128:	}
+129:	void main()
+130:	{
+131:	const int out_index = int(gl_WorkGroupID.y);
+132:	const int tid = int(gl_LocalInvocationID.x);
+133:	int ow, oh, od, oc;
+134:	decode_out(out_index, ow, oh, od, oc);
+135:	int in_coord[4] = int[4](0, 0, 0, 0);
+136:	if (p.map_out_w >= 0) in_coord[p.map_out_w] = ow;
+137:	if (p.map_out_h >= 0) in_coord[p.map_out_h] = oh;
+138:	if (p.map_out_d >= 0) in_coord[p.map_out_d] = od;
+139:	if (p.map_out_c >= 0) in_coord[p.map_out_c] = oc;
+140:	int in_w = p.in_w;
+141:	int in_h = (p.in_h > 0) ? p.in_h : 1;
+142:	int in_d = (p.in_d > 0) ? p.in_d : 1;
+143:	int in_c = (p.in_c > 0) ? p.in_c : 1;
+144:	int reduce_size = 1;
+145:	if (p.reduce_w != 0) reduce_size *= in_w;
+146:	if (p.reduce_h != 0) reduce_size *= in_h;
+147:	if (p.in_dims == 4 && p.reduce_d != 0) reduce_size *= in_d;
+148:	if (p.in_dims >= 3 && p.reduce_c != 0) reduce_size *= in_c;
+149:	afp acc = init_acc();
+150:	for (int t = tid; t < reduce_size; t += 256)
+151:	{
+152:	int tt = t;
+153:	int iw = in_coord[3];
+154:	int ih = in_coord[2];
+155:	int id = in_coord[1];
+156:	int ic = in_coord[0];
+157:	if (p.reduce_w != 0)
+158:	{
+159:	iw = tt % in_w;
+160:	tt /= in_w;
+161:	}
+162:	if (p.reduce_h != 0)
+163:	{
+164:	ih = tt % in_h;
+165:	tt /= in_h;
+166:	}
+167:	if (p.in_dims == 4 && p.reduce_d != 0)
+168:	{
+169:	id = tt % in_d;
+170:	tt /= in_d;
+171:	}
+172:	if (p.in_dims >= 3 && p.reduce_c != 0) { ic = tt % in_c; }
+173:	afp v = buffer_ld1(bottom_blob_data, in_index(iw, ih, id, ic));
+174:	acc = element_accum(acc, v);
+175:	}
+176:	#if ncnn_subgroup_basic && ncnn_subgroup_arithmetic && (!NCNN_fp16_arithmetic || ncnn_shaderSubgroupExtendedTypes)
+177:	afp sg = subgroup_reduce_acc(acc);
+178:	if (subgroupElect())
+179:	{
+180:	sdata[int(gl_SubgroupID)] = afp2lfp(sg);
+181:	}
+182:	barrier();
+183:	#if ncnn_subgroupSize >= 16
+184:	if (int(gl_SubgroupID) == 0)
+185:	{
+186:	const int lane = int(gl_SubgroupInvocationID);
+187:	const int num_sg = int(gl_NumSubgroups);
+188:	afp v = lane < num_sg ? lfp2afp(sdata[lane]) : init_acc();
+189:	afp outv = subgroup_reduce_acc(v);
+190:	if (subgroupElect())
+191:	{
+192:	outv = finalize_out(outv);
+193:	buffer_st1(top_blob_data, out_offset(ow, oh, od, oc), outv);
+194:	}
+195:	}
+196:	#elif ncnn_subgroupSize == 8
+197:	if (int(gl_SubgroupID) < 4)
+198:	{
+199:	const int lane = int(gl_SubgroupInvocationID);
+200:	const int base = int(gl_SubgroupID) * 8;
+201:	afp v = lfp2afp(sdata[base + lane]);
+202:	afp r = subgroup_reduce_acc(v);
+203:	if (subgroupElect())
+204:	{
+205:	sdata[int(gl_SubgroupID)] = afp2lfp(r);
+206:	}
+207:	}
+208:	barrier();
+209:	if (int(gl_SubgroupID) == 0)
+210:	{
+211:	const int lane = int(gl_SubgroupInvocationID);
+212:	afp v = lane < 4 ? lfp2afp(sdata[lane]) : init_acc();
+213:	afp outv = subgroup_reduce_acc(v);
+214:	if (subgroupElect())
+215:	{
+216:	outv = finalize_out(outv);
+217:	buffer_st1(top_blob_data, out_offset(ow, oh, od, oc), outv);
+218:	}
+219:	}
+220:	#elif ncnn_subgroupSize == 4
+221:	if (int(gl_SubgroupID) < 16)
+222:	{
+223:	const int lane = int(gl_SubgroupInvocationID);
+224:	const int base = int(gl_SubgroupID) * 4;
+225:	afp v = lfp2afp(sdata[base + lane]);
+226:	afp r = subgroup_reduce_acc(v);
+227:	if (subgroupElect())
+228:	{
+229:	sdata[int(gl_SubgroupID)] = afp2lfp(r);
+230:	}
+231:	}
+232:	barrier();
+233:	if (int(gl_SubgroupID) < 4)
+234:	{
+235:	const int lane = int(gl_SubgroupInvocationID);
+236:	const int base = int(gl_SubgroupID) * 4;
+237:	afp v = lfp2afp(sdata[base + lane]);
+238:	afp r = subgroup_reduce_acc(v);
+239:	if (subgroupElect())
+240:	{
+241:	sdata[int(gl_SubgroupID)] = afp2lfp(r);
+242:	}
+243:	}
+244:	barrier();
+245:	if (int(gl_SubgroupID) == 0)
+246:	{
+247:	const int lane = int(gl_SubgroupInvocationID);
+248:	afp v = lfp2afp(sdata[lane]);
+249:	afp outv = subgroup_reduce_acc(v);
+250:	if (subgroupElect())
+251:	{
+252:	outv = finalize_out(outv);
+253:	buffer_st1(top_blob_data, out_offset(ow, oh, od, oc), outv);
+254:	}
+255:	}
+256:	#else
+257:	{
+258:	const int num_sg = 256 / ncnn_subgroupSize;
+259:	for (int stride = num_sg / 2; stride > 0; stride >>= 1)
+260:	{
+261:	if (tid < stride)
+262:	{
+263:	afp a = lfp2afp(sdata[tid]);
+264:	afp b = lfp2afp(sdata[tid + stride]);
+265:	sdata[tid] = afp2lfp(combine_accum(a, b));
+266:	}
+267:	barrier();
+268:	}
+269:	if (tid == 0)
+270:	{
+271:	afp outv = lfp2afp(sdata[0]);
+272:	outv = finalize_out(outv);
+273:	buffer_st1(top_blob_data, out_offset(ow, oh, od, oc), outv);
+274:	}
+275:	}
+276:	#endif
+277:	#else
+278:	sdata[tid] = afp2lfp(acc);
+279:	barrier();
+280:	for (int stride = 128; stride > 0; stride >>= 1)
+281:	{
+282:	if (tid < stride)
+283:	{
+284:	afp a = lfp2afp(sdata[tid]);
+285:	afp b = lfp2afp(sdata[tid + stride]);
+286:	sdata[tid] = afp2lfp(combine_accum(a, b));
+287:	}
+288:	barrier();
+289:	}
+290:	if (tid == 0)
+291:	{
+292:	afp outv = lfp2afp(sdata[0]);
+293:	outv = finalize_out(outv);
+294:	buffer_st1(top_blob_data, out_offset(ow, oh, od, oc), outv);
+295:	}
+296:	#endif
+297:	}
+compile_spirv_module failed -1
+create_shader_module failed
+binding_count not match, expect 0 but got 2 + 0
+push_constant_count not match, expect 1684105299 but got 21

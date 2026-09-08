@@ -1,0 +1,105 @@
+{
+  "case": "patch-in",
+  "case_sha256": "d6a37ca61e191703b99b6793f8c4bf8176e44fbdb72c854ae1c31000d92c7663",
+  "device": {
+    "api_version": 4211017,
+    "device_id": 10464,
+    "driver_version": 2497102272,
+    "index": 0,
+    "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "subgroup_size": 32,
+    "vendor_id": 4318
+  },
+  "dispatch": "EXPLICIT_VULKAN_NO_CPU_FALLBACK",
+  "effective_options": {
+    "bf16_packed": false,
+    "bf16_storage": true,
+    "cooperative_matrix": false,
+    "fp16_arithmetic": false,
+    "fp16_packed": false,
+    "fp16_storage": false,
+    "fp16_uniform": false,
+    "subgroups": true
+  },
+  "gpu_output_layout": {
+    "c": 1,
+    "d": 1,
+    "dims": 2,
+    "elempack": 4,
+    "elemsize": 8,
+    "h": 80,
+    "scalar_storage_bits": 16,
+    "w": 2560
+  },
+  "inputs": [
+    {
+      "dtype": "f32le",
+      "elements": 42240,
+      "path": "input-0.f32",
+      "sha256": "6729c306df05e6fefef1534f7535f7151468340dd0455f39549ecefb47018ca9"
+    }
+  ],
+  "layers": [
+    {
+      "backend": "vulkan",
+      "name": "gemm_0",
+      "type": "Gemm"
+    }
+  ],
+  "load_upload_compute_download_ms": 150.535428,
+  "metrics": {
+    "elements": 819200,
+    "max_abs": 0.021593570709228516,
+    "max_error_over_limit": 9.178569526826863,
+    "nonfinite": 0,
+    "passed": false,
+    "rmse": 0.000768492468472479,
+    "violations": 46177
+  },
+  "model_verified": false,
+  "ncnn_commit": "6a1bf000f363714839a36793addc8c879d3d899e",
+  "ncnn_library_sha256": "a38d397d8792b06d3f85da69124810202871274c11da6ca180e87b5d07080190",
+  "output": {
+    "dtype": "f32le",
+    "elements": 819200,
+    "path": "output.f32",
+    "sha256": "1c1055adbf6a9a5f1a322ea0afdf9881c7cda11491e87fa52e6ce1f87085176c"
+  },
+  "precision": "bf16-storage",
+  "reference": {
+    "dtype": "f32le",
+    "elements": 819200,
+    "path": "reference.f32",
+    "sha256": "dd2f518f472f70a86a3330eb9db012736d04444c657084a2db253f13c221b42a"
+  },
+  "reference_kind": "REVIEWED_OFFICIAL_FP32_B_SAME_INPUT",
+  "requested_options": {
+    "bf16_packed": false,
+    "bf16_storage": true,
+    "cooperative_matrix": false,
+    "fp16_arithmetic": false,
+    "fp16_packed": false,
+    "fp16_storage": false,
+    "fp16_uniform": false,
+    "subgroups": true
+  },
+  "schema_version": "ncnn-precision-probe-v1",
+  "status": "EXECUTED",
+  "tolerance": {
+    "atol": 0.001,
+    "calibration": "FP32_DIAGNOSTIC_NOT_LOW_PRECISION_CERTIFICATION",
+    "rtol": 0.001
+  },
+  "uploaded_layouts": [
+    {
+      "c": 1,
+      "d": 1,
+      "dims": 2,
+      "elempack": 4,
+      "elemsize": 8,
+      "h": 80,
+      "scalar_storage_bits": 16,
+      "w": 132
+    }
+  ]
+}

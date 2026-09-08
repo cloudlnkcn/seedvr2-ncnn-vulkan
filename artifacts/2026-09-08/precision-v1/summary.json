@@ -1,0 +1,217 @@
+{
+  "schema_version": "seedvr2-precision-investigation-v1",
+  "created_utc": "2026-09-08T13:06:28.744302+00:00",
+  "model_verified": false,
+  "runs": {
+    "latest": {
+      "raw_directory": ".cache/precision-latest-v2",
+      "report": "latest/report.json",
+      "report_sha256": "654615c7d8542e099b284308a165674af79d9f01a13cbc6308b717d1e3fb6f3f",
+      "executed": 30,
+      "errors": 0,
+      "skipped": 0,
+      "fp32_budget_passed": 17,
+      "valid_for_numerical_conclusions": true
+    },
+    "latest-cancellation": {
+      "raw_directory": ".cache/precision-latest-cancellation-v1",
+      "report": "latest-cancellation/report.json",
+      "report_sha256": "31f6451af50a6d836710260dee19d76ad2a0b1c2e5f5acab410300f42a9255db",
+      "executed": 6,
+      "errors": 0,
+      "skipped": 0,
+      "fp32_budget_passed": 4,
+      "valid_for_numerical_conclusions": true
+    },
+    "old-comparison": {
+      "raw_directory": ".cache/precision-old-comparison-v1",
+      "report": "old-comparison/report.json",
+      "report_sha256": "2e5a08a2338a59b35d95615bdb877cdecea6a42b8cca25026273c99d1f7447c0",
+      "executed": 18,
+      "errors": 0,
+      "skipped": 0,
+      "fp32_budget_passed": 8,
+      "valid_for_numerical_conclusions": true
+    },
+    "latest-no-subgroups": {
+      "raw_directory": ".cache/precision-latest-no-subgroups-v1",
+      "report": "latest-no-subgroups/report.json",
+      "report_sha256": "d521b480f95a7d704f94fcc7e25a2c2a354fe5a2cd79ebda5c036745f88318a2",
+      "executed": 0,
+      "errors": 1,
+      "skipped": 0,
+      "fp32_budget_passed": 0,
+      "valid_for_numerical_conclusions": false,
+      "classification": "EXECUTION_FAILURE_ONLY"
+    },
+    "old-no-subgroups": {
+      "raw_directory": ".cache/precision-old-no-subgroups-v1",
+      "report": "old-no-subgroups/report.json",
+      "report_sha256": "719d62e3b39e378b9231aeb3356637c96c62c58c42c32c2d4c4b6ef8d1e2d3d4",
+      "executed": 0,
+      "errors": 1,
+      "skipped": 0,
+      "fp32_budget_passed": 0,
+      "valid_for_numerical_conclusions": false,
+      "classification": "EXECUTION_FAILURE_ONLY"
+    },
+    "harness-invalid-initial": {
+      "raw_directory": ".cache/precision-latest-v1",
+      "report": "harness-invalid-initial/report.json",
+      "report_sha256": "0422007c8d0eada59041fb1a1109f8f54e5bdcf71a632fa8f628b75b0cba70ce",
+      "executed": 6,
+      "errors": 30,
+      "skipped": 0,
+      "fp32_budget_passed": 0,
+      "valid_for_numerical_conclusions": false
+    }
+  },
+  "scope": "Explicit Vulkan kernels and a real official-input patch-in; application remains FP32",
+  "patch_in": [
+    {
+      "mode": "fp32",
+      "metrics": {
+        "elements": 819200,
+        "max_abs": 5.960464477539062e-07,
+        "max_error_over_limit": 0.00034662042057015424,
+        "nonfinite": 0,
+        "passed": true,
+        "rmse": 2.5001687334539117e-08,
+        "violations": 0
+      },
+      "old_new_output_identical": true
+    },
+    {
+      "mode": "fp16-storage",
+      "metrics": {
+        "elements": 819200,
+        "max_abs": 0.0020623207092285156,
+        "max_error_over_limit": 1.1707790927745112,
+        "nonfinite": 0,
+        "passed": false,
+        "rmse": 9.596969116168147e-05,
+        "violations": 3
+      },
+      "old_new_output_identical": true
+    },
+    {
+      "mode": "fp16-arithmetic",
+      "metrics": {
+        "elements": 819200,
+        "max_abs": 0.010221481323242188,
+        "max_error_over_limit": 5.723092903918694,
+        "nonfinite": 0,
+        "passed": false,
+        "rmse": 0.00037130595051989977,
+        "violations": 6775
+      },
+      "old_new_output_identical": true
+    },
+    {
+      "mode": "fp16-packed-arithmetic",
+      "metrics": {
+        "elements": 819200,
+        "max_abs": 0.010221481323242188,
+        "max_error_over_limit": 5.723092903918694,
+        "nonfinite": 0,
+        "passed": false,
+        "rmse": 0.00037130595051989977,
+        "violations": 6775
+      },
+      "old_new_output_identical": true
+    },
+    {
+      "mode": "bf16-storage",
+      "metrics": {
+        "elements": 819200,
+        "max_abs": 0.021593570709228516,
+        "max_error_over_limit": 9.178569526826863,
+        "nonfinite": 0,
+        "passed": false,
+        "rmse": 0.000768492468472479,
+        "violations": 46177
+      },
+      "old_new_output_identical": true
+    },
+    {
+      "mode": "bf16-packed",
+      "metrics": {
+        "elements": 819200,
+        "max_abs": 0.021593570709228516,
+        "max_error_over_limit": 9.178569526826863,
+        "nonfinite": 0,
+        "passed": false,
+        "rmse": 0.0007685205792473626,
+        "violations": 46178
+      },
+      "old_new_output_identical": true
+    }
+  ],
+  "cancellation": [
+    {
+      "mode": "fp32",
+      "reference": 0.5,
+      "old": 0.5,
+      "latest": 0.5
+    },
+    {
+      "mode": "fp16-storage",
+      "reference": 0.5,
+      "old": 0.5,
+      "latest": 0.5
+    },
+    {
+      "mode": "fp16-arithmetic",
+      "reference": 0.5,
+      "old": 0.0,
+      "latest": 0.0
+    },
+    {
+      "mode": "fp16-packed-arithmetic",
+      "reference": 0.5,
+      "old": 0.0,
+      "latest": 0.0
+    },
+    {
+      "mode": "bf16-storage",
+      "reference": 0.5,
+      "old": 0.0,
+      "latest": 0.5
+    },
+    {
+      "mode": "bf16-packed",
+      "reference": 0.5,
+      "old": 0.0,
+      "latest": 0.5
+    }
+  ],
+  "new_version": {
+    "executed": 36,
+    "fp32_budget_passed": 21,
+    "fp32_budget_failed": 15,
+    "errors": 0,
+    "skipped": 0,
+    "additional_no_subgroups_error": 1
+  },
+  "latest_remote_query": [
+    "3b7bdba7fc8aea8fd46779533eee027df77c639d\tHEAD",
+    "3b7bdba7fc8aea8fd46779533eee027df77c639d\trefs/heads/master"
+  ],
+  "source_pins": {
+    "current_runtime": {
+      "repository": "https://github.com/Tencent/ncnn",
+      "commit": "3b7bdba7fc8aea8fd46779533eee027df77c639d",
+      "url": "https://codeload.github.com/Tencent/ncnn/tar.gz/3b7bdba7fc8aea8fd46779533eee027df77c639d",
+      "sha256": "d9c45d475a047677e73ef9ac1dc3d80f602572261203903b12c6b01ff554a145",
+      "bytes": 14704999,
+      "patches": [],
+      "selection": {
+        "method": "git ls-remote https://github.com/Tencent/ncnn.git HEAD",
+        "remote_head": "3b7bdba7fc8aea8fd46779533eee027df77c639d",
+        "queried_at_utc": "2026-09-08T11:43:44.248293+00:00",
+        "source": "official archive; reviewed eight commits including Vulkan reduction and CPU topology fixes"
+      }
+    },
+    "comparison": "6a1bf000f363714839a36793addc8c879d3d899e"
+  }
+}
