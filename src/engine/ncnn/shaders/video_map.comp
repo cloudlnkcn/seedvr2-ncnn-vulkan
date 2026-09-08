@@ -1,0 +1,32 @@
+#version 450
+layout(local_size_x=128, local_size_y=1, local_size_z=1) in;
+layout(binding=0) readonly buffer Source { float src[]; };
+layout(binding=1) writeonly buffer Destination { float dst[]; };
+layout(push_constant) uniform parameter {
+    int mode, count, iw, ih, it, ic, isc, ow, oh, ot, oc, osc, kt, st, ss, pad, tile, frame, ratio;
+} p;
+void main() {
+    int i=int(gl_GlobalInvocationID.y)*65536+int(gl_GlobalInvocationID.x);
+    if(i>=p.count) return;
+    if(p.mode==0) { // C,T,H,W -> (C*Kt),(Tout*tile),Wpadded.
+        int x=i%p.ow, y=(i/p.ow)%p.oh, c=i/(p.ow*p.oh);
+        int t=y/p.tile, iy=y%p.tile-p.pad, ix=x-p.pad;
+        int it=clamp(t*p.st-(p.kt-1)+c%p.kt,0,p.it-1);
+        dst[c*p.osc+y*p.ow+x]=(iy<0||iy>=p.ih||ix<0||ix>=p.iw)?0.:
+            src[(c/p.kt)*p.isc+(it*p.ih+iy)*p.iw+ix];
+    } else if(p.mode==1) { // Convolution result: remove padding rows between frames.
+        int x=i%p.ow, y=(i/p.ow)%p.oh, t=(i/(p.ow*p.oh))%p.ot, c=i/(p.ow*p.oh*p.ot);
+        dst[c*p.osc+(t*p.oh+y)*p.ow+x]=src[c*p.isc+(t*p.tile+y)*p.iw+x];
+    } else if(p.mode==2) { // Frame C,H,W -> sequence N,C (one SDPA head).
+        int c=i%p.ic, n=i/p.ic;
+        dst[i]=src[c*p.isc+p.frame*p.iw*p.ih+n];
+    } else if(p.mode==3) { // SDPA N,C -> one frame in C,T,H,W.
+        int c=i%p.oc, n=i/p.oc;
+        dst[c*p.osc+p.frame*p.ow*p.oh+n]=src[i];
+    } else if(p.mode==4) { // Original (dy,dx,phase,c) channel order and remove_head.
+        int x=i%p.ow, y=(i/p.ow)%p.oh, t=(i/(p.ow*p.oh))%p.ot, c=i/(p.ow*p.oh*p.ot);
+        int expanded=t==0?0:t+p.ratio-1;
+        int sc=(((y%2)*2+x%2)*p.ratio+expanded%p.ratio)*p.oc+c;
+        dst[c*p.osc+(t*p.oh+y)*p.ow+x]=src[sc*p.isc+((expanded/p.ratio)*p.ih+y/2)*p.iw+x/2];
+    }
+}

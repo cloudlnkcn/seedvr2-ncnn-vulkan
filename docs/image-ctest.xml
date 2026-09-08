@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="(empty)"
+	tests="4"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname=""
+	time="0"
+	timestamp="2026-09-07T02:29:21"
+	>
+	<testcase name="framework.contracts" classname="framework.contracts" time="0.0137871" status="run">
+		<properties/>
+		<system-out>PASS geometry and temporal padding
+PASS unsafe geometry and allocation limits
+PASS ordered official window reference and single coverage
+PASS run transition matrix and cancellation
+PASS stale and foreign events
+PASS strict JSON boundary
+PASS plan cannot claim inference or measured VRAM
+groups=7 failures=0 assertions=610255
+</system-out>
+	</testcase>
+	<testcase name="cli.plan" classname="cli.plan" time="0.00494399" status="run">
+		<properties/>
+		<system-out>{
+  "declared_input": {
+    "frames": 17,
+    "height": 360,
+    "width": 640
+  },
+  "document_type": "geometry-plan",
+  "execution_blockers": [
+    "ENGINE_NOT_BUILT",
+    "INPUT_NOT_PROBED",
+    "MODEL_NOT_VERIFIED",
+    "DEVICE_NOT_PROBED"
+  ],
+  "execution_status": "NOT_RUN",
+  "geometry_policy": "preserve-content-v1",
+  "input_metadata_source": "declared-not-probed",
+  "logical_output": {
+    "frames": 17,
+    "height": 720,
+    "width": 1280
+  },
+  "memory": {
+    "kind": "theoretical-single-buffer",
+    "reason": "Weights, VAE, temporaries, staging and device allocations are not measured",
+    "single_hidden_fp16_bytes": 92160000,
+    "total_peak_bytes": null
+  },
+  "model_id": "seedvr2-3b",
+  "padding": {
+    "applied": false,
+    "bottom": 0,
+    "fill": "repeat-edge",
+    "right": 0,
+    "tail_frames": 0
+  },
+  "planning_status": "GEOMETRY_VALID",
+  "runnable": false,
+  "scale": {
+    "denominator": 1,
+    "numerator": 2
+  },
+  "schema_version": "1.0",
+  "token_grid_thw": [
+    5,
+    45,
+    80
+  ]...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="worker.capability-boundary" classname="worker.capability-boundary" time="0.0029683" status="run">
+		<properties/>
+		<system-out>{"accepts_run":true,"image":true,"inference":true,"model_verified":false,"protocol":"seedvr2-worker-v1","type":"capabilities","video":false}
+</system-out>
+	</testcase>
+	<testcase name="engine.awa-cpu" classname="engine.awa-cpu" time="0.0101136" status="run">
+		<properties/>
+		<system-out>{
+  "atol": 1e-05,
+  "backend": "ncnn-cpu",
+  "cases": [
+    {
+      "case_id": "t2-h3-w4-heads2-text5-regular",
+      "comparisons": [
+        {
+          "candidate_sha256": "95ea4cd08344da9648da0bafd2a4ded72dd8915fda4c9cc8e9102c304d6e1205",
+          "elements": 6144,
+          "max_abs": 5.960464477539063e-07,
+          "passed": true,
+          "reference_sha256": "5405ca613777523086be490ec84207279a87c77e51e5aef67786ef25d89ce44f",
+          "rmse": 8.375791110064514e-08,
+          "tensor": "video",
+          "violations": 0
+        },
+        {
+          "candidate_sha256": "26003a7b36d953dde4a734af8ec55ee489407cbf48329df86b91aa75eb3ff181",
+          "elements": 1280,
+          "max_abs": 3.5762786865234375e-07,
+          "passed": true,
+          "reference_sha256": "23c46043c8dc430f024db9c870a1d73416e61a0b80cad578c2babb5bc60f4ec4",
+          "rmse": 8.594171631648746e-08,
+          "tensor": "text",
+          "violations": 0
+        }
+      ],
+      "execution": {
+        "backend": "ncnn-cpu",
+      ...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+</testsuite>

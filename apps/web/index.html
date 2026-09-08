@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>SeedVR2 · 本地工作台</title>
+  <link rel="stylesheet" href="/app.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">跳到工作区</a>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><span class="mark" aria-hidden="true"></span><strong>SeedVR2</strong><small>本地图片与视频处理</small></div>
+    <nav aria-label="工作区">
+      <button data-view="start" aria-current="page"><span aria-hidden="true">↗</span>开始处理</button>
+      <button data-view="queue"><span aria-hidden="true">☷</span>任务队列</button>
+      <button data-view="compare"><span aria-hidden="true">◧</span>结果对比</button>
+      <button data-view="testing"><span aria-hidden="true">✓</span>测试与报告</button>
+      <button data-view="models"><span aria-hidden="true">▣</span>模型与设备</button>
+      <button data-view="publish"><span aria-hidden="true">↥</span>发布材料</button>
+    </nav>
+    <div class="sidebar-foot"><span class="local-dot"></span> 在这台电脑上运行<br><small>LOCAL WEB / C++ CORE</small></div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar"><span id="breadcrumb">工作区 / 开始处理</span><div class="connection"><span id="connection" role="status">正在连接本地服务…</span><button id="reconnect" class="text-button">重新连接</button></div></header>
+    <main id="main" tabindex="-1">
+      <section id="view-start" class="view" aria-labelledby="start-title">
+        <div class="intro"><div><p class="eyebrow">YOUR MEDIA. YOUR MACHINE.</p><h1 id="start-title">从一个清楚的处理计划开始。</h1><p class="subtitle">选定尺寸，检查工作范围，把每一次尝试保存下来。</p></div><span class="badge">框架预览 · 推理未接入</span></div>
+        <div class="notice">当前已接通真实 C++ 规划核心。可以计算输出尺寸和窗口布局；图片与视频修复、显卡检测尚未接入。</div>
+        <div class="layout">
+          <section class="panel input-panel" aria-labelledby="input-title">
+            <div class="panel-head"><h2 id="input-title">输入与设置</h2><span class="small-label">01 / PLAN</span></div>
+            <form id="plan-form">
+              <div class="presets" aria-label="示例配置"><button type="button" id="image-preset">图片示例</button><button type="button" id="video-preset">17 帧视频示例</button></div>
+              <label class="file-pick">选择一张图片，读取尺寸<input id="image-file" type="file" accept="image/png,image/jpeg"></label>
+              <p class="hint" id="file-hint">PNG / JPEG，最大 20 MiB。图片仅在浏览器预览，发送给 C++ 的是尺寸数字。</p>
+              <img id="input-preview" alt="所选图片的浏览器预览" hidden>
+              <label class="field"><span>任务类型</span><select id="kind"><option value="image">单张图片</option><option value="video" selected>短视频尺寸规划</option></select></label>
+              <div class="fields"><label class="field"><span>输入宽度 · 像素</span><input id="width" type="number" min="1" max="65536" step="1" value="640" required></label><label class="field"><span>输入高度 · 像素</span><input id="height" type="number" min="1" max="65536" step="1" value="360" required></label></div>
+              <div class="fields"><label class="field"><span>输入帧数</span><input id="frames" type="number" min="1" max="4097" step="1" value="17" required></label><label class="field"><span>输出比例</span><select id="scale"><option value="1">保持原尺寸</option><option value="2" selected>放大 2 倍</option><option value="4">放大 4 倍</option></select></label></div>
+              <p class="hint">保持内容与比例，工作尺寸对齐后裁回逻辑范围。声明尺寸不等于已检查实际媒体。</p>
+              <button type="submit" id="plan-button" class="primary" disabled>检查处理计划 <span aria-hidden="true">→</span></button>
+              <div id="error" class="error" role="alert" hidden></div>
+            </form>
+          </section>
+          <section class="panel output-panel" aria-labelledby="output-title">
+            <div class="panel-head"><h2 id="output-title">处理计划</h2><span class="small-label" id="plan-status" role="status">等待检查</span></div>
+            <div class="geometry-view"><div class="geometry-frame"><div class="frame-corner tl"></div><div class="frame-corner br"></div><p class="frame-label">LOGICAL OUTPUT</p><strong id="logical">— × —</strong><p id="logical-frames">还没有计算结果</p></div><p class="diagram-note">尺寸示意，不是模型输出</p></div>
+            <dl class="metrics"><div><dt>实际工作尺寸</dt><dd id="working">待计算</dd></div><div><dt>普通 / 平移窗口</dt><dd id="windows">待计算</dd></div><div><dt>画面 token 数</dt><dd id="tokens">待计算</dd></div><div><dt>总峰值显存</dt><dd>待实测</dd></div></dl>
+            <div class="output-footer"><span class="pending">模型、媒体与设备仍需验证</span><button disabled title="推理引擎尚未接入">开始修复</button></div>
+          </section>
+        </div>
+        <section class="panel evidence" aria-labelledby="evidence-title"><div class="panel-head"><h2 id="evidence-title">保存这一次检查</h2><span class="small-label">02 / REPRODUCE</span></div><div class="evidence-body"><div><p>网页与命令行使用同一个规划入口。</p><p class="hint">保存配置可重新检查；规划结果保留未验证项。刷新页面会清除当前规划展示。</p></div><div class="actions"><button id="save-request" disabled>保存规划配置</button><button id="save-result" disabled>保存规划结果</button></div></div><details><summary>查看规划细节</summary><div class="detail-meta"><span id="padding">补边：待计算</span><span id="hidden-memory">单份中间数据：待计算</span></div><p class="hint">单份中间数据大小不包含权重、VAE、临时缓冲和驱动分配。</p><pre id="result-json">尚未计算。</pre></details></section>
+      </section>
+      <section id="view-detail" class="view" aria-labelledby="detail-title" hidden>
+        <div class="intro"><div><p class="eyebrow" id="detail-eyebrow"></p><h1 id="detail-title"></h1><p class="subtitle" id="detail-subtitle"></p></div><span class="badge" id="detail-status"></span></div>
+        <div class="panel detail-body"><p id="detail-current"></p><ul id="detail-items"></ul><div id="capability-details" hidden><h2>本地服务实际能力</h2><pre id="capabilities-json"></pre></div><button data-view="start" class="primary compact">返回处理计划 →</button></div>
+      </section>
+      <footer class="page-foot"><span>SeedVR2 ncnn Vulkan · 0.1.0 framework</span><span>界面在浏览器，计算在本机。</span></footer>
+    </main>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,264 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://seedvr2.local/schemas/model-evidence-bundle.v1",
+  "title": "Model evidence bundle (auditor schema, not a certificate)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "document_type",
+    "scope",
+    "artifacts",
+    "tensor_pairs"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "document_type": {
+      "const": "model-evidence-bundle"
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model_id",
+        "weights_sha256",
+        "export_sha256",
+        "runtime_build",
+        "ncnn_commit",
+        "device",
+        "driver",
+        "precision",
+        "shape_profile",
+        "chunk_policy",
+        "dataset_sha256",
+        "noise_sha256"
+      ],
+      "properties": {
+        "model_id": {
+          "const": "seedvr2-3b"
+        },
+        "weights_sha256": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          ]
+        },
+        "export_sha256": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          ]
+        },
+        "runtime_build": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "ncnn_commit": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "device": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "driver": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "precision": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "shape_profile": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "chunk_policy": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "dataset_sha256": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          ]
+        },
+        "noise_sha256": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          ]
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "maxItems": 512,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "role",
+          "path",
+          "sha256"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "role": {
+            "enum": [
+              "awa_trace",
+              "backend_trace",
+              "calibration",
+              "dataset_manifest",
+              "device_manifest",
+              "dit_trace",
+              "end_to_end_trace",
+              "export_manifest",
+              "model_config",
+              "noise",
+              "performance_runs",
+              "quality_review",
+              "reference_a",
+              "reference_b",
+              "review_record",
+              "runtime_build",
+              "stability_runs",
+              "temporal_metrics",
+              "tensor",
+              "vae_trace",
+              "weights"
+            ]
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024,
+            "description": "Relative bundle path. Runtime additionally rejects dot segments, absolute paths, symlinks and backslashes."
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "tensor_pairs": {
+      "type": "array",
+      "maxItems": 512,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "gate_id",
+          "reference",
+          "candidate",
+          "shape",
+          "dtype"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "gate_id": {
+            "enum": [
+              "M01",
+              "M02",
+              "M03",
+              "M04",
+              "M05",
+              "M06",
+              "M07",
+              "M08",
+              "M09",
+              "M10",
+              "M11",
+              "M12"
+            ]
+          },
+          "reference": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "candidate": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "dtype": {
+            "const": "f32le"
+          },
+          "shape": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000000000
+            },
+            "description": "Runtime additionally checks product <= 1e9 and exact file byte count."
+          }
+        }
+      }
+    }
+  }
+}

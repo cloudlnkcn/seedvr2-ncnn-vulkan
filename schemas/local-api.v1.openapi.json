@@ -1,0 +1,1519 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "SeedVR2 local application API",
+    "version": "0.8-media-jobs",
+    "description": "0.4.0 local single-image preview: real ncnn CPU/Vulkan restoration, durable jobs, media IDs, cancellation, results and diagnostics. Loopback only. Model certification and video remain unavailable."
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:{port}/api/v1",
+      "variables": {
+        "port": {
+          "default": "8877",
+          "description": "Actual loopback port printed on startup"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/session": {
+      "get": {
+        "summary": "Obtain this process local session token",
+        "responses": {
+          "200": {
+            "description": "Session token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/Host/session rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Application queue full"
+          }
+        }
+      }
+    },
+    "/capabilities": {
+      "get": {
+        "summary": "Inspect real supported operations",
+        "responses": {
+          "200": {
+            "description": "Build capabilities; inference and model_certification are false",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/Host/session rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Application queue full"
+          }
+        }
+      }
+    },
+    "/plan": {
+      "post": {
+        "summary": "Compute declared geometry; does not run a model",
+        "responses": {
+          "200": {
+            "description": "GeometryPlan; runnable=false and execution_status=NOT_RUN",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/Host/session rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Application queue full"
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB. Framework may return an empty body."
+          },
+          "415": {
+            "description": "Content-Type must be application/json"
+          }
+        },
+        "security": [
+          {
+            "LocalSession": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlanningRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plans": {
+      "post": {
+        "summary": "Save a validated plan with no model execution",
+        "responses": {
+          "200": {
+            "description": "Record id and status=PLANNED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/Host/session rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Application queue full"
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB. Framework may return an empty body."
+          },
+          "415": {
+            "description": "Content-Type must be application/json"
+          }
+        },
+        "security": [
+          {
+            "LocalSession": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlanningRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/records": {
+      "get": {
+        "summary": "Latest 100 saved record summaries",
+        "responses": {
+          "200": {
+            "description": "Latest records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items",
+                    "limit"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/RecordSummary"
+                      }
+                    },
+                    "limit": {
+                      "const": 100
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/Host/session rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Application queue full"
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "enum": [
+                "plan",
+                "model-audit",
+                "operator-test"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/records/{id}": {
+      "get": {
+        "summary": "Read one plan or computed model audit",
+        "responses": {
+          "200": {
+            "description": "SavedPlan or ModelEvidenceAudit; audit is not a certificate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/Host/session rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Application queue full"
+          },
+          "404": {
+            "description": "No record with that id"
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{32}$"
+            }
+          }
+        ]
+      }
+    },
+    "/models/status": {
+      "get": {
+        "summary": "Current build model status; not promoted from imported records",
+        "responses": {
+          "200": {
+            "description": "12 required gates, missing evidence, model_verified=false, certificate=null",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/Host/session rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Application queue full"
+          }
+        }
+      }
+    },
+    "/models/policy": {
+      "get": {
+        "summary": "Exact embedded model policy",
+        "responses": {
+          "200": {
+            "description": "Policy with NOT_FROZEN calibration and issuance disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/Host/session rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Application queue full"
+          }
+        }
+      }
+    },
+    "/engine/devices": {
+      "get": {
+        "summary": "Explicitly probe local Vulkan devices",
+        "responses": {
+          "200": {
+            "description": "Device index/name/driver/capabilities and default GPU index; probing does not run a model",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/Host/session rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Application queue full"
+          }
+        }
+      }
+    },
+    "/engine/self-test": {
+      "post": {
+        "summary": "Run and save the embedded AWA numerical diagnostic",
+        "security": [
+          {
+            "LocalSession": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SelfTestRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Actual PASS or FAIL diagnostic with persistent record id; inspect passed/status, not HTTP status, for the numerical verdict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SelfTestResult"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin/Host/session rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Application queue full"
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB. Framework may return an empty body."
+          },
+          "415": {
+            "description": "Content-Type must be application/json"
+          }
+        }
+      }
+    },
+    "/models/image": {
+      "get": {
+        "summary": "Installed package availability; hashes checked by the worker before each run, never certified here",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Local Host/Origin/session rejected"
+          },
+          "404": {
+            "description": "Resource or completed result absent"
+          },
+          "422": {
+            "description": "Invalid request or job queue at capacity"
+          },
+          "429": {
+            "description": "HTTP application queue full"
+          }
+        }
+      }
+    },
+    "/media": {
+      "post": {
+        "summary": "Import PNG/JPEG (32 MiB) or MP4/MOV/WebM/MKV (256 MiB), 8-bit SDR video",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Local Host/Origin/session rejected"
+          },
+          "404": {
+            "description": "Resource or completed result absent"
+          },
+          "422": {
+            "description": "Invalid request or job queue at capacity"
+          },
+          "429": {
+            "description": "HTTP application queue full"
+          },
+          "413": {
+            "description": "Media body exceeds 32 MiB"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-File-Name",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 1536
+            },
+            "description": "Percent-encoded UTF-8 display name; decoded size at most 512 bytes"
+          },
+          {
+            "name": "X-Media-Kind",
+            "in": "header",
+            "schema": {
+              "enum": [
+                "image",
+                "video"
+              ],
+              "default": "image"
+            },
+            "description": "Video is explicitly selected and its container/stream validated. The job schema must match this media kind."
+          }
+        ],
+        "security": [
+          {
+            "LocalSession": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            },
+            "image/png": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            },
+            "image/jpeg": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
+        "description": "Video preview: local file protocols only, 16..4096 per side and <=4096*2160 pixels, 1..240 fps, square pixels, upright orientation, no HDR/BT.2020 or >8-bit pixels."
+      }
+    },
+    "/media/{id}": {
+      "get": {
+        "summary": "Read an imported image by its workspace identity",
+        "responses": {
+          "200": {
+            "description": "Actual input or allowlisted completed media/report",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "video/mp4": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "video/webm": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Local Host/Origin/session rejected"
+          },
+          "404": {
+            "description": "Resource or completed result absent"
+          },
+          "422": {
+            "description": "Invalid request or job queue at capacity"
+          },
+          "429": {
+            "description": "HTTP application queue full"
+          },
+          "206": {
+            "description": "Partial bytes with Content-Range and Accept-Ranges: bytes"
+          },
+          "416": {
+            "description": "Invalid or unavailable byte range; Content-Range: bytes */size"
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{32}$"
+            }
+          },
+          {
+            "name": "Range",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Single byte range; bytes=start-end, bytes=start-, or bytes=-suffix. Multiple/invalid/unsatisfiable ranges return 416."
+          }
+        ]
+      }
+    },
+    "/jobs": {
+      "get": {
+        "summary": "Latest 100 jobs; per-layer result stages omitted from list",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Local Host/Origin/session rejected"
+          },
+          "404": {
+            "description": "Resource or completed result absent"
+          },
+          "422": {
+            "description": "Invalid request or job queue at capacity"
+          },
+          "429": {
+            "description": "HTTP application queue full"
+          }
+        }
+      },
+      "post": {
+        "summary": "Submit an image or whole-clip video job; at most 8 unfinished jobs and 1 running worker",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaJob"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Local Host/Origin/session rejected"
+          },
+          "404": {
+            "description": "Resource or completed result absent"
+          },
+          "422": {
+            "description": "Invalid request or job queue at capacity"
+          },
+          "429": {
+            "description": "HTTP application queue full"
+          }
+        },
+        "security": [
+          {
+            "LocalSession": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ImageJobRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/VideoJobRequest"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{id}": {
+      "get": {
+        "summary": "Read full durable job and actual result or failure",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaJob"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Local Host/Origin/session rejected"
+          },
+          "404": {
+            "description": "Resource or completed result absent"
+          },
+          "422": {
+            "description": "Invalid request or job queue at capacity"
+          },
+          "429": {
+            "description": "HTTP application queue full"
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{32}$"
+            }
+          }
+        ]
+      }
+    },
+    "/jobs/{id}/cancel": {
+      "post": {
+        "summary": "Idempotently request cancellation; completed output remains unavailable for cancelled jobs",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaJob"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Local Host/Origin/session rejected"
+          },
+          "404": {
+            "description": "Resource or completed result absent"
+          },
+          "422": {
+            "description": "Invalid request or job queue at capacity"
+          },
+          "429": {
+            "description": "HTTP application queue full"
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{32}$"
+            }
+          }
+        ],
+        "security": [
+          {
+            "LocalSession": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "maxProperties": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{id}/events": {
+      "get": {
+        "summary": "Read at most 256 durable events after the cursor; polling, not SSE",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Local Host/Origin/session rejected"
+          },
+          "404": {
+            "description": "Resource or completed result absent"
+          },
+          "422": {
+            "description": "Invalid request or job queue at capacity"
+          },
+          "429": {
+            "description": "HTTP application queue full"
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{32}$"
+            }
+          },
+          {
+            "in": "query",
+            "name": "after",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ]
+      }
+    },
+    "/jobs/{id}/files/{name}": {
+      "get": {
+        "summary": "Allowlisted files of SUCCEEDED jobs only",
+        "responses": {
+          "200": {
+            "description": "Actual input or allowlisted completed media/report",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              },
+              "video/mp4": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Local Host/Origin/session rejected"
+          },
+          "404": {
+            "description": "Resource or completed result absent"
+          },
+          "422": {
+            "description": "Invalid request or job queue at capacity"
+          },
+          "429": {
+            "description": "HTTP application queue full"
+          },
+          "206": {
+            "description": "Partial bytes with Content-Range and Accept-Ranges: bytes"
+          },
+          "416": {
+            "description": "Invalid or unavailable byte range; Content-Range: bytes */size"
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{32}$"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "enum": [
+                "output.png",
+                "comparison-input.png",
+                "run.json",
+                "output.mp4",
+                "comparison-input.mp4"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "download",
+            "schema": {
+              "enum": [
+                "1"
+              ]
+            }
+          },
+          {
+            "name": "Range",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Single byte range; bytes=start-end, bytes=start-, or bytes=-suffix. Multiple/invalid/unsatisfiable ranges return 416."
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "LocalSession": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-SeedVR2-Session"
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "required": [
+          "schema_version",
+          "document_type",
+          "error"
+        ],
+        "properties": {
+          "schema_version": {
+            "const": "1.0"
+          },
+          "document_type": {
+            "const": "error"
+          },
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "field",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "field": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "PlanningRequest": {
+        "title": "SeedVR2 planning request 1.0 (declared geometry, not a runnable JobSpec)",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schema_version",
+          "model_id",
+          "geometry_policy",
+          "media",
+          "output"
+        ],
+        "properties": {
+          "schema_version": {
+            "const": "1.0"
+          },
+          "model_id": {
+            "const": "seedvr2-3b"
+          },
+          "geometry_policy": {
+            "const": "preserve-content-v1"
+          },
+          "media": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind",
+              "width",
+              "height",
+              "frames"
+            ],
+            "properties": {
+              "kind": {
+                "enum": [
+                  "image",
+                  "video"
+                ]
+              },
+              "width": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 65536
+              },
+              "height": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 65536
+              },
+              "frames": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 4097
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "image"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "frames": {
+                      "const": 1
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "output": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "scale"
+            ],
+            "properties": {
+              "scale": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "numerator",
+                  "denominator"
+                ],
+                "properties": {
+                  "numerator": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 64
+                  },
+                  "denominator": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 64
+                  }
+                }
+              }
+            }
+          }
+        },
+        "$comment": "The C++ parser additionally rejects duplicate keys and non-integer lexical numbers such as 17.0, and checks resulting geometry and token limits. Schema validation alone is not admission to inference."
+      },
+      "RecordSummary": {
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "created_at",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
+          },
+          "kind": {
+            "enum": [
+              "plan",
+              "model-audit",
+              "operator-test"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "enum": [
+              "PLANNED",
+              "BLOCKED",
+              "FAILED",
+              "PASS",
+              "FAIL"
+            ]
+          }
+        }
+      },
+      "SelfTestRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "backend",
+          "gpu"
+        ],
+        "properties": {
+          "backend": {
+            "enum": [
+              "cpu",
+              "vulkan"
+            ]
+          },
+          "gpu": {
+            "type": "integer",
+            "minimum": -1,
+            "maximum": 64
+          }
+        },
+        "description": "Runs the two embedded synthetic AWA cases and saves the actual result; no model download or full restoration. Duplicate keys and noninteger lexical GPU values are rejected."
+      },
+      "SelfTestResult": {
+        "type": "object",
+        "required": [
+          "document_type",
+          "status",
+          "passed",
+          "backend",
+          "ncnn_commit",
+          "cases",
+          "model_verified",
+          "record_id"
+        ],
+        "properties": {
+          "document_type": {
+            "const": "operator-test"
+          },
+          "status": {
+            "enum": [
+              "PASS",
+              "FAIL"
+            ]
+          },
+          "passed": {
+            "type": "boolean"
+          },
+          "backend": {
+            "enum": [
+              "ncnn-cpu",
+              "ncnn-vulkan"
+            ]
+          },
+          "ncnn_commit": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40}$"
+          },
+          "cases": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "type": "object"
+            }
+          },
+          "model_verified": {
+            "const": false
+          },
+          "record_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
+          }
+        }
+      },
+      "ImageJobRequest": {
+        "title": "SeedVR2 single-image job request",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schema_version",
+          "media_id",
+          "size",
+          "backend",
+          "gpu",
+          "seed"
+        ],
+        "properties": {
+          "schema_version": {
+            "const": "seedvr2-image-job-v1"
+          },
+          "media_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 64,
+            "maximum": 512,
+            "multipleOf": 16
+          },
+          "backend": {
+            "enum": [
+              "cpu",
+              "vulkan"
+            ]
+          },
+          "gpu": {
+            "type": "integer",
+            "minimum": -1,
+            "maximum": 64
+          },
+          "seed": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          }
+        }
+      },
+      "ImageJobStatus": {
+        "enum": [
+          "QUEUED",
+          "RUNNING",
+          "CANCELLING",
+          "SUCCEEDED",
+          "FAILED",
+          "CANCELLED",
+          "INTERRUPTED"
+        ]
+      },
+      "ImageJob": {
+        "type": "object",
+        "required": [
+          "id",
+          "schema_version",
+          "request",
+          "input",
+          "status",
+          "progress",
+          "sequence",
+          "result",
+          "error",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
+          },
+          "schema_version": {
+            "const": "seedvr2-image-job-v1"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ImageJobStatus"
+          },
+          "request": {
+            "$ref": "#/components/schemas/ImageJobRequest"
+          },
+          "input": {
+            "type": "object"
+          },
+          "progress": {
+            "type": "object"
+          },
+          "sequence": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "result": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "error": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          }
+        }
+      },
+      "VideoJobRequest": {
+        "title": "SeedVR2 whole-clip short-video job request",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schema_version",
+          "media_id",
+          "size",
+          "backend",
+          "gpu",
+          "seed",
+          "max_frames"
+        ],
+        "properties": {
+          "schema_version": {
+            "const": "seedvr2-video-job-v1"
+          },
+          "media_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 64,
+            "maximum": 128,
+            "multipleOf": 16
+          },
+          "backend": {
+            "enum": [
+              "cpu",
+              "vulkan"
+            ]
+          },
+          "gpu": {
+            "type": "integer",
+            "minimum": -1,
+            "maximum": 64
+          },
+          "seed": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          },
+          "max_frames": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 17
+          }
+        },
+        "$comment": "The runtime additionally rejects duplicate keys and float lexical numbers, verifies media kind and a complete video package. This schema is not certification."
+      },
+      "VideoJob": {
+        "type": "object",
+        "required": [
+          "id",
+          "schema_version",
+          "request",
+          "input",
+          "status",
+          "progress",
+          "sequence",
+          "result",
+          "error",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
+          },
+          "schema_version": {
+            "const": "seedvr2-video-job-v1"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ImageJobStatus"
+          },
+          "request": {
+            "$ref": "#/components/schemas/VideoJobRequest"
+          },
+          "input": {
+            "type": "object"
+          },
+          "progress": {
+            "type": "object"
+          },
+          "sequence": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "result": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "error": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          }
+        }
+      },
+      "MediaJob": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ImageJob"
+          },
+          {
+            "$ref": "#/components/schemas/VideoJob"
+          }
+        ]
+      }
+    }
+  }
+}

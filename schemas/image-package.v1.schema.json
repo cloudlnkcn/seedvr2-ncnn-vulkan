@@ -1,0 +1,244 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SeedVR2 fixed FP32-B image package",
+  "description": "Structural contract. Runtime separately checks actual file length/hash, graph identity, allowed layers and profile. A manifest is not a model certificate.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "model_id",
+    "profile",
+    "precision",
+    "reference_profile",
+    "ncnn_commit",
+    "model_sources",
+    "official_sources",
+    "model_verified",
+    "limits",
+    "sampling",
+    "constants",
+    "graphs",
+    "exporter"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "seedvr2-image-package-v1"
+    },
+    "model_id": {
+      "const": "seedvr2-3b"
+    },
+    "profile": {
+      "const": "seedvr2-3b-image-fp32-b-v1"
+    },
+    "precision": {
+      "const": "fp32"
+    },
+    "reference_profile": {
+      "const": "FP32-B"
+    },
+    "ncnn_commit": {
+      "const": "6a1bf000f363714839a36793addc8c879d3d899e"
+    },
+    "limits": {
+      "const": {
+        "min_side": 64,
+        "max_side": 512,
+        "max_pixels": 262144,
+        "divisible_by": 16
+      }
+    },
+    "sampling": {
+      "const": {
+        "steps": 1,
+        "timestep": 1000,
+        "cfg": 1,
+        "latent_scale": 0.9152,
+        "color_fix": "none"
+      }
+    },
+    "model_verified": {
+      "const": false
+    },
+    "model_sources": {
+      "type": "object"
+    },
+    "official_sources": {
+      "type": "object"
+    },
+    "exporter": {
+      "type": "object"
+    },
+    "graphs": {
+      "type": "array",
+      "minItems": 36,
+      "maxItems": 36,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "param",
+          "weights"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "enum": [
+              "encoder",
+              "decoder",
+              "block-00",
+              "block-01",
+              "block-02",
+              "block-03",
+              "block-04",
+              "block-05",
+              "block-06",
+              "block-07",
+              "block-08",
+              "block-09",
+              "block-10",
+              "block-11",
+              "block-12",
+              "block-13",
+              "block-14",
+              "block-15",
+              "block-16",
+              "block-17",
+              "block-18",
+              "block-19",
+              "block-20",
+              "block-21",
+              "block-22",
+              "block-23",
+              "block-24",
+              "block-25",
+              "block-26",
+              "block-27",
+              "block-28",
+              "block-29",
+              "block-30",
+              "block-31",
+              "patch-in",
+              "patch-out"
+            ]
+          },
+          "param": {
+            "type": "object",
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\\\\\u0000]+$"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          },
+          "weights": {
+            "type": "object",
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\\\\\u0000]+$"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "constants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "text",
+        "time"
+      ],
+      "properties": {
+        "text": {
+          "type": "object",
+          "required": [
+            "path",
+            "sha256",
+            "dtype",
+            "shape"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\\\\\u0000]+$"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "bytes": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "dtype": {
+              "const": "f32le"
+            },
+            "shape": {
+              "const": [
+                58,
+                2560
+              ]
+            }
+          }
+        },
+        "time": {
+          "type": "object",
+          "required": [
+            "path",
+            "sha256",
+            "dtype",
+            "shape"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\\\\\u0000]+$"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "bytes": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "dtype": {
+              "const": "f32le"
+            },
+            "shape": {
+              "const": [
+                2560,
+                6
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

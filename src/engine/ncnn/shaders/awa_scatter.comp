@@ -1,0 +1,22 @@
+#version 450
+layout(local_size_x=64, local_size_y=1, local_size_z=1) in;
+layout(binding=0) readonly buffer Attention { float attention[]; };
+layout(binding=1) writeonly buffer Video { float video[]; };
+layout(binding=2) writeonly buffer TextWindows { float text_windows[]; };
+layout(push_constant) uniform parameter {
+    int sequence, heads, attention_cstep, output_cstep;
+    int grid_w, t0, h0, w0, nt, nh, nw, window_index, text_cstep;
+} p;
+void main() {
+    int index=int(gl_GlobalInvocationID.x), hd=p.heads*128;
+    if (index>=p.sequence*hd) return;
+    int token=index/hd, feature=index%hd;
+    float v=attention[(feature/128)*p.attention_cstep+token*128+feature%128];
+    int nv=p.nt*p.nh*p.nw;
+    if (token<nv) {
+        int t=token/(p.nh*p.nw), h=(token/p.nw)%p.nh, w=token%p.nw;
+        video[(p.t0+t)*p.output_cstep+((p.h0+h)*p.grid_w+p.w0+w)*hd+feature]=v;
+    } else {
+        text_windows[p.window_index*p.text_cstep+(token-nv)*hd+feature]=v;
+    }
+}

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SeedVR2 whole-clip short-video job request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "media_id",
+    "size",
+    "backend",
+    "gpu",
+    "seed",
+    "max_frames"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "seedvr2-video-job-v1"
+    },
+    "media_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{32}$"
+    },
+    "size": {
+      "type": "integer",
+      "minimum": 64,
+      "maximum": 128,
+      "multipleOf": 16
+    },
+    "backend": {
+      "enum": [
+        "cpu",
+        "vulkan"
+      ]
+    },
+    "gpu": {
+      "type": "integer",
+      "minimum": -1,
+      "maximum": 64
+    },
+    "seed": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295
+    },
+    "max_frames": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 17
+    }
+  },
+  "$comment": "The runtime additionally rejects duplicate keys and float lexical numbers, verifies media kind and a complete video package. This schema is not certification."
+}

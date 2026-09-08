@@ -1,0 +1,12 @@
+#version 450
+layout(local_size_x=64, local_size_y=1, local_size_z=1) in;
+layout(binding=0) readonly buffer TextWindows { float text_windows[]; };
+layout(binding=1) writeonly buffer Text { float text[]; };
+layout(push_constant) uniform parameter { int size, windows, text_cstep; } p;
+void main() {
+    int i=int(gl_GlobalInvocationID.x);
+    if(i>=p.size) return;
+    float sum=0.;
+    for(int w=0;w<p.windows;++w) sum+=text_windows[w*p.text_cstep+i];
+    text[i]=sum/float(p.windows);
+}

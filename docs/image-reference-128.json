@@ -1,0 +1,1411 @@
+{
+  "schema_version": "seedvr2-image-parity-v1",
+  "reference_profile": "FP32-B",
+  "passed": true,
+  "model_verified": false,
+  "model_certificate": null,
+  "scope": "Complete single-image original NaDiT trajectory, all 32 blocks, output Ada cache, VAE posterior/scaling and original Euler endpoint; shared raw noise; no BF16/FlashAttention or video certification",
+  "tolerance": {
+    "atol": 0.001,
+    "rtol": 0.001,
+    "max_uint8_error": 1,
+    "calibration": "DIAGNOSTIC_NOT_MODEL_CERTIFICATION"
+  },
+  "native_run_sha256": "edfd6881915a18b0df1db0e22283f579441e22f4f3eeae6f207ea8299c50f077",
+  "original_sources": {
+    "repository": "https://github.com/ByteDance-Seed/SeedVR",
+    "commit": "e4de8c24441a67e1b7df56abea10645059bb1185",
+    "files": [
+      {
+        "path": "common/cache.py",
+        "sha256": "37e8e0661cc87f37e9ac5247ea046557eb87bed7baf9709ab528aa4ec1b22b85"
+      },
+      {
+        "path": "models/dit_v2/window.py",
+        "sha256": "61b3e0235e25d3e901271186bbaa43a90dcc1552f003daa3d2844b5126ce7e84"
+      },
+      {
+        "path": "models/dit_v2/na.py",
+        "sha256": "adc4a48dd368fa7fbeebb20385d04111e77b193ff359d8fc17bffe42c9fd4fbf"
+      },
+      {
+        "path": "models/dit_v2/mm.py",
+        "sha256": "157033d387a8514ce175f2c58f2c91e06fa50fd4d9501aa2ccf423c35472fa01"
+      },
+      {
+        "path": "models/dit_v2/rope.py",
+        "sha256": "f84ff873cfa92c9f0b468ed169bafa292f7aede203756a79275d2bf4f6c73885"
+      },
+      {
+        "path": "models/dit_v2/nablocks/attention/mmattn.py",
+        "sha256": "4c207bc1b0863fe83ee59a0e35a3f04c958815167d699b99c76e627af7c57456"
+      },
+      {
+        "path": "configs_3b/main.yaml",
+        "sha256": "2606dcfde7544c3b69686b633411fcf6f37a4c159182596c4ce8347537d22f35"
+      },
+      {
+        "path": "LICENSE",
+        "sha256": "5967a0c153e731109b76c5d83b5e0fae2382b6aaf7b898d08ff03702eea59430"
+      },
+      {
+        "path": "models/video_vae_v3/modules/attn_video_vae.py",
+        "sha256": "981faf238b040a9f62b29f4f10e3886ba7152ff24ece03713129f6f19ea44568"
+      },
+      {
+        "path": "models/video_vae_v3/modules/causal_inflation_lib.py",
+        "sha256": "4fe2da553b531c9a8090875e7291d9ccddc9b3be28d960c14a22034fb6896832"
+      },
+      {
+        "path": "models/video_vae_v3/modules/types.py",
+        "sha256": "fdb693bc8c98174915b00050bc21889f1ebe6b34ca3c1cf97e65bddf7ca5605f"
+      },
+      {
+        "path": "models/video_vae_v3/s8_c16_t4_inflation_sd3.yaml",
+        "sha256": "88135a1dd1d7fe0558c1d52633bb251cb3a86b420b98c416a735ab768e0f929d"
+      },
+      {
+        "path": "requirements.txt",
+        "sha256": "6736a9df3d7bc11ea985e09c7ab5c8fdb2126b7a26de97182adad06e2ba043a9"
+      },
+      {
+        "path": "models/dit_v2/modulation.py",
+        "sha256": "0ce217c0d1e6d2cc56ded9619de1018060b6a40d29ee40d468ce55a5a1ad60ca"
+      },
+      {
+        "path": "models/dit_v2/embedding.py",
+        "sha256": "dacc6fc8e3fd9b277456470c197a9d16317d61903c39df1fc99f2bd021416412"
+      },
+      {
+        "path": "models/dit_v2/mlp.py",
+        "sha256": "af3b8bf0f1bc7e135140e5bd9f63869320f9ea3803c95f8482f21a48f1fa1d3a"
+      },
+      {
+        "path": "models/dit_v2/nablocks/mmsr_block.py",
+        "sha256": "f360460a734a97b2e019bc2b0fecebad97e57154e826195eb5ba1437a2ed6749"
+      },
+      {
+        "path": "models/dit_v2/nadit.py",
+        "sha256": "b0ad54bb9257ec0a1059b1b101bf395544c541cbb8ad04298ec17ff9d1639bc3"
+      },
+      {
+        "path": "models/dit_v2/patch/patch_v1.py",
+        "sha256": "9ca13aa766df6d357cf5fc19a3ab8fa536954d73f99471804deff32c65d9fb6a"
+      },
+      {
+        "path": "models/dit_v2/normalization.py",
+        "sha256": "6d192e4b5a74da1b516191979a04d955b7317a7d69479273ef5e08edfb855e44"
+      },
+      {
+        "path": "projects/video_diffusion_sr/infer.py",
+        "sha256": "8a4034c343cb8bdc816dc6e5686f8843be2812d7cc77786160a12af272d885ae"
+      },
+      {
+        "path": "projects/inference_seedvr2_3b.py",
+        "sha256": "089de47cd576bfd51b63b77b8f430146ae85bdd98bc2076011f869e54e2922ee"
+      },
+      {
+        "path": "common/diffusion/schedules/base.py",
+        "sha256": "a7fc37f35846aee5ebe1aeeca9b9f18a7bcc6023c0759be3e13c609e4f1f5bdc"
+      },
+      {
+        "path": "common/diffusion/schedules/lerp.py",
+        "sha256": "04b4d4fc475c5caa2510a905ce67bfa03fb7d0d9f0e5316c308327ebe868f955"
+      },
+      {
+        "path": "common/diffusion/samplers/base.py",
+        "sha256": "2afb7029d3e93431ba9df37e115527f6dd5fa3d76855dc1c936d529ba0a228f2"
+      },
+      {
+        "path": "common/diffusion/samplers/euler.py",
+        "sha256": "44505596662f3a1ce3794465089b84c644cccc9b155a51a1be85e77c1bc3ea86"
+      },
+      {
+        "path": "common/diffusion/timesteps/sampling/trailing.py",
+        "sha256": "b5ebc28cd9e2145107b149af44639dd1c98a79dd488802c73c5012cfb229d4e8"
+      },
+      {
+        "path": "common/diffusion/types.py",
+        "sha256": "b937002661425ddb67082a95d524697b857b7b7693aa7c8d3740ad978870dec0"
+      },
+      {
+        "path": "common/diffusion/utils.py",
+        "sha256": "d4a1f565020160c203f8ee04e7d6fd307bf07ba4e55c67ae9ea769eb68111dbd"
+      },
+      {
+        "path": "data/image/transforms/area_resize.py",
+        "sha256": "de2536debd88f82116f1077f26396f9815b452a1967cca141ca9d420f60baab1"
+      },
+      {
+        "path": "data/image/transforms/na_resize.py",
+        "sha256": "d92e3cf3f2da416ed65619bf4f81718255231b775002b7631c280c0c35ae2193"
+      },
+      {
+        "path": "data/image/transforms/divisible_crop.py",
+        "sha256": "480d20fce1c7ac92310177cfce712b6dd80e52de84c5ca7b90f13278bc2648a9"
+      }
+    ]
+  },
+  "scripts": {
+    "check_image.py": "598e74d16b2eb422767ef5bea387b9a21eb9811367d8eddb2c9b2ba6ace5c324",
+    "image_reference.py": "f27bf2bb66a8f9c8d039ef1f23af0020ce6b599fc5424e3389869ad8dccb20d1",
+    "dit_block_reference.py": "6fdd93f3de87c9334dac4cc1646f5c8064f48efd477d7ba2d2682281c84d1df4",
+    "vae_reference.py": "2231fc3b9aba18785f627ebb9448305b83e0a4e1105aec958999ed36783ebe7e",
+    "awa_reference.py": "7432d9cabd36a3f8b5b13aa264064af7656a85ba728f7ab446b7fde2d18a88e2"
+  },
+  "stages": [
+    {
+      "stage": "prepared",
+      "passed": true,
+      "finite": true,
+      "max_abs": 1.5497207641601562e-06,
+      "rmse": 2.2569925757976906e-07,
+      "violations": 0,
+      "reference": {
+        "path": "prepared.f32",
+        "sha256": "9fc8c0af5bdb0382f21ab11488aa9bc54673619dad70aaedd4a17de523a726eb",
+        "dtype": "f32le",
+        "shape": [
+          3,
+          80,
+          128
+        ]
+      }
+    },
+    {
+      "stage": "posterior",
+      "passed": true,
+      "finite": true,
+      "max_abs": 1.621246337890625e-05,
+      "rmse": 2.9203292035094013e-06,
+      "violations": 0,
+      "reference": {
+        "path": "posterior.f32",
+        "sha256": "12b0086edbad93bf78fff65d40d7cd5e35ebc909d4c060dca7ccd1e5e4995053",
+        "dtype": "f32le",
+        "shape": [
+          32,
+          10,
+          16
+        ]
+      }
+    },
+    {
+      "stage": "conditioned",
+      "passed": true,
+      "finite": true,
+      "max_abs": 5.8710575103759766e-06,
+      "rmse": 9.264396006600893e-07,
+      "violations": 0,
+      "reference": {
+        "path": "conditioned.f32",
+        "sha256": "ba7afe60f84ea029bd72f1719854478cc04bc5f68077f32dd1236a9625312a62",
+        "dtype": "f32le",
+        "shape": [
+          16,
+          10,
+          16
+        ]
+      }
+    },
+    {
+      "stage": "text-in",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0,
+      "rmse": 0.0,
+      "violations": 0,
+      "reference": {
+        "path": "text-in.f32",
+        "sha256": "c7cecae53e4f83d60cab1ebddeca3bdf028c630ef33feb0cfd58d8c1ab50e42d",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "patch-in",
+      "passed": true,
+      "finite": true,
+      "max_abs": 1.996755599975586e-06,
+      "rmse": 1.3930664137284181e-07,
+      "violations": 0,
+      "reference": {
+        "path": "patch-in.f32",
+        "sha256": "f3739b914a221a9e05b4cf872636bd57fd9af9ad9a73089036a4adc1a3fe9ecb",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "time-in",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0,
+      "rmse": 0.0,
+      "violations": 0,
+      "reference": {
+        "path": "time-in.f32",
+        "sha256": "bd542b62115dab2f055c2ec0ff47df9ebdbe25a9bf1d287b7557c08d20c6e719",
+        "dtype": "f32le",
+        "shape": [
+          2560,
+          6
+        ]
+      }
+    },
+    {
+      "stage": "block-00-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 6.103515625e-05,
+      "rmse": 5.901114009931208e-07,
+      "violations": 0,
+      "reference": {
+        "path": "block-00-video.f32",
+        "sha256": "3b324ff4277546509ea47375092b31b89ae3ab86ab65a35d15b2dc048a051f0f",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-00-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 9.1552734375e-05,
+      "rmse": 8.915202194310626e-07,
+      "violations": 0,
+      "reference": {
+        "path": "block-00-text.f32",
+        "sha256": "1b985f43cbd01c87c9e2e078f37b580cb0fd72451acded6ccb0f03c326f1191d",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-01-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 3.62396240234375e-05,
+      "rmse": 6.41373188323003e-07,
+      "violations": 0,
+      "reference": {
+        "path": "block-01-video.f32",
+        "sha256": "b403d471896a64ea0c848146be83d565b125e35a8c0301842fe7ce33194cec67",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-01-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 7.62939453125e-05,
+      "rmse": 9.694076901557803e-07,
+      "violations": 0,
+      "reference": {
+        "path": "block-01-text.f32",
+        "sha256": "ea5af072d06e19e25186845f3f5f3cf1eb03d77768c7c05f8e8c931b8c6f6781",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-02-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 3.4332275390625e-05,
+      "rmse": 6.684569931704304e-07,
+      "violations": 0,
+      "reference": {
+        "path": "block-02-video.f32",
+        "sha256": "486533e88ca3a20e0d7d198fb2bd31081cea6a0ca56845252a5a31c57baa070f",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-02-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0001678466796875,
+      "rmse": 1.6239260372828846e-06,
+      "violations": 0,
+      "reference": {
+        "path": "block-02-text.f32",
+        "sha256": "809479a38d12296f05f505a516f137a0e1ee1ebfa398c5456fd5cfb84dd786eb",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-03-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 5.7220458984375e-05,
+      "rmse": 7.493051711421458e-07,
+      "violations": 0,
+      "reference": {
+        "path": "block-03-video.f32",
+        "sha256": "60fa8317a8dd886d9b2735a98860f8ce3d8a24a5cce4fd658b5ae9f26f2e7c71",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-03-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.000213623046875,
+      "rmse": 1.7672802686281569e-06,
+      "violations": 0,
+      "reference": {
+        "path": "block-03-text.f32",
+        "sha256": "5be40b321c5cfb335999f0ff2fb9d4a4dd9106b0090ca26df9d47daa6c9423db",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-04-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 5.340576171875e-05,
+      "rmse": 7.599831243623617e-07,
+      "violations": 0,
+      "reference": {
+        "path": "block-04-video.f32",
+        "sha256": "078b53e22d10df8cf7b06d5ee92150fdc2e5712b0f94eedd3e10b6b1ba26fcf5",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-04-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.00067138671875,
+      "rmse": 5.2796534997964155e-06,
+      "violations": 0,
+      "reference": {
+        "path": "block-04-text.f32",
+        "sha256": "4ed307e3d41699041f5f0679947e55b6dbded782231621e9a858596bbfa25be9",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-05-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 3.62396240234375e-05,
+      "rmse": 7.793999173972365e-07,
+      "violations": 0,
+      "reference": {
+        "path": "block-05-video.f32",
+        "sha256": "f9df00c706fee24be5f3fd0061eff9b943e4b8c5bca9094fdb42370c2cb1970a",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-05-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.000701904296875,
+      "rmse": 5.116348765779766e-06,
+      "violations": 0,
+      "reference": {
+        "path": "block-05-text.f32",
+        "sha256": "18b9b79b2e1d81efc96ca80a734f608ff80f6d06bab9080a2ba5180392a0aac0",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-06-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 3.814697265625e-05,
+      "rmse": 8.044262653271076e-07,
+      "violations": 0,
+      "reference": {
+        "path": "block-06-video.f32",
+        "sha256": "f63789248f0c2923f3e981de32646c94842eb0593566342e4dcc24c527f217eb",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-06-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0006103515625,
+      "rmse": 4.764060096872914e-06,
+      "violations": 0,
+      "reference": {
+        "path": "block-06-text.f32",
+        "sha256": "ec839812fc2f67a83b3c43625d046a89ca40473c77daabf99119ca06b0418760",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-07-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 4.00543212890625e-05,
+      "rmse": 8.561444133041001e-07,
+      "violations": 0,
+      "reference": {
+        "path": "block-07-video.f32",
+        "sha256": "cbe4d75fe12c5b0639bb2756d5bf536cc2880b3eeb31346147ac29a41e8e7490",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-07-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.00042724609375,
+      "rmse": 4.609718849460521e-06,
+      "violations": 0,
+      "reference": {
+        "path": "block-07-text.f32",
+        "sha256": "7e69ee22101972c14ee174a193ab40925cee189db093f101319ebabaa4583f1b",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-08-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 5.53131103515625e-05,
+      "rmse": 9.300997528274126e-07,
+      "violations": 0,
+      "reference": {
+        "path": "block-08-video.f32",
+        "sha256": "6a0d7070acfd7a383ba720d4a96574476683023f06ae7f4c3398395179d6e9fa",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-08-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0004425048828125,
+      "rmse": 5.8058413691822815e-06,
+      "violations": 0,
+      "reference": {
+        "path": "block-08-text.f32",
+        "sha256": "b4fe8cee4ab5161ccae56beead97513637b6f41fb3eb9075fba994a9020be67a",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-09-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 4.76837158203125e-05,
+      "rmse": 9.802605103955733e-07,
+      "violations": 0,
+      "reference": {
+        "path": "block-09-video.f32",
+        "sha256": "23831559385cbc4a6ba400da0ba631bc77a1daa7f3c28239aba8efcc1b78afaa",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-09-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0419921875,
+      "rmse": 0.00032365753326752176,
+      "violations": 0,
+      "reference": {
+        "path": "block-09-text.f32",
+        "sha256": "f0dfbb1d6508fa193693fb34fbd5b80a7b6d27875fe56aacfb1503199d440175",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-10-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 3.814697265625e-05,
+      "rmse": 1.057409362586844e-06,
+      "violations": 0,
+      "reference": {
+        "path": "block-10-video.f32",
+        "sha256": "643f431fe986d9d114446eb3a4e7d868ce52f1a0cffdabc30ff08d6fbf19f4a0",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-10-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0419921875,
+      "rmse": 0.0003238123863192642,
+      "violations": 0,
+      "reference": {
+        "path": "block-10-text.f32",
+        "sha256": "452b3955db6b46168a10fb01c0151d87a104af228f7bee761726613cf587cfdf",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-11-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 2.86102294921875e-05,
+      "rmse": 1.089968188343495e-06,
+      "violations": 0,
+      "reference": {
+        "path": "block-11-video.f32",
+        "sha256": "470cd48e8d12b5fe229c9461e11bf079160bb353f1beb932108131f9f2655314",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-11-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0419921875,
+      "rmse": 0.0003238163697277819,
+      "violations": 0,
+      "reference": {
+        "path": "block-11-text.f32",
+        "sha256": "88cc07f6ee87a145e1ab56858d32e87d3a6429fff86562ad1fc0e04c161a5a4e",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-12-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 3.814697265625e-05,
+      "rmse": 1.146797150108968e-06,
+      "violations": 0,
+      "reference": {
+        "path": "block-12-video.f32",
+        "sha256": "abdaf682b6cda7135f1563d556e32b51f3a648a43ed72e1237c3334532ba7c13",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-12-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0419921875,
+      "rmse": 0.0003237575172146001,
+      "violations": 0,
+      "reference": {
+        "path": "block-12-text.f32",
+        "sha256": "cca5332dfeadb6fd967a9476d0b789b3225ae607e36502b09d55766e71cd6637",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-13-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 3.0517578125e-05,
+      "rmse": 1.3521454483855972e-06,
+      "violations": 0,
+      "reference": {
+        "path": "block-13-video.f32",
+        "sha256": "d831e52e30ab0bd1683e9aa86eb80d9cd074ad5e62084cb60dc937a0587ae727",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-13-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0419921875,
+      "rmse": 0.00032374587252524505,
+      "violations": 0,
+      "reference": {
+        "path": "block-13-text.f32",
+        "sha256": "778fcb7ec2bfbff52f24bffc014ab826f4f2d1933f0b2027d37fd015c623d8fd",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-14-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 7.343292236328125e-05,
+      "rmse": 1.4496414917291206e-06,
+      "violations": 0,
+      "reference": {
+        "path": "block-14-video.f32",
+        "sha256": "d4c66d78fbfb1e3657c6fbca1459649a0c71669d86a847c2a2b3aaa958f3dc5b",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-14-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.04150390625,
+      "rmse": 0.00032327930239607866,
+      "violations": 0,
+      "reference": {
+        "path": "block-14-text.f32",
+        "sha256": "35e5b9886f9e4d7b5fb0ccd9088efa96c21b9c1511765a86a65009d9848abcc7",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-15-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 4.9591064453125e-05,
+      "rmse": 1.5110835594876263e-06,
+      "violations": 0,
+      "reference": {
+        "path": "block-15-video.f32",
+        "sha256": "a546146f7e429ec7fec131c0d554c7fbf59ee3c9275c695c471a7140441e68ca",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-15-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.04150390625,
+      "rmse": 0.0003232800699784018,
+      "violations": 0,
+      "reference": {
+        "path": "block-15-text.f32",
+        "sha256": "70bebaf791ed7408e1d107e4faf66382a11e97a303182c04030d4897a040a907",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-16-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 7.82012939453125e-05,
+      "rmse": 1.7712594979291602e-06,
+      "violations": 0,
+      "reference": {
+        "path": "block-16-video.f32",
+        "sha256": "4f2b6f1ef7c84587b439948f028f7f2a510c89b962d8daf15c30a9501f6151d3",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-16-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.04150390625,
+      "rmse": 0.0003231115209828712,
+      "violations": 0,
+      "reference": {
+        "path": "block-16-text.f32",
+        "sha256": "e5c4bb3897e08ade9e7353b01c961af3aa8ccfe3ae69aaa5aee186aa77db4bd8",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-17-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 8.678436279296875e-05,
+      "rmse": 2.0435485057915647e-06,
+      "violations": 0,
+      "reference": {
+        "path": "block-17-video.f32",
+        "sha256": "41e7aa543bf8f004291154494bb5eee2b3fce42a36042c524ff552791e503be2",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-17-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0419921875,
+      "rmse": 0.00032362217820473957,
+      "violations": 0,
+      "reference": {
+        "path": "block-17-text.f32",
+        "sha256": "2a3653b70d3e6595d1d1bec0deec2d5adee3bb1f7d6c666d38864c143dbbb9f7",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-18-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.000110626220703125,
+      "rmse": 2.216021188701695e-06,
+      "violations": 0,
+      "reference": {
+        "path": "block-18-video.f32",
+        "sha256": "e7666386f0b714fc1fd5e776f6b1142c61e77c5d6ff4867d8af0bef9a8c71797",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-18-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0419921875,
+      "rmse": 0.0003236165117351148,
+      "violations": 0,
+      "reference": {
+        "path": "block-18-text.f32",
+        "sha256": "ef192f5aa1da32af16df394b1fb1f6574fd8d5cbb1d7f75ebdc57d8dc86e9f37",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-19-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0001773834228515625,
+      "rmse": 2.614154705108368e-06,
+      "violations": 0,
+      "reference": {
+        "path": "block-19-video.f32",
+        "sha256": "52298eb7a931c024c788b06f4cbf284059ec661d517a4722e674c33943038874",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-19-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0419921875,
+      "rmse": 0.0003234785470344087,
+      "violations": 0,
+      "reference": {
+        "path": "block-19-text.f32",
+        "sha256": "0df8414c936f9fdba0fc813d30ab4466f0f95b6f1b4e95971cea126777be4093",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-20-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0001068115234375,
+      "rmse": 3.1735647605129437e-06,
+      "violations": 0,
+      "reference": {
+        "path": "block-20-video.f32",
+        "sha256": "5b4dcfebe06ec2298328264fe60e92088f39cf2dd652472d14a3eccac003ebb8",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-20-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0419921875,
+      "rmse": 0.000323865061244942,
+      "violations": 0,
+      "reference": {
+        "path": "block-20-text.f32",
+        "sha256": "de5a0493d14b6d65c7e64520703c9687041f44fd7447d4000c4db4fd1be456e0",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-21-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.00010204315185546875,
+      "rmse": 3.2395397602737525e-06,
+      "violations": 0,
+      "reference": {
+        "path": "block-21-video.f32",
+        "sha256": "071d91b09c6b5a1341d297c1a88583215c85687ed6e072d2bcc655e675e75ee4",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-21-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0419921875,
+      "rmse": 0.00032383359513926034,
+      "violations": 0,
+      "reference": {
+        "path": "block-21-text.f32",
+        "sha256": "a56518948ce1e2ec14c36d30f2a04305080bcc926e1ece6b114e658836123e83",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-22-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.00011920928955078125,
+      "rmse": 3.5893176213050983e-06,
+      "violations": 0,
+      "reference": {
+        "path": "block-22-video.f32",
+        "sha256": "6d07cce95dd365cf947078eb5c3dce123a2229327e88f342497efc0d6eaf8899",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-22-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0419921875,
+      "rmse": 0.0003237527131047172,
+      "violations": 0,
+      "reference": {
+        "path": "block-22-text.f32",
+        "sha256": "2eefe90f789746bfd69bf41a6947bea7cde3b2b4bd25564f9998baab312dd133",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-23-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0002002716064453125,
+      "rmse": 4.260586513030692e-06,
+      "violations": 0,
+      "reference": {
+        "path": "block-23-video.f32",
+        "sha256": "5d9092b4b38bc717255ee1cca0dbcb2a6de920402ef5de05d48004844a12e849",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-23-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0419921875,
+      "rmse": 0.0003231392090522304,
+      "violations": 0,
+      "reference": {
+        "path": "block-23-text.f32",
+        "sha256": "56be1f2579a0b62cd0dd081795b4b73ef319af1ed84e4ed2f57ffa07e48a708a",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-24-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.000118255615234375,
+      "rmse": 5.083577848111104e-06,
+      "violations": 0,
+      "reference": {
+        "path": "block-24-video.f32",
+        "sha256": "03a13a5748601b8a5b3b194447c80deb2580bfd6b2546f4628e5f2feeedec6b4",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-24-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0419921875,
+      "rmse": 0.00032304613974164264,
+      "violations": 0,
+      "reference": {
+        "path": "block-24-text.f32",
+        "sha256": "79eb27ed197518ff2f2ca9501a5a52de67d2b86304671259f4de59e6ddc7252d",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-25-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.00012826919555664062,
+      "rmse": 5.699744426164234e-06,
+      "violations": 0,
+      "reference": {
+        "path": "block-25-video.f32",
+        "sha256": "8f0b58cf0558b7ef7a295a25fa364ee1aa72131f70b5ccee251974412e070160",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-25-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0419921875,
+      "rmse": 0.00032244519636943187,
+      "violations": 0,
+      "reference": {
+        "path": "block-25-text.f32",
+        "sha256": "fbf094364502e33be4485552cbcf8b01a1dc80f5875f90a174197d4511051fc8",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-26-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.00015735626220703125,
+      "rmse": 7.4371169117263786e-06,
+      "violations": 0,
+      "reference": {
+        "path": "block-26-video.f32",
+        "sha256": "777aad894871a37ae478fec755595a1ab2c741df725b187638aaa6b4cf2236f9",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-26-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0419921875,
+      "rmse": 0.0003231114048595606,
+      "violations": 0,
+      "reference": {
+        "path": "block-26-text.f32",
+        "sha256": "9ebafc01a79a513a11db95bff1ca48d6283d0685b00e732f7f71722dfa4034bf",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-27-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.00016880035400390625,
+      "rmse": 9.41451421612022e-06,
+      "violations": 0,
+      "reference": {
+        "path": "block-27-video.f32",
+        "sha256": "68522a1732cc0daec68ddd783b0b3cef54efe2f9e968fdb53bb1fc3601e08415",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-27-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0419921875,
+      "rmse": 0.00032286828026406963,
+      "violations": 0,
+      "reference": {
+        "path": "block-27-text.f32",
+        "sha256": "1fcbb5d1912ceef4258766a8b5d6b54bef47c91574ba6931f248867885fc6db5",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-28-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.00016546249389648438,
+      "rmse": 1.222304064420677e-05,
+      "violations": 0,
+      "reference": {
+        "path": "block-28-video.f32",
+        "sha256": "81d06d1622f12b8e4081342412b2742eb277170ddfb9d00b271f550aa286469f",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-28-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0419921875,
+      "rmse": 0.000322975490667131,
+      "violations": 0,
+      "reference": {
+        "path": "block-28-text.f32",
+        "sha256": "beff72cf9b2367006d0852f90fe2110f63ac8eb7853046973b43c215ae0db244",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-29-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0002307891845703125,
+      "rmse": 1.60736109986197e-05,
+      "violations": 0,
+      "reference": {
+        "path": "block-29-video.f32",
+        "sha256": "e769706cd79c49382e8afb10bd482117c511ca89392c75562f13e67ec1d14787",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-29-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.04248046875,
+      "rmse": 0.0003247543491710131,
+      "violations": 0,
+      "reference": {
+        "path": "block-29-text.f32",
+        "sha256": "e268327832383757fe35325e5830f9ff53c2a98baabf2fb4dd408854b424e473",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-30-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.00040340423583984375,
+      "rmse": 2.4349317893649203e-05,
+      "violations": 0,
+      "reference": {
+        "path": "block-30-video.f32",
+        "sha256": "78bf2c6aa38543ee5ee3c9282ed2f818c398a091bff51bf075acbcbfa0770986",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-30-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.04248046875,
+      "rmse": 0.0003245301449262252,
+      "violations": 0,
+      "reference": {
+        "path": "block-30-text.f32",
+        "sha256": "7f897efed9f948e75177b7f5aae4e6497d5b2547b76a793a0a5a840d6fad9efc",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-31-video",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0004367828369140625,
+      "rmse": 2.7807103731538285e-05,
+      "violations": 0,
+      "reference": {
+        "path": "block-31-video.f32",
+        "sha256": "e34050753af20ac6bf015b23b4534b700bd403a535935fef7fc327dbcc5808a7",
+        "dtype": "f32le",
+        "shape": [
+          40,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "block-31-text",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0849609375,
+      "rmse": 0.0006532555034670071,
+      "violations": 0,
+      "reference": {
+        "path": "block-31-text.f32",
+        "sha256": "3b58c11bbe7e8d08cfe78c53e6abc04e642af62ba638152aa1a4bb34bbbbe970",
+        "dtype": "f32le",
+        "shape": [
+          58,
+          2560
+        ]
+      }
+    },
+    {
+      "stage": "velocity",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.00015115737915039062,
+      "rmse": 2.3533802368462585e-05,
+      "violations": 0,
+      "reference": {
+        "path": "velocity.f32",
+        "sha256": "ed39913ef74ff41c715c10cdd0e5a155420aca4ee5a70166cb0ae2dc63fd2b79",
+        "dtype": "f32le",
+        "shape": [
+          16,
+          10,
+          16
+        ]
+      }
+    },
+    {
+      "stage": "latent",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.0001652240753173828,
+      "rmse": 2.5713199739309137e-05,
+      "violations": 0,
+      "reference": {
+        "path": "latent.f32",
+        "sha256": "246bd66fb752a216629aa60b17430939c7289fd2b71afb5bd539d314eedfbfbb",
+        "dtype": "f32le",
+        "shape": [
+          16,
+          10,
+          16
+        ]
+      }
+    },
+    {
+      "stage": "decoded",
+      "passed": true,
+      "finite": true,
+      "max_abs": 0.00020319223403930664,
+      "rmse": 1.8170092020202416e-05,
+      "violations": 0,
+      "reference": {
+        "path": "decoded.f32",
+        "sha256": "10e054213047ebd5b8f9af2687d8b121e39b375c35b22003a988d2c5b391c97f",
+        "dtype": "f32le",
+        "shape": [
+          3,
+          80,
+          128
+        ]
+      }
+    }
+  ],
+  "output_identity_valid": true,
+  "pixels": {
+    "max_abs": 1,
+    "different": 34,
+    "total": 30720
+  }
+}

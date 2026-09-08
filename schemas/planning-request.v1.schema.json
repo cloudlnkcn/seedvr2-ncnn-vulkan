@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SeedVR2 planning request 1.0 (declared geometry, not a runnable JobSpec)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "model_id", "geometry_policy", "media", "output"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "model_id": {"const": "seedvr2-3b"},
+    "geometry_policy": {"const": "preserve-content-v1"},
+    "media": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "width", "height", "frames"],
+      "properties": {
+        "kind": {"enum": ["image", "video"]},
+        "width": {"type": "integer", "minimum": 1, "maximum": 65536},
+        "height": {"type": "integer", "minimum": 1, "maximum": 65536},
+        "frames": {"type": "integer", "minimum": 1, "maximum": 4097}
+      },
+      "allOf": [{"if": {"properties": {"kind": {"const": "image"}}}, "then": {"properties": {"frames": {"const": 1}}}}]
+    },
+    "output": {
+      "type": "object", "additionalProperties": false, "required": ["scale"],
+      "properties": {"scale": {
+        "type": "object", "additionalProperties": false,
+        "required": ["numerator", "denominator"],
+        "properties": {
+          "numerator": {"type": "integer", "minimum": 1, "maximum": 64},
+          "denominator": {"type": "integer", "minimum": 1, "maximum": 64}
+        }
+      }}
+    }
+  },
+  "$comment": "The C++ parser additionally rejects duplicate keys and non-integer lexical numbers such as 17.0, and checks resulting geometry and token limits. Schema validation alone is not admission to inference."
+}

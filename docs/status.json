@@ -1,0 +1,346 @@
+{
+  "project_version": "0.5.0-video-preview",
+  "architecture_version": "0.8-media-jobs",
+  "date": "2026-09-07",
+  "checked_at_utc": "2026-09-07T02:05:03.535627+00:00",
+  "product_policy": {
+    "single_application": true,
+    "testing_builtin": true,
+    "local_web": true,
+    "independent_cli": true
+  },
+  "model_execution": "IMAGE_AND_WHOLE_SHORT_VIDEO_FP32_B",
+  "ncnn_linked": true,
+  "ncnn_commit": "6a1bf000f363714839a36793addc8c879d3d899e",
+  "ncnn_source": {
+    "selection": "Freshly fetched official HEAD at recorded source query time; pinned for this validation",
+    "local_neighbor_checkout_used": false,
+    "patches": [],
+    "later_observed_official_head": "88a29d8ef42be81b0d67f5fc53ba7695d380cc64"
+  },
+  "implemented": [
+    {
+      "module": "complete-image-engine",
+      "scope": "Official VAE posterior, conditioning, all 32 connected DiT blocks, patch projections, Euler endpoint and VAE decoder"
+    },
+    {
+      "module": "awa-cpu-vulkan",
+      "scope": "Full custom AWA and pnnx export; explicit layer dispatch without network CPU fallback"
+    },
+    {
+      "module": "bounded-weight-lifetime",
+      "scope": "One graph/block resident at a time, last-consumer activation release, per-run pipeline cache"
+    },
+    {
+      "module": "local-web",
+      "scope": "React/TypeScript/Ant Design served by native Drogon with embedded offline assets"
+    },
+    {
+      "module": "independent-cli",
+      "scope": "Complete run/run-video, planning, audit, history, devices, self-test and submodel diagnostics; no HTTP required"
+    },
+    {
+      "module": "jobs-worker",
+      "scope": "Image/video worker in Linux process isolation, 8 unfinished / 1 running, cancel, retry as new job, interrupted recovery"
+    },
+    {
+      "module": "media-and-results",
+      "scope": "PNG/JPEG and 8-bit SDR video import; aligned images; synchronized video and frame stepping; PNG/MP4/JSON download with single byte ranges"
+    },
+    {
+      "module": "sqlite-workspace",
+      "scope": "Schema 3 transactions, ordered events, migrated historical records, resource IDs"
+    },
+    {
+      "module": "model-auditor",
+      "scope": "Strict artifacts and raw tensor diagnostics; policy not frozen, no certificate issuance"
+    },
+    {
+      "module": "local-discussion-draft",
+      "scope": "Selected actual job and self-test record with exact identities and remaining work"
+    },
+    {
+      "module": "complete-temporal-video-engine",
+      "scope": "Whole causal temporal VAE, all 32 3D AWA blocks, temporal padding/crop, four native CPU/Vulkan VAE operators; short clips only"
+    }
+  ],
+  "functional_upscale_demo": {
+    "job_id": "d3dec86e500d2010e302a6322c605abb",
+    "input": [
+      128,
+      87
+    ],
+    "output": [
+      512,
+      336
+    ],
+    "backend": "ncnn-vulkan",
+    "total_ms": 63445.851273,
+    "quality_benchmark": false,
+    "report": "examples/image-demo-job.json"
+  },
+  "gpu_performance": "SINGLE_RUN_TIMINGS_ONLY; NO_COLD_WARM_STATISTICAL_BENCHMARK",
+  "peak_memory_validation": "NOT_RUN",
+  "video_restoration": true,
+  "windows_runtime": "NOT_TESTED",
+  "portable_distribution": "NOT_QUALIFIED; system media ABI and complete license qualification pending",
+  "external_publication": "NOT_PERFORMED",
+  "workspace_schema_version": 3,
+  "http_task_events": "DURABLE_CURSOR_POLLING",
+  "sse": false,
+  "cli_requires_web": false,
+  "runtime_requires_python": false,
+  "runtime_requires_node": false,
+  "automatic_browser_launcher": false,
+  "model_verified": false,
+  "model_certificate": null,
+  "model_certificate_issuance": "DISABLED",
+  "model_policy_calibration": "NOT_FROZEN",
+  "formal_gate_status": "12_MISSING_EVIDENCE; DEVELOPMENT_REPORTS_NOT_ASSEMBLED_IN_FORMAL_BUNDLE",
+  "evidence": [
+    "video-validation.md",
+    "video-manifest.json",
+    "video-vae-native-validation.json",
+    "video-reference-six.json",
+    "video-reference-seventeen.json",
+    "video-parity-final-six.json",
+    "video-parity-final-seventeen.json",
+    "video-parity-cpu-seventeen.json",
+    "video-image-parity-final.json",
+    "video-jobs-validation.json",
+    "video-image-jobs-validation.json",
+    "video-web-validation.json",
+    "video-install-http-validation.json",
+    "video-ctest.xml",
+    "video-cli-ctest.xml",
+    "video-browser-validation.json",
+    "video-contract-validation.json",
+    "video-workspace-upgrade.json",
+    "video-install-validation.json",
+    "video-cli-only-parity.json",
+    "video-cli-only-run.json",
+    "video-cli-validation.json",
+    "video-engine-validation.json",
+    "video-build-capabilities.json",
+    "video-model-status.json"
+  ],
+  "next_implementation": [
+    "Isolate later DiT video differences without relaxing strict thresholds",
+    "Natural-video/motion/cut coverage and frozen quality holdout",
+    "Reference A and broader FP32 inputs/shapes, then low precision",
+    "Streaming causal cache and chunk-boundary parity; audio and long video",
+    "Higher resolution, measured peak memory and repeatable performance",
+    "Media ABI, complete license and portable release qualification"
+  ],
+  "historical_evidence": [
+    "image-validation.md",
+    "image-manifest.json",
+    "image-browser-validation.json",
+    "image-model-status.json",
+    "image-reference-128.json",
+    "image-reference-256.json",
+    "image-parity-128-cpu.json",
+    "image-parity-final-256-vulkan.json",
+    "image-jobs-validation.json",
+    "image-boundaries-validation.json",
+    "image-install-http-validation.json",
+    "image-cli-only-validation.json",
+    "image-engine-validation.json",
+    "image-audit-validation.json",
+    "image-install-validation.json",
+    "image-contract-validation.json",
+    "image-workspace-migration.json",
+    "image-ctest.xml",
+    "image-cli-only-ctest.xml",
+    "image-build-capabilities.json",
+    "image-dit-remaining-export.json",
+    "image-run-128-vulkan-2.json",
+    "image-run-256-vulkan.json",
+    "image-run-512-vulkan.json",
+    "image-run-128-cpu.json",
+    "image-run-final-256-vulkan.json"
+  ],
+  "image_profile": {
+    "id": "seedvr2-3b-image-fp32-b-v1",
+    "precision": "fp32",
+    "frames": 1,
+    "graph_count": 36,
+    "dit_blocks": 32,
+    "steps": 1,
+    "cfg": 1,
+    "color_fix": "none",
+    "output_long_side": [
+      64,
+      512
+    ],
+    "output_multiple": 16,
+    "minimum_short_side": 64,
+    "model_manifest_sha256": "64c7c5a48bf6fffc193435535c39c6f559be71059e8510778c7eb3068b851298"
+  },
+  "image_numerical_validation_0_4": {
+    "reference_profile": "FP32-B",
+    "input_count": 1,
+    "sizes": [
+      [
+        128,
+        80
+      ],
+      [
+        256,
+        160
+      ]
+    ],
+    "tensors_per_trajectory": 73,
+    "trajectories": [
+      {
+        "backend": "vulkan",
+        "output": [
+          128,
+          80
+        ],
+        "passed": 73,
+        "total": 73,
+        "report": "image-reference-128.json"
+      },
+      {
+        "backend": "vulkan",
+        "output": [
+          256,
+          160
+        ],
+        "passed": 73,
+        "total": 73,
+        "report": "image-reference-256.json"
+      },
+      {
+        "backend": "cpu",
+        "output": [
+          128,
+          80
+        ],
+        "passed": 73,
+        "total": 73,
+        "report": "image-parity-128-cpu.json"
+      },
+      {
+        "backend": "vulkan-final",
+        "output": [
+          256,
+          160
+        ],
+        "passed": 73,
+        "total": 73,
+        "report": "image-parity-final-256-vulkan.json"
+      }
+    ],
+    "tolerance": {
+      "atol": 0.001,
+      "rtol": 0.001,
+      "max_uint8_error": 1,
+      "calibration": "DIAGNOSTIC_NOT_MODEL_CERTIFICATION"
+    },
+    "official_BF16_FlashAttention_A": "NOT_RUN",
+    "512_numeric_reference": "NOT_RUN"
+  },
+  "video_profile": {
+    "id": "seedvr2-3b-video-fp32-b-v1",
+    "precision": "fp32",
+    "frames": [
+      1,
+      17
+    ],
+    "output_long_side": [
+      64,
+      128
+    ],
+    "output_multiple": 16,
+    "minimum_short_side": 64,
+    "graph_count": 36,
+    "dit_blocks": 32,
+    "steps": 1,
+    "cfg": 1,
+    "audio": false,
+    "streaming_cache": false,
+    "input": "8-bit SDR only",
+    "model_manifest_sha256": "fe38835c367a2a389c689d89ce85c952b0e347d1edfd879b008d796a65374028"
+  },
+  "video_numerical_validation": {
+    "status": "MIXED",
+    "vae_cpu_vulkan": {
+      "passed": 16,
+      "total": 16,
+      "report": "video-vae-native-validation.json"
+    },
+    "whole_clip": [
+      {
+        "frames": 6,
+        "width": 64,
+        "height": 64,
+        "backend": "vulkan",
+        "passed": 73,
+        "total": 73,
+        "verdict": "PASS",
+        "report": "video-parity-final-six.json"
+      },
+      {
+        "frames": 17,
+        "width": 128,
+        "height": 128,
+        "backend": "vulkan",
+        "passed": 60,
+        "total": 73,
+        "verdict": "FAIL",
+        "report": "video-parity-final-seventeen.json"
+      },
+      {
+        "frames": 17,
+        "width": 128,
+        "height": 128,
+        "backend": "cpu",
+        "passed": 70,
+        "total": 73,
+        "verdict": "FAIL",
+        "report": "video-parity-cpu-seventeen.json"
+      }
+    ],
+    "input_count": 1,
+    "input_kind": "Synthetic motion pattern; no natural-video quality acceptance",
+    "tolerance": {
+      "atol": 0.001,
+      "rtol": 0.001,
+      "calibration": "DIAGNOSTIC_NOT_MODEL_CERTIFICATION"
+    },
+    "final_decoded_pass_does_not_override_intermediate_failures": true,
+    "official_BF16_FlashAttention_A": "NOT_RUN",
+    "model_verified": false
+  },
+  "image_numerical_regression": {
+    "passed": 73,
+    "total": 73,
+    "output": [
+      128,
+      80
+    ],
+    "pixel_max_abs": 1,
+    "report": "video-image-parity-final.json"
+  },
+  "runtime_requires_ffmpeg_shared_libraries": true,
+  "runtime_video_encoder": "libx264",
+  "ffmpeg_library_version": "8.0.1",
+  "functional_video_demo": {
+    "job_id": "bc4fe196bf90bda25872d1cf23f93309",
+    "frames": 17,
+    "input": [
+      64,
+      64
+    ],
+    "output": [
+      128,
+      128
+    ],
+    "backend": "ncnn-vulkan",
+    "total_ms": 49084.996841,
+    "quality_benchmark": false,
+    "report": "examples/video-demo-job.json"
+  }
+}

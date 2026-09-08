@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SeedVR2 single-image job request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "media_id",
+    "size",
+    "backend",
+    "gpu",
+    "seed"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "seedvr2-image-job-v1"
+    },
+    "media_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{32}$"
+    },
+    "size": {
+      "type": "integer",
+      "minimum": 64,
+      "maximum": 512,
+      "multipleOf": 16
+    },
+    "backend": {
+      "enum": [
+        "cpu",
+        "vulkan"
+      ]
+    },
+    "gpu": {
+      "type": "integer",
+      "minimum": -1,
+      "maximum": 64
+    },
+    "seed": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295
+    }
+  }
+}

@@ -1,0 +1,2941 @@
+{
+  "schema_version": "dit-block-export-v1",
+  "scope": "Complete selected DiT blocks, actual official weights; independently sampled video inputs, official positive text embedding, timestep 1000. Not a 32-block denoising trajectory.",
+  "checkpoint": {
+    "repository": "ByteDance-Seed/SeedVR2-3B",
+    "revision": "37255ff8cccfb01071b87f635a5948ca8d53117c",
+    "filename": "seedvr2_ema_3b.pth",
+    "sha256": "6bcc5ac59447e97b100477480aebb01be2ec724c8340bb83faae21f64848604b",
+    "tensors": 635
+  },
+  "official_sources": {
+    "repository": "https://github.com/ByteDance-Seed/SeedVR",
+    "commit": "e4de8c24441a67e1b7df56abea10645059bb1185",
+    "files": [
+      {
+        "path": "common/cache.py",
+        "sha256": "37e8e0661cc87f37e9ac5247ea046557eb87bed7baf9709ab528aa4ec1b22b85"
+      },
+      {
+        "path": "models/dit_v2/window.py",
+        "sha256": "61b3e0235e25d3e901271186bbaa43a90dcc1552f003daa3d2844b5126ce7e84"
+      },
+      {
+        "path": "models/dit_v2/na.py",
+        "sha256": "adc4a48dd368fa7fbeebb20385d04111e77b193ff359d8fc17bffe42c9fd4fbf"
+      },
+      {
+        "path": "models/dit_v2/mm.py",
+        "sha256": "157033d387a8514ce175f2c58f2c91e06fa50fd4d9501aa2ccf423c35472fa01"
+      },
+      {
+        "path": "models/dit_v2/rope.py",
+        "sha256": "f84ff873cfa92c9f0b468ed169bafa292f7aede203756a79275d2bf4f6c73885"
+      },
+      {
+        "path": "models/dit_v2/nablocks/attention/mmattn.py",
+        "sha256": "4c207bc1b0863fe83ee59a0e35a3f04c958815167d699b99c76e627af7c57456"
+      },
+      {
+        "path": "configs_3b/main.yaml",
+        "sha256": "2606dcfde7544c3b69686b633411fcf6f37a4c159182596c4ce8347537d22f35"
+      },
+      {
+        "path": "LICENSE",
+        "sha256": "5967a0c153e731109b76c5d83b5e0fae2382b6aaf7b898d08ff03702eea59430"
+      },
+      {
+        "path": "models/video_vae_v3/modules/attn_video_vae.py",
+        "sha256": "981faf238b040a9f62b29f4f10e3886ba7152ff24ece03713129f6f19ea44568"
+      },
+      {
+        "path": "models/video_vae_v3/modules/causal_inflation_lib.py",
+        "sha256": "4fe2da553b531c9a8090875e7291d9ccddc9b3be28d960c14a22034fb6896832"
+      },
+      {
+        "path": "models/video_vae_v3/modules/types.py",
+        "sha256": "fdb693bc8c98174915b00050bc21889f1ebe6b34ca3c1cf97e65bddf7ca5605f"
+      },
+      {
+        "path": "models/video_vae_v3/s8_c16_t4_inflation_sd3.yaml",
+        "sha256": "88135a1dd1d7fe0558c1d52633bb251cb3a86b420b98c416a735ab768e0f929d"
+      },
+      {
+        "path": "requirements.txt",
+        "sha256": "6736a9df3d7bc11ea985e09c7ab5c8fdb2126b7a26de97182adad06e2ba043a9"
+      },
+      {
+        "path": "models/dit_v2/modulation.py",
+        "sha256": "0ce217c0d1e6d2cc56ded9619de1018060b6a40d29ee40d468ce55a5a1ad60ca"
+      },
+      {
+        "path": "models/dit_v2/embedding.py",
+        "sha256": "dacc6fc8e3fd9b277456470c197a9d16317d61903c39df1fc99f2bd021416412"
+      },
+      {
+        "path": "models/dit_v2/mlp.py",
+        "sha256": "af3b8bf0f1bc7e135140e5bd9f63869320f9ea3803c95f8482f21a48f1fa1d3a"
+      },
+      {
+        "path": "models/dit_v2/nablocks/mmsr_block.py",
+        "sha256": "f360460a734a97b2e019bc2b0fecebad97e57154e826195eb5ba1437a2ed6749"
+      }
+    ]
+  },
+  "reference_profile": "FP32-B",
+  "pnnx_sha256": "732a25bf3c8e17b1d071b3eed8c6131a14da5450564bbe1a157d6dc11c2a10ba",
+  "torch_version": "2.9.0+cpu",
+  "ncnn_commit": "6a1bf000f363714839a36793addc8c879d3d899e",
+  "tolerance": {
+    "atol": 0.0001,
+    "rtol": 0.001,
+    "calibration": "DIAGNOSTIC_NOT_MODEL_CERTIFICATION"
+  },
+  "scripts": {
+    "dit_block_reference.py": "6fdd93f3de87c9334dac4cc1646f5c8064f48efd477d7ba2d2682281c84d1df4",
+    "dit_block_module.py": "82959f324e8fc7d73dfb686901fceb3546d8013ef117db077f544ef195545d3d",
+    "awa_export_module.py": "05b87ce6a0699168120fb7828182c8685a26a449433a7f438fff89f681abf2d7",
+    "export_dit_block.py": "d62a5ea11dbd357cfcc3ca930d6f29b9582b49834291050eac027259ef26915c"
+  },
+  "blocks": [
+    {
+      "index": 2,
+      "official_tensors": 29,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "7b33de294ccd81f377fb7773f2d7aa114cbdd0ef179b695184c4daebcc516e45",
+        "constant_rewrites": 12,
+        "original_param_sha256": "5f7818ecdb13c9c5fc9cc181dd053f9c841caa19877944f1f634f11b87f10b18",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "index": 3,
+      "official_tensors": 29,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "84ab82172e3a05e0e2ac95bf0dd1a623a3a18a7846223eb9e34863e0a3d70f8d",
+        "constant_rewrites": 12,
+        "original_param_sha256": "5f7818ecdb13c9c5fc9cc181dd053f9c841caa19877944f1f634f11b87f10b18",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "index": 4,
+      "official_tensors": 29,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "db5e598db9cb63b8cad36b5113cdcdcd755a7b2a68ac4ff9c5a65fb1b609d57c",
+        "constant_rewrites": 12,
+        "original_param_sha256": "5f7818ecdb13c9c5fc9cc181dd053f9c841caa19877944f1f634f11b87f10b18",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "index": 5,
+      "official_tensors": 29,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "452bdfd9f4f3fccf9561ef19aa9663d81b4e7d50b86e07e263a76836fdc7545b",
+        "constant_rewrites": 12,
+        "original_param_sha256": "5f7818ecdb13c9c5fc9cc181dd053f9c841caa19877944f1f634f11b87f10b18",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "index": 6,
+      "official_tensors": 29,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "15e3051e48970f4f7001462112878a23de8e4e27a9129d6765f86317e8f47411",
+        "constant_rewrites": 12,
+        "original_param_sha256": "5f7818ecdb13c9c5fc9cc181dd053f9c841caa19877944f1f634f11b87f10b18",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "index": 7,
+      "official_tensors": 29,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "b23fa872629e66a0ab59a77c5d07f237f5f53a6b3b285c49d44ba25f4c172710",
+        "constant_rewrites": 12,
+        "original_param_sha256": "5f7818ecdb13c9c5fc9cc181dd053f9c841caa19877944f1f634f11b87f10b18",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "index": 8,
+      "official_tensors": 29,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "94a2237bdf6ed5d767b8c828cdc723536233fca941608ce798f4ff9edc386a2f",
+        "constant_rewrites": 12,
+        "original_param_sha256": "5f7818ecdb13c9c5fc9cc181dd053f9c841caa19877944f1f634f11b87f10b18",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "index": 9,
+      "official_tensors": 29,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "c5f7c69cba12ee38cc65299a52893770057468baeabf8ee6d993173b6e66c899",
+        "constant_rewrites": 12,
+        "original_param_sha256": "5f7818ecdb13c9c5fc9cc181dd053f9c841caa19877944f1f634f11b87f10b18",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "index": 12,
+      "official_tensors": 15,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "b3e4f890526891cef02c6257a22789384d17d146909af29635138f592d03bf7a",
+        "constant_rewrites": 6,
+        "original_param_sha256": "8528fcbda796f256da6a8306c2705b182905a21731c92001dc7b982d6e99b1ad",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "index": 13,
+      "official_tensors": 15,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "903b794ed0d7053be9e21df3542df00bb72c5f3eeaee12ed1eefa196bba3bcd7",
+        "constant_rewrites": 6,
+        "original_param_sha256": "8528fcbda796f256da6a8306c2705b182905a21731c92001dc7b982d6e99b1ad",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "index": 14,
+      "official_tensors": 15,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "01af823f034b60c3ba984acba4899566026aaefe8adffa5eebfa2debeae068cc",
+        "constant_rewrites": 6,
+        "original_param_sha256": "8528fcbda796f256da6a8306c2705b182905a21731c92001dc7b982d6e99b1ad",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "index": 15,
+      "official_tensors": 15,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "e701de8e69a2366c8046b6138eb4e74a4be2787b4c9a2ddb782da251da201d44",
+        "constant_rewrites": 6,
+        "original_param_sha256": "8528fcbda796f256da6a8306c2705b182905a21731c92001dc7b982d6e99b1ad",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "index": 16,
+      "official_tensors": 15,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "64e3f447cc75c41400cafc3b10692a9cdf3c333f47c48099faab6ecd3391f1a0",
+        "constant_rewrites": 6,
+        "original_param_sha256": "8528fcbda796f256da6a8306c2705b182905a21731c92001dc7b982d6e99b1ad",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "index": 17,
+      "official_tensors": 15,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "c11ace433c9745e2c8feb185e7d9528be8dd347c5c42d694b24e0226b75fe721",
+        "constant_rewrites": 6,
+        "original_param_sha256": "8528fcbda796f256da6a8306c2705b182905a21731c92001dc7b982d6e99b1ad",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "index": 18,
+      "official_tensors": 15,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "97007a17a81288ff0713b9ab7e22aec501e1364aa6b888ce426d10d18022398f",
+        "constant_rewrites": 6,
+        "original_param_sha256": "8528fcbda796f256da6a8306c2705b182905a21731c92001dc7b982d6e99b1ad",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "index": 19,
+      "official_tensors": 15,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "60a74d2ade9bd39c89533fb021ff6916f86139de59d00b1db5ca1055ba1b8dc6",
+        "constant_rewrites": 6,
+        "original_param_sha256": "8528fcbda796f256da6a8306c2705b182905a21731c92001dc7b982d6e99b1ad",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "index": 20,
+      "official_tensors": 15,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "a9e9a85945830ffcd72ccae3571af86bbe99e43f45849f3d0f2f680047ef227a",
+        "constant_rewrites": 6,
+        "original_param_sha256": "8528fcbda796f256da6a8306c2705b182905a21731c92001dc7b982d6e99b1ad",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "index": 21,
+      "official_tensors": 15,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "85baf6433d46690d217998a0cac02870e0fac5b933ce3a5950751c5e6a0d4910",
+        "constant_rewrites": 6,
+        "original_param_sha256": "8528fcbda796f256da6a8306c2705b182905a21731c92001dc7b982d6e99b1ad",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "index": 22,
+      "official_tensors": 15,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "66fee7e5f4126027ee93ae959c6560c5eee516a70b78988c1a25f3f7822ae95a",
+        "constant_rewrites": 6,
+        "original_param_sha256": "8528fcbda796f256da6a8306c2705b182905a21731c92001dc7b982d6e99b1ad",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "index": 23,
+      "official_tensors": 15,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "10087fdc19a5ec303c94f56084e899eb94dbed2e976706f784beee70ccc28e66",
+        "constant_rewrites": 6,
+        "original_param_sha256": "8528fcbda796f256da6a8306c2705b182905a21731c92001dc7b982d6e99b1ad",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "index": 24,
+      "official_tensors": 15,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "64c0e070f45477fc6fbc9374bd627e158e54c9fa1ad334d6af0970c91abce463",
+        "constant_rewrites": 6,
+        "original_param_sha256": "8528fcbda796f256da6a8306c2705b182905a21731c92001dc7b982d6e99b1ad",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "index": 25,
+      "official_tensors": 15,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "e2e65bdda0a248f811f298dd8e3559b67b0b1252f218874d8ccf18c620bbb89d",
+        "constant_rewrites": 6,
+        "original_param_sha256": "8528fcbda796f256da6a8306c2705b182905a21731c92001dc7b982d6e99b1ad",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "index": 26,
+      "official_tensors": 15,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "d6a46e2390eeef1e89199319a7df6a81abe0659944770602441ebe58d96103d5",
+        "constant_rewrites": 6,
+        "original_param_sha256": "8528fcbda796f256da6a8306c2705b182905a21731c92001dc7b982d6e99b1ad",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "index": 27,
+      "official_tensors": 15,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "d7448cf26ad236cbcda0896a139bdad3c484080ff77d63606aa8f3667f986eb2",
+        "constant_rewrites": 6,
+        "original_param_sha256": "8528fcbda796f256da6a8306c2705b182905a21731c92001dc7b982d6e99b1ad",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "index": 28,
+      "official_tensors": 15,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "de2fa7b4c3bbccb96f217ab13af758ffb52b98fd32ee4f3221e79daecf60475f",
+        "constant_rewrites": 6,
+        "original_param_sha256": "8528fcbda796f256da6a8306c2705b182905a21731c92001dc7b982d6e99b1ad",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "index": 29,
+      "official_tensors": 15,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "6a63d0ba0bd72251df1bfc9ea1418fa150d24c55a63e04e98eb51f2c4f734fdc",
+        "constant_rewrites": 6,
+        "original_param_sha256": "8528fcbda796f256da6a8306c2705b182905a21731c92001dc7b982d6e99b1ad",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "index": 30,
+      "official_tensors": 15,
+      "operators": [
+        "BinaryOp",
+        "InnerProduct",
+        "Input",
+        "RMSNorm",
+        "Reshape",
+        "SeedVR2AWA",
+        "SeedVR2Constant",
+        "Slice",
+        "Split",
+        "Swish"
+      ],
+      "awa_lowering": {
+        "format": 2,
+        "binary_rewritten": false,
+        "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+        "norm_weights_sha256": "e0c5fa21aee050e789dc985b05d0d9f5f0fa78de2cfbf1b338251f22a974a114",
+        "constant_rewrites": 6,
+        "original_param_sha256": "8528fcbda796f256da6a8306c2705b182905a21731c92001dc7b982d6e99b1ad",
+        "shape_rewrites": [
+          {
+            "before": [
+              "0=2560",
+              "1=-1",
+              "12=233",
+              "13=0"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "6=\"7680,1h,1d\""
+            ],
+            "after": [
+              "6=\"7680,1h,1d,1c\""
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "0=2560"
+            ],
+            "after": [
+              "0=2560",
+              "1=-1"
+            ],
+            "count": 1
+          },
+          {
+            "before": [
+              "12=0",
+              "13=233",
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "after": [
+              "6=\"2560,1h,1d,1c\""
+            ],
+            "count": 1
+          }
+        ]
+      }
+    }
+  ],
+  "cases": [
+    {
+      "path": "dit-block-2-1x2x3/case.json",
+      "sha256": "907fbc990db250f86d1aba81bb80c69f7cf0ee8027175febb50007759c4ba183",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-2-2x3x4/case.json",
+      "sha256": "6c86716d96a56ea420da54682693a024928c550fe4c7a4c4707ef2357a8f5bf6",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-3-1x2x3/case.json",
+      "sha256": "4affd7f4a340be2d750a4ba5f5bb634079191dc540ad961c4df6fc36d2610b37",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-3-2x3x4/case.json",
+      "sha256": "501aa2b92d60dd3725dca103f4669d69eb9c1868c02eef4a140953d663970721",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-4-1x2x3/case.json",
+      "sha256": "c96a55312adcd3345796eebd0ac4e8297b8e50cb38e04176c7312035a7164da1",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-4-2x3x4/case.json",
+      "sha256": "e4d95734b8f7bab9f5a58674eb8e27ebb266870d8bc91ed4344537e19b726ec9",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-5-1x2x3/case.json",
+      "sha256": "2b0f629a6ede5fe3ebb6e98e0846c8f1bf0e8752e13ce1ec15dd7764a59d5a3b",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-5-2x3x4/case.json",
+      "sha256": "f43c16375abae328d7a9ee0493cefb1c3d3e588587d37417c8b95661ab62be28",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-6-1x2x3/case.json",
+      "sha256": "6cec192b5b276f73276af408523c8ccdf3f9bb0229b59212c8ffc80c80ec39c2",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-6-2x3x4/case.json",
+      "sha256": "49f91c0b63c2667a16afdb85f03eed7405bf8504078ba2772c9ca188fb4ff0df",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-7-1x2x3/case.json",
+      "sha256": "3a4130d465a8a87af5811af8a98a37c4e8a554ebb108e1e4b6dab11f90965b0c",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-7-2x3x4/case.json",
+      "sha256": "00099846ef78e0d2ff98bdad57aeb527bbf91cb32a677f8c1e1f7d4452f17f71",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-8-1x2x3/case.json",
+      "sha256": "9de4b50fb010275ebd59b83f9a13a1acf22bd303c486e477cc6dbfd9f753f19a",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-8-2x3x4/case.json",
+      "sha256": "e2752a25d97d44c3121f1368b0e170974e0881d7e7c470badcb3334b454ce833",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-9-1x2x3/case.json",
+      "sha256": "6692cd3276bda93265d4bb85a12c7cdfef8081e3e93385fef38c635786dea6f0",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-9-2x3x4/case.json",
+      "sha256": "41143bc4df7451d8aadb1686f4295d22809be8c3caf4e97a76dca71dbc443182",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-12-1x2x3/case.json",
+      "sha256": "394ad9d7fbca2960dcbab61405e37f36c6781df872af20a11e3b5121174f7864",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-12-2x3x4/case.json",
+      "sha256": "f6a323f651ebfb9bb1b20aeb5a1f8d60129ac48ac759d78066328f9d83f60314",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-13-1x2x3/case.json",
+      "sha256": "7fcac1afe619d9c7026c80e56999f11e8367a056801c105cc5debfeec3e1eacc",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-13-2x3x4/case.json",
+      "sha256": "a114255db0939a02b3e747846a9e69735e6885047508785925582d322d3368de",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-14-1x2x3/case.json",
+      "sha256": "deb2e9965d2534241ec446f5c3a9baf937df010237f438045351ddc2a1449f32",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-14-2x3x4/case.json",
+      "sha256": "e79b919e5ffe9117116f8318098668c84250a251d56192e0d36b819e2f69b8a7",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-15-1x2x3/case.json",
+      "sha256": "a91ee7ef23e91bab1afd3ee4d7060f8ccf2eac789f43f33d70e6bf101b08e0ff",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-15-2x3x4/case.json",
+      "sha256": "89b0b4f200fcbe80d010ba361ca476d14c598eac1526e856b2cded88c77ae00d",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-16-1x2x3/case.json",
+      "sha256": "d0995f9e9d70a61c7104153e42e5db16bc1220866a5446533952c69ddf8664ca",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-16-2x3x4/case.json",
+      "sha256": "ea372e42207fd9f2f73323e638d178ebecc0705ff6df6ae0b4ce84fb7ad60a7a",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-17-1x2x3/case.json",
+      "sha256": "fbb66ff6bd5056c0c66308ae89bbf16779f761716599885332a9761bec467ada",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-17-2x3x4/case.json",
+      "sha256": "f00caa843baa75c984605aa0bf844e628e4965c850d66b93b3ddb1117a3c4570",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-18-1x2x3/case.json",
+      "sha256": "833745f5a2e47d272e113ad8b7664c60d47558bc5e1c43758ceb9d38c7ff0b12",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-18-2x3x4/case.json",
+      "sha256": "abfff424046a0eda11f5ec93317b73c2d6717bac549da16dcab267cf40277ac4",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-19-1x2x3/case.json",
+      "sha256": "47244e314eb52b27f2178db09fda31c57023a28036bd2aeeb9ebfb332a67fea4",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-19-2x3x4/case.json",
+      "sha256": "55abd01758474ed17d2e912c71dd51ece78edfd53dae07af1e6f952260446845",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-20-1x2x3/case.json",
+      "sha256": "a9c9fe66ff87f8fafd5c65a2b0c6208a5c1280dd26aeba7936bf438c1b4f65aa",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-20-2x3x4/case.json",
+      "sha256": "ad92c442757baef504d9c5ce09dda887cb56de935b3b02aa368ebc3123f9e220",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-21-1x2x3/case.json",
+      "sha256": "0a99ec70b159c29b8549a18ce74e61c3c482ce13c5f7ad359e2b38a0acc5c444",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-21-2x3x4/case.json",
+      "sha256": "2d4fa225a109244a7a249a10176c5d419d7f3a55c33e8fd195c69eb95b9ac91c",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-22-1x2x3/case.json",
+      "sha256": "5695e0e639ce7a68b0d0972f4ef107375f961fd39fabdd0b1c15d72912655494",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-22-2x3x4/case.json",
+      "sha256": "5c603c75a9f077572611ada6a8ba418b6073de1f4e4ff989455e3ae59af02085",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-23-1x2x3/case.json",
+      "sha256": "7d953df6df1976130138e6e9206e11b981684746ecd17faaea6841743df8fd61",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-23-2x3x4/case.json",
+      "sha256": "8f57182fd85db28536df2355749cb372b8a1384ac6007cde4735cef3dd2a8b29",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-24-1x2x3/case.json",
+      "sha256": "4512c1277c8ff33f6221c2830e578023ddcfa1a8bf7d469f425f2eae6c6fdedd",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-24-2x3x4/case.json",
+      "sha256": "8e3b722c2e65a88835debfaff1653cc5e65c5996328d4b93d77c201bfa9b4d5d",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-25-1x2x3/case.json",
+      "sha256": "0d27b09ffa01fd24cb278a362732e91c153fddf4e7c542dc3027319aec8a23b1",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-25-2x3x4/case.json",
+      "sha256": "ec653e2cebe6028fe2c0e7e8e558a91918c66636be99ea9ae4d0c289219f852c",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-26-1x2x3/case.json",
+      "sha256": "85e5a5335609950838afeda9505f921f3650ec4339105269bbe05c0bebe0ad8d",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-26-2x3x4/case.json",
+      "sha256": "50267b27667eb6b196e8752d0e7690cdc1c3825f2bc616f60612ed9a37a1ae87",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-27-1x2x3/case.json",
+      "sha256": "7075030eb794aaf1fa628e7f83af0032d2a29150e08b4977df5c34f92212e1a1",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-27-2x3x4/case.json",
+      "sha256": "ab1dd55d311e1fbfe17f63529a2cc8192f87f39cbacdfe48982ad3c2f2eb2bd8",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-28-1x2x3/case.json",
+      "sha256": "5191e0d133ed22d5368ccd867d9a3fd5c73376006d8a045f03539b9a59943df3",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-28-2x3x4/case.json",
+      "sha256": "389b305fdf9ee9620543829ae396c9f81a83de8ca0dcc81794d4342f858c3879",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-29-1x2x3/case.json",
+      "sha256": "ebb20139b7caa0da8c3512f34ea822546057ce421a35d3834be117159991a698",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-29-2x3x4/case.json",
+      "sha256": "3f90ae19660210bd498521c298d088ab8e914650086f94d12cb39b7b262ea6d5",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-30-1x2x3/case.json",
+      "sha256": "2261a5949fd18ed0d9c7aaa3ad2b16d2749b5ac7d99dfeb50817b3a021a2953f",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    },
+    {
+      "path": "dit-block-30-2x3x4/case.json",
+      "sha256": "3ff730ee71294b6172cf7c13de16f857f106a6a6f4136cbcc39d47a7f0df3536",
+      "scripted_vs_official": [
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        },
+        {
+          "passed": true,
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "violations": 0
+        }
+      ]
+    }
+  ],
+  "model_verified": false,
+  "passed": true
+}

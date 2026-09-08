@@ -1,0 +1,224 @@
+{
+  "artifact_checks": [],
+  "assurance": "Local file integrity and diagnostic comparison only; provenance and suite coverage are not certified",
+  "blockers": [
+    "ENGINE_NOT_BUILT",
+    "REFERENCE_NOT_REGISTERED",
+    "THRESHOLDS_NOT_FROZEN",
+    "MODEL_GATES_NOT_EXECUTED"
+  ],
+  "calibration_status": "NOT_FROZEN",
+  "certificate": null,
+  "document_type": "model-evidence-audit",
+  "gates": [
+    {
+      "id": "M01",
+      "mandatory": true,
+      "missing_artifact_roles": [
+        "weights",
+        "model_config"
+      ],
+      "required_artifact_roles": [
+        "weights",
+        "model_config"
+      ],
+      "requirement": "每个分片、VAE、文本条件与配置的实际哈希；冻结官方来源和模型许可。",
+      "status": "MISSING_EVIDENCE",
+      "title": "权重与模型身份"
+    },
+    {
+      "id": "M02",
+      "mandatory": true,
+      "missing_artifact_roles": [
+        "export_manifest",
+        "runtime_build"
+      ],
+      "required_artifact_roles": [
+        "export_manifest",
+        "runtime_build"
+      ],
+      "requirement": "固定 pnnx、ncnn、导出脚本与子图；未知算子、CPU 回退必须逐项列出。",
+      "status": "MISSING_EVIDENCE",
+      "title": "导出与算子覆盖"
+    },
+    {
+      "id": "M03",
+      "mandatory": true,
+      "missing_artifact_roles": [
+        "reference_a",
+        "reference_b",
+        "noise"
+      ],
+      "required_artifact_roles": [
+        "reference_a",
+        "reference_b",
+        "noise"
+      ],
+      "requirement": "官方 BF16 路径 A、显式 FP32 路径 B；保存实际 posterior / DiT noise。",
+      "status": "MISSING_EVIDENCE",
+      "title": "独立参考与随机输入"
+    },
+    {
+      "id": "M04",
+      "mandatory": true,
+      "missing_artifact_roles": [
+        "awa_trace"
+      ],
+      "required_artifact_roles": [
+        "awa_trace"
+      ],
+      "requirement": "QKV、norm、局部 RoPE 126+2、SDPA、scatter、等权 text mean；regular / shifted 与非整除形状。",
+      "status": "MISSING_EVIDENCE",
+      "title": "AWA 全计算"
+    },
+    {
+      "id": "M05",
+      "mandatory": true,
+      "missing_artifact_roles": [
+        "vae_trace"
+      ],
+      "required_artifact_roles": [
+        "vae_trace"
+      ],
+      "requirement": "因果 3D 卷积、时间 cache、归一化、空间 attention、首帧与尾帧、encode / decode。",
+      "status": "MISSING_EVIDENCE",
+      "title": "VAE 编码与解码"
+    },
+    {
+      "id": "M06",
+      "mandatory": true,
+      "missing_artifact_roles": [
+        "dit_trace"
+      ],
+      "required_artifact_roles": [
+        "dit_trace"
+      ],
+      "requirement": "前 10 层双分支及每层 video / text 状态；逐层误差累积、NaN/Inf。",
+      "status": "MISSING_EVIDENCE",
+      "title": "DiT 32 层中间结果"
+    },
+    {
+      "id": "M07",
+      "mandatory": true,
+      "missing_artifact_roles": [
+        "end_to_end_trace"
+      ],
+      "required_artifact_roles": [
+        "end_to_end_trace"
+      ],
+      "requirement": "固定输入、噪声、单步 CFG=1；latent、色彩修复前后浮点输出、最终媒体。",
+      "status": "MISSING_EVIDENCE",
+      "title": "整网端到端一致性"
+    },
+    {
+      "id": "M08",
+      "mandatory": true,
+      "missing_artifact_roles": [
+        "temporal_metrics"
+      ],
+      "required_artifact_roles": [
+        "temporal_metrics"
+      ],
+      "requirement": "静止、运动、切镜、首尾帧、拼接边界；完整 clip 对照及时间残差，不只抽单帧。",
+      "status": "MISSING_EVIDENCE",
+      "title": "视频时间与分块一致性"
+    },
+    {
+      "id": "M09",
+      "mandatory": true,
+      "missing_artifact_roles": [
+        "quality_review",
+        "dataset_manifest"
+      ],
+      "required_artifact_roles": [
+        "quality_review",
+        "dataset_manifest"
+      ],
+      "requirement": "独立样例及未用于调阈值的保留集；纹理、文字、人像、压缩、过度锐化。",
+      "status": "MISSING_EVIDENCE",
+      "title": "真实画质与保留集"
+    },
+    {
+      "id": "M10",
+      "mandatory": true,
+      "missing_artifact_roles": [
+        "backend_trace",
+        "device_manifest"
+      ],
+      "required_artifact_roles": [
+        "backend_trace",
+        "device_manifest"
+      ],
+      "requirement": "同输入 CPU / Vulkan 对照、实际逐算子后端、驱动、设备、精度与 shader 身份。",
+      "status": "MISSING_EVIDENCE",
+      "title": "Vulkan 与精度配置"
+    },
+    {
+      "id": "M11",
+      "mandatory": true,
+      "missing_artifact_roles": [
+        "performance_runs",
+        "stability_runs"
+      ],
+      "required_artifact_roles": [
+        "performance_runs",
+        "stability_runs"
+      ],
+      "requirement": "冷启动、至少 3 次暖跑、原始耗时/峰值、OOM 与长视频；8GB/720p 需实测。",
+      "status": "MISSING_EVIDENCE",
+      "title": "资源与稳定性"
+    },
+    {
+      "id": "M12",
+      "mandatory": true,
+      "missing_artifact_roles": [
+        "calibration",
+        "review_record"
+      ],
+      "required_artifact_roles": [
+        "calibration",
+        "review_record"
+      ],
+      "requirement": "冻结阈值及其校准依据、样例覆盖、独立复核；证书只覆盖精确 profile。",
+      "status": "MISSING_EVIDENCE",
+      "title": "可复现模型验收档案"
+    }
+  ],
+  "manifest_sha256": "8ed4da98acaea1e43c484fec37a0af451aa233c3306a7bfd791a829a12bf90f0",
+  "missing_scope": [
+    "chunk_policy",
+    "dataset_sha256",
+    "device",
+    "driver",
+    "export_sha256",
+    "ncnn_commit",
+    "noise_sha256",
+    "precision",
+    "runtime_build",
+    "shape_profile",
+    "weights_sha256"
+  ],
+  "model_id": "seedvr2-3b",
+  "model_verified": false,
+  "policy_id": "seedvr2-3b-validation-v1-draft",
+  "policy_sha256": "9ecd258361bd50fc9455985e0c8e47044fd17e6a4fd061c236cd7bb0c267c8c9",
+  "record_id": "0747b6b512c5682b2aaa47ea93f5326e",
+  "schema_version": "1.0",
+  "scope": {
+    "chunk_policy": null,
+    "dataset_sha256": null,
+    "device": null,
+    "driver": null,
+    "export_sha256": null,
+    "model_id": "seedvr2-3b",
+    "ncnn_commit": null,
+    "noise_sha256": null,
+    "precision": null,
+    "runtime_build": null,
+    "shape_profile": null,
+    "weights_sha256": null
+  },
+  "scope_binding": "DECLARED_UNVERIFIED",
+  "status": "BLOCKED",
+  "tensor_checks": []
+}

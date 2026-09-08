@@ -1,0 +1,133 @@
+{
+  "schema_version": "1.0",
+  "document_type": "model-validation-policy",
+  "policy_id": "seedvr2-3b-validation-v1-draft",
+  "model_id": "seedvr2-3b",
+  "official_source_commit": "e4de8c24441a67e1b7df56abea10645059bb1185",
+  "calibration_status": "NOT_FROZEN",
+  "certificate_issuance_enabled": false,
+  "diagnostic_tolerance": {
+    "dtype": "f32le",
+    "atol": 1e-05,
+    "rtol": 0.0001,
+    "use": "FP32 operator diagnostics only; not full-model acceptance"
+  },
+  "gates": [
+    {
+      "id": "M01",
+      "title": "权重与模型身份",
+      "requirement": "每个分片、VAE、文本条件与配置的实际哈希；冻结官方来源和模型许可。",
+      "required_artifact_roles": [
+        "weights",
+        "model_config"
+      ],
+      "mandatory": true
+    },
+    {
+      "id": "M02",
+      "title": "导出与算子覆盖",
+      "requirement": "固定 pnnx、ncnn、导出脚本与子图；未知算子、CPU 回退必须逐项列出。",
+      "required_artifact_roles": [
+        "export_manifest",
+        "runtime_build"
+      ],
+      "mandatory": true
+    },
+    {
+      "id": "M03",
+      "title": "独立参考与随机输入",
+      "requirement": "官方 BF16 路径 A、显式 FP32 路径 B；保存实际 posterior / DiT noise。",
+      "required_artifact_roles": [
+        "reference_a",
+        "reference_b",
+        "noise"
+      ],
+      "mandatory": true
+    },
+    {
+      "id": "M04",
+      "title": "AWA 全计算",
+      "requirement": "QKV、norm、局部 RoPE 126+2、SDPA、scatter、等权 text mean；regular / shifted 与非整除形状。",
+      "required_artifact_roles": [
+        "awa_trace"
+      ],
+      "mandatory": true
+    },
+    {
+      "id": "M05",
+      "title": "VAE 编码与解码",
+      "requirement": "因果 3D 卷积、时间 cache、归一化、空间 attention、首帧与尾帧、encode / decode。",
+      "required_artifact_roles": [
+        "vae_trace"
+      ],
+      "mandatory": true
+    },
+    {
+      "id": "M06",
+      "title": "DiT 32 层中间结果",
+      "requirement": "前 10 层双分支及每层 video / text 状态；逐层误差累积、NaN/Inf。",
+      "required_artifact_roles": [
+        "dit_trace"
+      ],
+      "mandatory": true
+    },
+    {
+      "id": "M07",
+      "title": "整网端到端一致性",
+      "requirement": "固定输入、噪声、单步 CFG=1；latent、色彩修复前后浮点输出、最终媒体。",
+      "required_artifact_roles": [
+        "end_to_end_trace"
+      ],
+      "mandatory": true
+    },
+    {
+      "id": "M08",
+      "title": "视频时间与分块一致性",
+      "requirement": "静止、运动、切镜、首尾帧、拼接边界；完整 clip 对照及时间残差，不只抽单帧。",
+      "required_artifact_roles": [
+        "temporal_metrics"
+      ],
+      "mandatory": true
+    },
+    {
+      "id": "M09",
+      "title": "真实画质与保留集",
+      "requirement": "独立样例及未用于调阈值的保留集；纹理、文字、人像、压缩、过度锐化。",
+      "required_artifact_roles": [
+        "quality_review",
+        "dataset_manifest"
+      ],
+      "mandatory": true
+    },
+    {
+      "id": "M10",
+      "title": "Vulkan 与精度配置",
+      "requirement": "同输入 CPU / Vulkan 对照、实际逐算子后端、驱动、设备、精度与 shader 身份。",
+      "required_artifact_roles": [
+        "backend_trace",
+        "device_manifest"
+      ],
+      "mandatory": true
+    },
+    {
+      "id": "M11",
+      "title": "资源与稳定性",
+      "requirement": "冷启动、至少 3 次暖跑、原始耗时/峰值、OOM 与长视频；8GB/720p 需实测。",
+      "required_artifact_roles": [
+        "performance_runs",
+        "stability_runs"
+      ],
+      "mandatory": true
+    },
+    {
+      "id": "M12",
+      "title": "可复现模型验收档案",
+      "requirement": "冻结阈值及其校准依据、样例覆盖、独立复核；证书只覆盖精确 profile。",
+      "required_artifact_roles": [
+        "calibration",
+        "review_record"
+      ],
+      "mandatory": true
+    }
+  ]
+}

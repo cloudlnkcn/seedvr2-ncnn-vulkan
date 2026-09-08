@@ -1,0 +1,27 @@
+#version 450
+layout(local_size_x=128, local_size_y=1, local_size_z=1) in;
+layout(binding=0) readonly buffer Source { float src[]; };
+layout(binding=1) readonly buffer Affine { float affine[]; };
+layout(binding=2) writeonly buffer Destination { float dst[]; };
+layout(push_constant) uniform parameter { int spatial, frames, channels, cstep, outstep, groups; float epsilon; } p;
+shared float reduction[128];
+shared float mean_value;
+void main() {
+    int lane=int(gl_LocalInvocationID.x), g=int(gl_WorkGroupID.x), t=int(gl_WorkGroupID.y);
+    int cg=p.channels/p.groups, count=cg*p.spatial;
+    float sum=0.;
+    for(int i=lane;i<count;i+=128) sum+=src[(g*cg+i/p.spatial)*p.cstep+t*p.spatial+i%p.spatial];
+    reduction[lane]=sum; barrier();
+    for(int step=64;step>0;step/=2) { if(lane<step) reduction[lane]+=reduction[lane+step]; barrier(); }
+    if(lane==0) mean_value=reduction[0]/float(count);
+    barrier();
+    sum=0.;
+    for(int i=lane;i<count;i+=128) { float v=src[(g*cg+i/p.spatial)*p.cstep+t*p.spatial+i%p.spatial]-mean_value; sum+=v*v; }
+    reduction[lane]=sum; barrier();
+    for(int step=64;step>0;step/=2) { if(lane<step) reduction[lane]+=reduction[lane+step]; barrier(); }
+    float scale=inversesqrt(reduction[0]/float(count)+p.epsilon);
+    for(int i=lane;i<count;i+=128) {
+        int c=g*cg+i/p.spatial, off=t*p.spatial+i%p.spatial;
+        dst[c*p.outstep+off]=(src[c*p.cstep+off]-mean_value)*scale*affine[c]+affine[p.channels+c];
+    }
+}

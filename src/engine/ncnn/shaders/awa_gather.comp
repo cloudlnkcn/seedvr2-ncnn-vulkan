@@ -1,0 +1,54 @@
+#version 450
+// One workgroup per (window token, head). FP32 RMSNorm, local MM RoPE, QKV pack.
+layout(local_size_x=128, local_size_y=1, local_size_z=1) in;
+layout(binding=0) readonly buffer Video { float video[]; };
+layout(binding=1) readonly buffer Text { float text[]; };
+layout(binding=2) readonly buffer Norm { float norm[]; };
+layout(binding=3) writeonly buffer Query { float query[]; };
+layout(binding=4) writeonly buffer Key { float key[]; };
+layout(binding=5) writeonly buffer Value { float value[]; };
+layout(push_constant) uniform parameter {
+    int input_width, grid_h, grid_w, input_cstep;
+    int text_length, heads, sequence, qkv_cstep;
+    int t0, h0, w0, nt, nh, nw;
+    float epsilon;
+} p;
+shared float q[128];
+shared float k[128];
+shared float qsum[128];
+shared float ksum[128];
+void main() {
+    int token=int(gl_WorkGroupID.x), head=int(gl_WorkGroupID.y), d=int(gl_LocalInvocationID.x);
+    if (token>=p.sequence || head>=p.heads) return;
+    int nv=p.nt*p.nh*p.nw, hd=p.heads*128;
+    bool is_video=token<nv;
+    ivec3 local=ivec3(token/(p.nh*p.nw),(token/p.nw)%p.nh,token%p.nw);
+    int base=is_video ? (p.t0+local.x)*p.input_cstep+((p.h0+local.y)*p.grid_w+p.w0+local.z)*p.input_width
+                      : (token-nv)*p.input_width;
+    int index=base+head*128+d;
+    float v;
+    if (is_video) {q[d]=video[index];k[d]=video[index+hd];v=video[index+2*hd];}
+    else {q[d]=text[index];k[d]=text[index+hd];v=text[index+2*hd];}
+    qsum[d]=q[d]*q[d]; ksum[d]=k[d]*k[d];
+    barrier();
+    for (int step=64;step>0;step/=2) {
+        if (d<step) {qsum[d]+=qsum[d+step];ksum[d]+=ksum[d+step];}
+        barrier();
+    }
+    int offset=is_video?0:256;
+    float qs=inversesqrt(qsum[0]/128.+p.epsilon);
+    float ks=inversesqrt(ksum[0]/128.+p.epsilon);
+    float qn=q[d]*qs*norm[offset+d], kn=k[d]*ks*norm[offset+128+d];
+    if (d<126) {
+        int axis=d/42, pair=(d%42)/2, partner=d^1;
+        float pos=is_video ? (axis==0 ? float(p.text_length+local.x) : (axis==1?float(local.y):float(local.z)))
+                           : float(token-nv);
+        // Norm buffer also contains the 21 locked language-RoPE frequencies.
+        float angle=pos*norm[512+pair], c=cos(angle), s=sin(angle);
+        float sign=(d%2==0)?-1.:1.;
+        qn=qn*c+sign*q[partner]*qs*norm[offset+partner]*s;
+        kn=kn*c+sign*k[partner]*ks*norm[offset+128+partner]*s;
+    }
+    int dest=head*p.qkv_cstep+token*128+d;
+    query[dest]=qn; key[dest]=kn; value[dest]=v;
+}
