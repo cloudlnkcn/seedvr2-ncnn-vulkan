@@ -4,60 +4,14 @@
 #include "video_layers.hpp"
 #include "engine_build.hpp"
 #include "graph.hpp"
+#include "package.hpp"
+#include "weight_io.hpp"
 #include "seedvr2/image.hpp"
 #include <algorithm>
 #include <numbers>
 #include <pipelinecache.h>
 namespace seedvr2::engine::inference {
 using namespace detail;
-inline constexpr auto profile = "seedvr2-3b-image-fp32-b-v1";
-inline constexpr auto video_profile = "seedvr2-3b-video-fp32-b-v1";
-struct Cancelled final : std::exception {
-    const char *what() const noexcept override { return "Image processing cancelled"; }
-};
-struct GraphFiles { std::filesystem::path param, weights; };
-struct Package {
-    Json manifest;
-    std::string identity;
-    std::map<std::string, GraphFiles> graphs;
-    ncnn::Mat text, time;
-    explicit Package(const std::filesystem::path &root, const std::function<void()> &check = {}, bool video = false) {
-        const auto path = root/"manifest.json";
-        manifest = read_document(path);
-        identity = hash(path);
-        if (manifest.at("schema_version") != (video ? "seedvr2-video-package-v1" : "seedvr2-image-package-v1") ||
-            manifest.at("profile") != (video ? video_profile : profile) || manifest.at("model_id") != "seedvr2-3b" ||
-            manifest.at("precision") != "fp32" || manifest.at("ncnn_commit") != SEEDVR2_NCNN_COMMIT ||
-            manifest.at("sampling") != Json({{"steps", 1}, {"timestep", 1000}, {"cfg", 1},
-                                            {"latent_scale", .9152}, {"color_fix", "none"}}) ||
-            !manifest.at("graphs").is_array() || manifest.at("graphs").size() != 36)
-            throw std::runtime_error("Unsupported or incomplete image model package");
-        std::set<std::string> expected{"encoder", "decoder", "patch-in", "patch-out"};
-        for (int i = 0; i < 32; ++i)
-            expected.insert("block-"+std::string(i < 10 ? "0" : "")+std::to_string(i));
-        for (const auto &row : manifest.at("graphs")) {
-            if (check) check();
-            const auto id = row.at("id").get<std::string>();
-            if (expected.erase(id) != 1)
-                throw std::runtime_error("Duplicate or unknown graph in model package");
-            graphs.emplace(id, GraphFiles{artifact(root, row.at("param"), 128*1024),
-                artifact(root, row.at("weights"), 1024ULL*1024*1024)});
-        }
-        for (const auto *key : {"text", "time"}) {
-            const auto &row = manifest.at("constants").at(key);
-            const std::vector<int> shape = std::string_view(key) == "text" ?
-                std::vector<int>{58, 2560} : std::vector<int>{2560, 6};
-            if (row.at("shape") != shape || row.at("dtype") != "f32le")
-                throw std::runtime_error("Invalid fixed conditioning shape");
-            auto value = allocate_tensor(shape);
-            read_tensor(artifact(root, row, 1024*1024), value);
-            (std::string_view(key) == "text" ? text : time) = value;
-        }
-        if (hash(path) != identity)
-            throw std::runtime_error("Model package changed during validation");
-    }
-};
-
 // Explicit, versioned generator, independent of std::normal_distribution and
 // Python. Same-seed equivalence to the PyTorch generator is never claimed.
 class NormalNoise {
@@ -89,6 +43,7 @@ inline std::vector<ncnn::Mat> execute_graph(const GraphFiles &files, const std::
     Json &report, const std::function<void()> &check, ncnn::PipelineCache *pipelines) {
     const auto started = Clock::now();
     ExecutionTrace awa;
+    std::unique_ptr<MappedWeights> mapped;
     ncnn::Net net;
     net.opt.use_vulkan_compute = request.vulkan;
     net.opt.use_packing_layout = false;
@@ -119,7 +74,8 @@ inline std::vector<ncnn::Mat> execute_graph(const GraphFiles &files, const std::
         (awa.heads != 20 || awa.shifted != std::stoi(id.substr(6))%2)))
         throw std::runtime_error("Adaptive attention graph metadata mismatch");
     check();
-    if (net.load_model(files.weights.string().c_str()) != 0)
+    if (request.mapped_weights) mapped=std::make_unique<MappedWeights>(files.weights);
+    if ((mapped?net.load_model(*mapped):net.load_model(files.weights.string().c_str())) != 0 || (mapped && !mapped->consumed()))
         throw std::runtime_error("Cannot load graph weights: "+id);
     const auto loaded = Clock::now();
     check();
@@ -155,6 +111,7 @@ inline std::vector<ncnn::Mat> execute_graph(const GraphFiles &files, const std::
         throw std::runtime_error("Requested attention backend did not execute exclusively");
     const auto end = Clock::now();
     report.push_back({{"id", id}, {"backend", request.vulkan ? "ncnn-vulkan" : "ncnn-cpu"},
+        {"weight_io",request.mapped_weights?"mapped":"buffered"},
         {"load_ms", std::chrono::duration<double, std::milli>(loaded-started).count()},
         {"compute_ms", std::chrono::duration<double, std::milli>(end-loaded).count()},
         {"layers", layers.size()}, {"cpu_layers", request.vulkan ? 0 : layers.size()},

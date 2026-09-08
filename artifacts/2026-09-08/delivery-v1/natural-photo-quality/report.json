@@ -1,0 +1,51 @@
+{
+  "schema_version": "seedvr2-controlled-photo-quality-v1",
+  "model_verified": false,
+  "sample_count": 1,
+  "scope": "Single NASA/scikit-image public-domain image with documented synthetic JPEG degradation. Not representative, not a holdout or an acceptance threshold.",
+  "protocol": {
+    "range": 255,
+    "color": "RGB equally averaged, no Y conversion",
+    "border_crop": 0,
+    "ssim": "11x11 Gaussian sigma=1.5, valid convolution, population covariance, K1=.01 K2=.03",
+    "baseline": "Native aligned bicubic-antialias input; same geometry as result"
+  },
+  "files": {
+    "baseline": {
+      "path": ".cache/delivery-offline-v3/\u7ed3\u679c \u81ea\u7136\u56fe\u50cf/comparison-input.png",
+      "sha256": "d8299654cf5e756192584f3f1b8fcaa2ed296e317c7ffab6eb6de149dd87afad"
+    },
+    "native": {
+      "path": ".cache/delivery-offline-v3/\u7ed3\u679c \u81ea\u7136\u56fe\u50cf/output.png",
+      "sha256": "86594366003966855dbe9105a5780e379a3d9e74248b295b8e612f4e2bec5227"
+    },
+    "official_fp32_b": {
+      "path": ".cache/delivery-natural-reference/reference.png",
+      "sha256": "0f2d9e86917a5c0d479c39409cb1388ef42e3d0e1971b64bd8b94285f7b99bac"
+    },
+    "target": {
+      "path": "tests/fixtures/natural/astronaut-target.png",
+      "sha256": "1f103b6ab1f62f669ff29f1d197c31b4a0e75333466e887350e8d972f7a77405"
+    }
+  },
+  "metrics": {
+    "baseline": {
+      "psnr_db": 23.7858350498221,
+      "identical": false,
+      "ssim_rgb": 0.7567556506089366
+    },
+    "native": {
+      "psnr_db": 20.008816184932844,
+      "identical": false,
+      "ssim_rgb": 0.6772429538569809
+    },
+    "official_fp32_b": {
+      "psnr_db": 20.00881730823962,
+      "identical": false,
+      "ssim_rgb": 0.6772428266527548
+    }
+  },
+  "fixture_provenance_sha256": "3a42524dd190232986179b2187a7b0b7483d19ddc8f7ffa9e03493436cca7c07",
+  "native_run_sha256": "05354e10677622db9c4dca2c99574e14d9eae8cfde35c01d421e358e9b27988c",
+  "script_sha256": "ece687b4da41354b2da9b86d005a5040bb59aa9540092368320df19f6c155a0d"
+}

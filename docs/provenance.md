@@ -1,10 +1,10 @@
 # 来源与派生范围
 
-当前版本 0.5.0-video-preview，2026-09-07。现行实现和证据见 [native-backend.md](native-backend.md)、[image-validation.md](image-validation.md)、[video-validation.md](video-validation.md)。native-*、foundation-*、web-*、framework-* 是以前版本的历史记录；其“未链接 ncnn”等结论不描述当前版本。
+当前版本 0.6.0-native-preview，2026-09-08。当前实现与独立版本证据见 [DELIVERY-RESULTS.md](DELIVERY-RESULTS.md)，此前图像/视频证据保留各自身份。native-*、foundation-*、web-*、framework-* 是以前版本的历史记录；其“未链接 ncnn”等结论不描述当前版本。
 
 ## ncnn 与 pnnx
 
-从 [Tencent/ncnn 官方远端](https://github.com/Tencent/ncnn/commit/6a1bf000f363714839a36793addc8c879d3d899e) 查询当时 HEAD，锁定 `6a1bf000f363714839a36793addc8c879d3d899e`。提交、查询时间、归档 URL、字节数和实际 SHA256 在根目录 `engine-dependencies.lock.json`。ncnn 和 pnnx 使用同一份未修改的官方源码，准备脚本在复用缓存前逐文件与已验证归档比对。没有链接相邻的 ncnn 工作树。
+本轮从 [Tencent/ncnn 官方远端](https://github.com/Tencent/ncnn/commit/3b7bdba7fc8aea8fd46779533eee027df77c639d) 查询 HEAD，运行库锁定 `3b7bdba7fc8aea8fd46779533eee027df77c639d`，身份在 `engine-dependencies.lock.json`。转换器独立固定 `6a1bf000f363714839a36793addc8c879d3d899e`，身份在 `converter-dependencies.lock.json`。两者均为未修改的官方源码，准备脚本复用缓存前逐文件与已验证归档比对，没有链接相邻的 ncnn 工作树。旧模型包的转换器字段仍描述当时导出，兼容新运行库不等于重新导出。
 
 本机 ncnn 构建启用 Vulkan、系统 glslang，关闭 INT8 和 AVX512。pnnx 由项目私有 Python 3.13 / PyTorch 2.9.0+cpu 开发环境构建，身份记录在 `.deps/bin/pnnx-build.json`。Python 和 pnnx 不进入应用运行时。
 
@@ -14,7 +14,7 @@
 
 参考来源是 [ByteDance-Seed/SeedVR](https://github.com/ByteDance-Seed/SeedVR/tree/e4de8c24441a67e1b7df56abea10645059bb1185)，提交 `e4de8c24441a67e1b7df56abea10645059bb1185`。使用的 attention、RoPE、窗口、DiT block、modulation、embedding、MLP、VAE 类和配置原文保存在 `tests/reference/seedvr`；每个文件的 SHA256 在 `sources.json`，许可证保持原文。旧窗口基线另外保存在 `tests/reference/official_window.py`，其 SHA256 为 `61b3e0235e25d3e901271186bbaa43a90dcc1552f003daa3d2844b5126ce7e84`。
 
-官方权重来自 [ByteDance-Seed/SeedVR2-3B 的固定 revision](https://huggingface.co/ByteDance-Seed/SeedVR2-3B/tree/37255ff8cccfb01071b87f635a5948ca8d53117c)。`model-sources.lock.json` 固定四个文件：3B DiT、VAE、正向与负向文本 embedding；实际下载后逐个核对官方 LFS SHA256 和精确字节数。文件位于忽略目录 `.cache/models`，没有随源码或本轮安装目录分发。
+官方权重来自 [ByteDance-Seed/SeedVR2-3B 的固定 revision](https://huggingface.co/ByteDance-Seed/SeedVR2-3B/tree/37255ff8cccfb01071b87f635a5948ca8d53117c)。`model-sources.lock.json` 固定四个文件：3B DiT、VAE、正向与负向文本 embedding；实际下载后逐个核对官方 LFS SHA256 和精确字节数。原文件位于忽略目录 `.cache/models`，不进入 Git。0.6 本机安装的 `models/image`、`models/video` 包含经过校验的独立导出副本，未公开上传。
 
 `tools/awa_reference.py`、`vae_reference.py`、`dit_block_reference.py`、`image_reference.py` 执行上述原始类的方法体，对分布式/缓存外壳、Apex RMSNorm、FlashAttention 及 BF16 转换做显式 FP32-B 适配。原文不修改，适配逻辑可独立审查。AWA 使用合成 projected QKV/RMS；VAE 与 DiT 块使用真实官方 checkpoint。候选导出模块独立实现后与参考比较，不能把候选自己的输出作为 golden。
 
@@ -32,7 +32,11 @@
 
 ## 发行状态
 
-本轮只有本机开发安装与验证，没有发布权重包、便携发行版或外部 Discussion。第三方许可证随开发安装附带；完整发行仍需整理项目自身许可决定、全部运行库声明、模型分发条款和目标平台实测。不得用这一来源说明替代尚未完成的发行验收。
+本轮已形成可安装的 SDK/CLI/Web、独立模型副本和同系统 ABI 的离线验证，没有发布公开权重包、跨系统便携发行版或外部 Discussion。第三方许可证随安装附带；公开发行仍需项目自身许可决定、完整运行库与模型分发资格、目标平台实测。本说明不代替这些尚未完成的事项。
+
+## 0.6.0 JPEG 与自然样例
+
+当前 JPEG 解码链接系统 libjpeg-turbo 3.1.3，以 ISLOW 和 fancy upsampling 对齐独立 Pillow 像素参考；PNG 继续使用固定运行库附带的 stb。`third_party/media/libjpeg/` 保存本机许可原文及哈希。自然照片原件来自 scikit-image 官方固定标签的数据集，为 NASA 公有领域图像；输入、受控降质与派生夹具身份在 `tests/fixtures/natural/provenance.json`，不以该单例证明普遍画质合格。
 
 ## 0.4.0 图像 IO 与上游检查
 

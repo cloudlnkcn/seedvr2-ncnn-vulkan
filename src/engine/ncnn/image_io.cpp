@@ -4,11 +4,14 @@
 #include <fstream>
 #include <memory>
 #include <stdexcept>
+#include <csetjmp>
+#include <cstdio>
+#include <cstdlib>
+#include <jpeglib.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_STATIC
 #define STBI_ONLY_PNG
-#define STBI_ONLY_JPEG
 #define STBI_MAX_DIMENSIONS 16384
 #include <stb_image.h>
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -16,6 +19,65 @@
 #include <stb_image_write.h>
 
 namespace seedvr2::engine::detail {
+namespace {
+// libjpeg uses longjmp for errors. Keep mutable C decoder state on the heap;
+// do not cross C++ object construction/destruction inside the protected region.
+struct JpegState {
+    jpeg_decompress_struct decoder{};
+    jpeg_error_mgr error{};
+    std::jmp_buf jump{};
+    unsigned char *pixels = nullptr;
+    bool created = false, warned = false;
+    char message[JMSG_LENGTH_MAX]{};
+    ~JpegState() {
+        if (created) jpeg_destroy_decompress(&decoder);
+        std::free(pixels);
+    }
+};
+void jpeg_failure(j_common_ptr info) {
+    auto *state = static_cast<JpegState *>(info->client_data);
+    info->err->format_message(info, state->message);
+    std::longjmp(state->jump, 1);
+}
+void jpeg_message(j_common_ptr info, int level) {
+    if (level < 0) static_cast<JpegState *>(info->client_data)->warned = true;
+}
+ImagePixels load_jpeg(const std::vector<unsigned char> &bytes) {
+    auto state = std::make_unique<JpegState>();
+    auto &d = state->decoder;
+    d.err = jpeg_std_error(&state->error);
+    state->error.error_exit = jpeg_failure;
+    state->error.emit_message = jpeg_message;
+    d.client_data = state.get();
+    if (setjmp(state->jump)) throw std::runtime_error(std::string("JPEG decoding failed: ")+state->message);
+    state->created = true;
+    jpeg_create_decompress(&d);
+    jpeg_mem_src(&d, bytes.data(), static_cast<unsigned long>(bytes.size()));
+    jpeg_read_header(&d, TRUE);
+    if (d.image_width < 16 || d.image_height < 16 || d.image_width > 16384 || d.image_height > 16384 ||
+        std::uint64_t(d.image_width)*d.image_height > 32*1024*1024)
+        throw std::runtime_error("Image dimensions must be 16..16384 with at most 32 megapixels");
+    if (d.jpeg_color_space != JCS_YCbCr && d.jpeg_color_space != JCS_RGB && d.jpeg_color_space != JCS_GRAYSCALE)
+        throw std::runtime_error("JPEG must use RGB, YCbCr or grayscale; convert CMYK to RGB first");
+    d.out_color_space = JCS_RGB;
+    d.dct_method = JDCT_ISLOW;
+    d.do_fancy_upsampling = TRUE;
+    d.mem->max_memory_to_use = 64*1024*1024;
+    jpeg_start_decompress(&d);
+    const std::size_t stride = std::size_t(d.output_width)*3;
+    state->pixels = static_cast<unsigned char *>(std::malloc(stride*d.output_height));
+    if (!state->pixels) throw std::runtime_error("JPEG pixel allocation failed");
+    while (d.output_scanline < d.output_height) {
+        JSAMPROW row = state->pixels+std::size_t(d.output_scanline)*stride;
+        if (jpeg_read_scanlines(&d, &row, 1) != 1) throw std::runtime_error("Incomplete JPEG scanline");
+    }
+    jpeg_finish_decompress(&d);
+    if (state->warned) throw std::runtime_error("JPEG is truncated or contains invalid data");
+    ImagePixels image{static_cast<int>(d.output_width), static_cast<int>(d.output_height), {}};
+    image.rgb.assign(state->pixels, state->pixels+stride*d.output_height);
+    return image;
+}
+}
 ImagePixels load_image(const std::filesystem::path &path) {
     constexpr std::uint64_t max_bytes = 32 * 1024 * 1024;
     if (!std::filesystem::is_regular_file(path) || std::filesystem::file_size(path) > max_bytes)
@@ -25,6 +87,8 @@ ImagePixels load_image(const std::filesystem::path &path) {
     file.read(reinterpret_cast<char *>(bytes.data()), static_cast<std::streamsize>(bytes.size()));
     if (!file)
         throw std::runtime_error("Cannot read image");
+    if (bytes.size() >= 2 && bytes[0] == 0xff && bytes[1] == 0xd8)
+        return load_jpeg(bytes);
     ImagePixels image;
     int channels = 0;
     if (!stbi_info_from_memory(bytes.data(), static_cast<int>(bytes.size()),

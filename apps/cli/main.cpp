@@ -7,12 +7,20 @@
 #include "seedvr2/validation.hpp"
 #include <CLI/CLI.hpp>
 #include <charconv>
+#include <csignal>
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
 
 namespace {
 using namespace seedvr2;
+volatile std::sig_atomic_t cancel_requested = 0;
+void request_cancel(int) { cancel_requested = 1; }
+void progress(const Progress &p) {
+    std::cerr << nlohmann::json({{"event","progress"},{"stage",p.stage},{"completed",p.completed},
+        {"total",p.total},{"elapsed_ms",p.elapsed_ms}}).dump() << std::endl;
+}
+bool cancelled() { return cancel_requested!=0; }
 int fail(const Error &error, int code = 2) {
     std::cout << serialize_error(error) << '\n';
     return code;
@@ -38,7 +46,9 @@ int print(const Result<std::string> &result, int success = 0) {
 }
 int main_impl(int argc, char **argv) {
     CLI::App cli{"SeedVR2 native image restoration and independent diagnostics CLI."};
-    cli.require_subcommand(1);
+    cli.require_subcommand(1,1);
+    std::signal(SIGINT,request_cancel);
+    std::signal(SIGTERM,request_cancel);
     std::string database;
     cli.add_option("--database", database,
                    "SQLite workspace (optional; commands that do not save stay stateless)");
@@ -51,7 +61,8 @@ int main_impl(int argc, char **argv) {
     std::string image_model, image_input, image_output, image_backend = "vulkan";
     int image_size = 256, image_gpu = -1, image_threads = 4;
     std::uint64_t image_seed = 666;
-    bool image_diagnostics = false;
+    bool image_diagnostics = false, check_only = false;
+    std::string image_weight_io="buffered",diagnostic_weight_io="buffered";
     run->add_option("--model", image_model, "Directory containing the complete model package")->required();
     run->add_option("--input", image_input, "PNG or JPEG input")->required();
     run->add_option("--output", image_output, "New output directory")->required();
@@ -61,6 +72,7 @@ int main_impl(int argc, char **argv) {
     run->add_option("--threads", image_threads)->check(CLI::Range(1, 32));
     run->add_option("--seed", image_seed);
     run->add_flag("--diagnostic-tensors", image_diagnostics, "Save intermediate tensors for independent reference comparison");
+    run->add_flag("--check",check_only,"Check parameters, input, model manifest, output space and device without inference");
     auto video_run=cli.add_subcommand("run-video", "Restore the first 1..17 frames jointly with the temporal VAE and 3D attention");
     int video_frames=17,video_size=128;
     video_run->add_option("--model",image_model)->required();
@@ -73,6 +85,9 @@ int main_impl(int argc, char **argv) {
     video_run->add_option("--threads",image_threads)->check(CLI::Range(1,32));
     video_run->add_option("--seed",image_seed);
     video_run->add_flag("--diagnostic-tensors",image_diagnostics);
+    video_run->add_flag("--check",check_only,"Check the requested short-video operation without inference");
+    for (auto *command : {run,video_run})
+        command->add_option("--weight-io",image_weight_io,"buffered (default) or experimental Linux mapped weights")->check(CLI::IsMember({"buffered","mapped"}));
     auto engine_cli = cli.add_subcommand("engine", "ncnn backend, AWA and checkpoint submodel diagnostics");
     engine_cli->require_subcommand(1);
     auto engine_status =
@@ -82,6 +97,8 @@ int main_impl(int argc, char **argv) {
     auto graph = engine_cli->add_subcommand("graph", "Run a hashed VAE submodel case with explicit backend dispatch");
     auto block = engine_cli->add_subcommand("block", "Run a complete exported DiT block with explicit backend dispatch");
     auto self_test = engine_cli->add_subcommand("self-test", "Run embedded AWA numerical diagnostics offline");
+    for (auto *command : {graph,block})
+        command->add_option("--weight-io",diagnostic_weight_io)->check(CLI::IsMember({"buffered","mapped"}));
     std::string case_file, output_directory, backend = "cpu";
     int gpu_index = -1, threads = 4;
     awa->add_option("--case", case_file)->required();
@@ -117,6 +134,14 @@ int main_impl(int argc, char **argv) {
     auto models =
         cli.add_subcommand("models", "Model policy, missing evidence and raw artifact audits");
     models->require_subcommand(1);
+    auto verify=models->add_subcommand("verify","Authenticate the reviewed model package and hash every file offline");
+    auto copy=models->add_subcommand("copy","Copy and verify a model package for offline relocation");
+    std::string package_kind="image",package_destination;
+    for (auto *command : {verify,copy}) {
+        command->add_option("--model",image_model,"Source model package")->required();
+        command->add_option("--kind",package_kind)->check(CLI::IsMember({"image","video"}));
+    }
+    copy->add_option("--output",package_destination,"New destination model directory")->required();
     auto status = models->add_subcommand("status", "Current model validation status");
     auto policy =
         models->add_subcommand("policy", "Exact acceptance policy and calibration status");
@@ -135,6 +160,7 @@ int main_impl(int argc, char **argv) {
     list->add_option("--kind", kind)->check(CLI::IsMember({"plan", "model-audit", "operator-test"}));
     auto get = history->add_subcommand("get", "Read one saved record");
     get->add_option("--id", record_id)->required();
+    if (argc==1) {std::cout << cli.help() << '\n'; return 0;}
     try {
         cli.parse(argc, argv);
     } catch (const CLI::CallForHelp &e) {
@@ -143,7 +169,7 @@ int main_impl(int argc, char **argv) {
         return fail({"CLI_USAGE", "command", "Unknown or missing arguments. Use --help"});
     }
     if (*version) {
-        std::cout << "0.5.0-video-preview; architecture=0.8-media-jobs; ncnn=linked; "
+        std::cout << "0.6.0-native-preview; sdk=installed-cpp; ncnn=linked; "
                      "awa=cpu+vulkan; restoration=image+short-video; model=not-certified\n";
         return 0;
     }
@@ -164,11 +190,11 @@ int main_impl(int argc, char **argv) {
     if (*graph)
         return print(engine::run_graph({seedvr2::utf8_path(case_file),
                                        seedvr2::utf8_path(output_directory),
-                                       backend == "vulkan", gpu_index, threads}));
+                                       backend == "vulkan", gpu_index, threads,diagnostic_weight_io=="mapped"}));
     if (*block)
         return print(engine::run_dit_block({seedvr2::utf8_path(case_file),
                                            seedvr2::utf8_path(output_directory),
-                                           backend == "vulkan", gpu_index, threads}));
+                                           backend == "vulkan", gpu_index, threads,diagnostic_weight_io=="mapped"}));
     if (*self_test) {
         const auto result = save_self_test
             ? Application(db()).self_test_and_save("{\"backend\":\"" + backend + "\",\"gpu\":" + std::to_string(gpu_index) + "}")
@@ -178,23 +204,27 @@ int main_impl(int argc, char **argv) {
         // PASS belongs to this numerical diagnostic only; never model certification.
         return print(result, nlohmann::json::parse(std::get<std::string>(result)).at("passed").get<bool>() ? 0 : 7);
     }
-    if (*video_run) {
-        engine::VideoRequest request;
-        request.model_directory=seedvr2::utf8_path(image_model);request.input_file=seedvr2::utf8_path(image_input);
-        request.output_directory=seedvr2::utf8_path(image_output);request.vulkan=image_backend=="vulkan";
-        request.gpu_index=image_gpu;request.threads=image_threads;request.long_side=video_size;request.seed=image_seed;
-        request.diagnostic_tensors=image_diagnostics;request.max_frames=video_frames;
-        return print(engine::run_video(request,[](const engine::ImageProgress &p) {
-            std::cerr << nlohmann::json({{"event","progress"},{"stage",p.stage},{"completed",p.completed},{"total",p.total},{"elapsed_ms",p.elapsed_ms}}).dump() << std::endl;
-        }));
+    if (*verify || *copy) {
+        const auto media=package_kind=="video"?MediaKind::video:MediaKind::image;
+        const auto result=*copy?copy_model(utf8_path(image_model),utf8_path(package_destination),media,progress,cancelled):
+            verify_model(utf8_path(image_model),media,progress,cancelled);
+        if (is_error(result)) {const auto &e=std::get<Error>(result);return fail(e,e.code=="CANCELLED"?130:2);}
+        std::cout << std::get<PackageInfo>(result).report_json << '\n';return 0;
     }
-    if (*run)
-        return print(engine::run_image({seedvr2::utf8_path(image_model), seedvr2::utf8_path(image_input),
-            seedvr2::utf8_path(image_output), image_backend == "vulkan", image_gpu, image_threads,
-            image_size, image_seed, image_diagnostics}, [](const engine::ImageProgress &p) {
-                std::cerr << nlohmann::json({{"event", "progress"}, {"stage", p.stage},
-                    {"completed", p.completed}, {"total", p.total}, {"elapsed_ms", p.elapsed_ms}}).dump() << std::endl;
-            }));
+    if (*run || *video_run) {
+        const RestoreRequest settings{utf8_path(image_model),utf8_path(image_input),utf8_path(image_output),
+            *video_run?MediaKind::video:MediaKind::image,image_backend=="vulkan"?Backend::vulkan:Backend::cpu,
+            image_gpu,image_threads,*video_run?video_size:image_size,video_frames,image_seed,image_diagnostics,
+            image_weight_io=="mapped"?WeightIO::mapped:WeightIO::buffered};
+        if (check_only) {
+            const auto result=preflight(settings);
+            if (is_error(result)) return fail(std::get<Error>(result));
+            std::cout << std::get<Preflight>(result).report_json << '\n';return 0;
+        }
+        const auto result=restore(settings,progress,cancelled);
+        if (is_error(result)) {const auto &e=std::get<Error>(result);return fail(e,e.code=="CANCELLED"?130:2);}
+        std::cout << std::get<RunResult>(result).report_json << '\n';return 0;
+    }
     if (*plan) {
         const auto text = read_request(request);
         if (is_error(text))

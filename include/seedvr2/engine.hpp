@@ -10,6 +10,7 @@ struct CaseRequest {
     bool vulkan = false;
     int gpu_index = -1;
     int threads = 4;
+    bool mapped_weights = false;
 };
 std::string build_status();
 Result<std::string> devices();

@@ -1,6 +1,6 @@
 # 完整应用框架
 
-0.8-media-jobs / 0.5.0-video-preview，2026-09-07。当前执行状态见 [status.json](status.json)，模型数值与工程证据见 [video-validation.md](video-validation.md)。
+本页保留 0.8-media-jobs / 0.5.0-video-preview 的应用框架设计。0.6.0 已增加可安装的共享 SDK、公共预检与模型复制；当前公共边界和源码导航以 [ARCHITECTURE.md](ARCHITECTURE.md) 为准，当前执行证据见 [DELIVERY-RESULTS.md](DELIVERY-RESULTS.md)。
 
 ## 技术栈与职责
 

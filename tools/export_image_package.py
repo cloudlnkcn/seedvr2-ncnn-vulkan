@@ -56,7 +56,7 @@ def main():
         text = F.linear(pos, state['txt_in.weight'], state['txt_in.bias'])
     manifest = dict(schema_version='seedvr2-image-package-v1', model_id='seedvr2-3b',
         profile='seedvr2-3b-image-fp32-b-v1', precision='fp32', reference_profile='FP32-B',
-        ncnn_commit=json.loads((ROOT/'engine-dependencies.lock.json').read_text())['ncnn']['commit'],
+        ncnn_commit=json.loads((ROOT/'converter-dependencies.lock.json').read_text())['ncnn']['commit'],
         model_sources=lock, official_sources=verify_sources(), model_verified=False,
         limits=dict(min_side=64, max_side=512, max_pixels=512*512, divisible_by=16),
         sampling=dict(steps=1, timestep=1000, cfg=1, latent_scale=0.9152, color_fix='none'),

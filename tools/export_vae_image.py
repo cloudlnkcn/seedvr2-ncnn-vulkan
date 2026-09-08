@@ -96,7 +96,7 @@ def main():
                                   'keep upsample temporal phase zero', 'reorder PixelShuffle channels'],
                   environment=dict(torch=torch.__version__, diffusers=diffusers.__version__),
                   pnnx_sha256=digest(args.pnnx),
-                  ncnn_commit=json.loads((ROOT/'engine-dependencies.lock.json').read_text())['ncnn']['commit'],
+                  ncnn_commit=json.loads((ROOT/'converter-dependencies.lock.json').read_text())['ncnn']['commit'],
                   scripts={name: digest(ROOT/'tools'/name) for name in
                            ['vae_reference.py', 'vae_image_module.py', 'export_vae_image.py']},
                   tolerance=dict(atol=ATOL, rtol=RTOL, calibration='DIAGNOSTIC_NOT_MODEL_CERTIFICATION'),

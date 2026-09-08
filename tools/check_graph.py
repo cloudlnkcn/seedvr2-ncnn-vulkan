@@ -40,6 +40,7 @@ def main():
     parser.add_argument('--backends', default='cpu,vulkan')
     parser.add_argument('--gpu', type=int, default=0)
     parser.add_argument('--validation-layer', action='store_true')
+    parser.add_argument('--weight-io', choices=['buffered','mapped'], default='buffered')
     args = parser.parse_args()
     if args.output.exists() and any(args.output.iterdir()):
         raise SystemExit('Output must be empty')
@@ -57,6 +58,7 @@ def main():
             command = [str(args.binary.resolve()), 'engine', 'block' if dit else 'graph', '--case', str(case_path.resolve()),
                        '--output', str(folder.resolve()), '--backend', backend, '--gpu', str(args.gpu)]
             env = os.environ.copy()
+            if args.weight_io!='buffered': command += ['--weight-io',args.weight_io]
             if args.validation_layer:
                 env['VK_INSTANCE_LAYERS'] = 'VK_LAYER_KHRONOS_validation'
             result = subprocess.run(command, capture_output=True, text=True, timeout=180, env=env)
@@ -89,7 +91,7 @@ def main():
             print(case['case_id'], backend, 'PASS' if row['passed'] else 'FAIL',
                   row.get('comparison', row.get('error')), flush=True)
     report = dict(schema_version='ncnn-graph-validation-v1', scope=suite['scope'],
-                  reference_profile=suite['reference_profile'], checkpoint=suite['checkpoint'],
+                  reference_profile=suite['reference_profile'], checkpoint=suite['checkpoint'], weight_io=args.weight_io,
                   suite_sha256=sha(args.suite), binary_sha256=sha(args.binary),
                   threshold=suite['tolerance'], validation_layer_requested=args.validation_layer,
                   cases=rows, passed=bool(rows) and all(row['passed'] for row in rows),

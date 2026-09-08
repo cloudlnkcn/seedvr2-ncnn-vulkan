@@ -124,7 +124,7 @@ def main():
                         filename='seedvr2_ema_3b.pth', sha256=checkpoint_hash, tensors=len(state)),
         official_sources=verify_sources(), reference_profile='FP32-B',
         pnnx_sha256=digest(args.pnnx), torch_version=torch.__version__,
-        ncnn_commit=json.loads((ROOT/'engine-dependencies.lock.json').read_text())['ncnn']['commit'],
+        ncnn_commit=json.loads((ROOT/'converter-dependencies.lock.json').read_text())['ncnn']['commit'],
         tolerance=dict(atol=1e-4, rtol=1e-3, calibration='DIAGNOSTIC_NOT_MODEL_CERTIFICATION'),
         scripts={name: digest(ROOT/'tools'/name) for name in
                  ['dit_block_reference.py', 'dit_block_module.py', 'awa_export_module.py', 'export_dit_block.py']},

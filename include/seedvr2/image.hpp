@@ -1,5 +1,6 @@
 #pragma once
 #include "seedvr2/result.hpp"
+#include "seedvr2/pipeline.hpp"
 #include <cstdint>
 #include <filesystem>
 #include <functional>
@@ -16,15 +17,11 @@ struct ImageRequest {
     int long_side = 256;
     std::uint64_t seed = 666;
     bool diagnostic_tensors = false;
+    bool mapped_weights = false;
 };
-struct ImageProgress {
-    std::string stage;
-    int completed = 0;
-    int total = 38;
-    double elapsed_ms = 0;
-};
-using ImageObserver = std::function<void(const ImageProgress &)>;
-using CancellationCheck = std::function<bool()>;
+using ImageProgress = seedvr2::Progress;
+using ImageObserver = seedvr2::ProgressObserver;
+using CancellationCheck = seedvr2::CancellationCheck;
 
 Result<std::string> inspect_image(const std::filesystem::path &path);
 Result<std::string> inspect_image_package(const std::filesystem::path &directory);

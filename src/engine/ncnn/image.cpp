@@ -1,4 +1,5 @@
 #include "inference.hpp"
+#include "provenance.hpp"
 #include "image_io.hpp"
 #include <bit>
 
@@ -23,12 +24,14 @@ Result<std::string> inspect_image_package(const std::filesystem::path &directory
 }
 Result<std::string> run_image(const ImageRequest &request, ImageObserver observer, CancellationCheck cancelled) {
     try {
+        const auto started=Clock::now();
+        const auto ready=seedvr2::preflight(public_request(request));
+        if (is_error(ready)) return std::get<Error>(ready);
         if constexpr (std::endian::native != std::endian::little)
             throw std::runtime_error("The FP32 package requires a little endian host");
         if (request.threads < 1 || request.threads > 32 || request.gpu_index < -1)
             throw std::runtime_error("Invalid execution settings");
         std::lock_guard lock(engine_mutex);
-        const auto started = Clock::now();
         auto check = [&] { if (cancelled && cancelled()) throw Cancelled(); };
         auto progress = [&](std::string stage, int completed) {
             check();
@@ -43,7 +46,9 @@ Result<std::string> run_image(const ImageRequest &request, ImageObserver observe
         auto prepared = prepare_image(image, request.long_side);
         const int height = prepared.h, width = prepared.w, lh = height/8, lw = width/8;
         const int gh = height/16, gw = width/16;
-        Package package(request.model_directory, check);
+        const auto validation_started=Clock::now();
+        Package package(request.model_directory, check, false, [&](const Progress &) { progress("validating",0); });
+        const auto validation_ms=std::chrono::duration<double,std::milli>(Clock::now()-validation_started).count();
         Json gpu_info = nullptr;
         int gpu = -1;
         std::unique_ptr<ncnn::PipelineCache> pipelines;
@@ -172,9 +177,20 @@ Result<std::string> run_image(const ImageRequest &request, ImageObserver observe
             {"dispatch", "EXPLICIT_PER_LAYER_NO_BACKEND_FALLBACK"}, {"stages", stages},
             {"diagnostics", diagnostics},
             {"total_ms", std::chrono::duration<double, std::milli>(Clock::now()-started).count()}};
-#if defined(__linux__)
-        report["executable_sha256"] = hash("/proc/self/exe");
-#endif
+        report["implementation"]=implementation_identity();
+        if (report["implementation"].contains("executable_sha256")) report["executable_sha256"]=report["implementation"]["executable_sha256"];
+        report["resources"]=process_resources();
+        report["weight_io"]=request.mapped_weights?"mapped":"buffered";
+        const auto &preflight=std::get<Preflight>(ready);
+        report["resources"]["package_bytes"]=preflight.package_bytes;
+        report["resources"]["largest_graph_weight_bytes"]=preflight.largest_graph_bytes;
+        double loads=0,compute=0;
+        for (const auto &stage:stages) {loads+=stage.at("load_ms").get<double>();compute+=stage.at("compute_ms").get<double>();}
+        report["timing"]={{"package_validation_ms",validation_ms},{"graph_load_ms",loads},{"graph_compute_ms",compute},
+            {"other_host_wait_and_cleanup_ms",report.at("total_ms").get<double>()-validation_ms-loads-compute}};
+        report["package_authenticated"]=true;
+        report["converter_ncnn_commit"]=package.manifest.at("ncnn_commit");
+
         const auto result = report.dump(2);
         std::ofstream file(request.output_directory/"run.partial.json");
         file << result << '\n'; file.close();

@@ -1,4 +1,5 @@
 #include "inference.hpp"
+#include "provenance.hpp"
 #include "video_io.hpp"
 #include "seedvr2/video.hpp"
 #include <bit>
@@ -23,12 +24,14 @@ Result<std::string> inspect_video_package(const std::filesystem::path &directory
 }
 Result<std::string> run_video(const VideoRequest &request,ImageObserver observer,CancellationCheck cancelled) {
     try {
+        const auto started=Clock::now();
+        const auto ready=seedvr2::preflight(public_request(request,true,request.max_frames));
+        if (is_error(ready)) return std::get<Error>(ready);
         if constexpr (std::endian::native!=std::endian::little) throw std::runtime_error("FP32 package needs a little endian host");
         if (request.max_frames<1 || request.max_frames>17 || request.long_side<64 || request.long_side>128 ||
             request.long_side%16 || request.threads<1 || request.threads>32 || request.gpu_index< -1)
             throw std::runtime_error("Short-video preview supports 1..17 frames and 64..128 output long side, divisible by 16");
         std::lock_guard lock(engine_mutex);
-        const auto started=Clock::now();
         auto check=[&] {if (cancelled && cancelled()) throw Cancelled();};
         auto progress=[&](std::string stage,int completed) {
             check();if (observer) observer({std::move(stage),completed,38,std::chrono::duration<double,std::milli>(Clock::now()-started).count()});
@@ -47,7 +50,9 @@ Result<std::string> run_video(const VideoRequest &request,ImageObserver observer
             check();const auto frame=prepare_image(clip.frames[std::min(t,frames-1)],request.long_side);
             for (int c=0;c<3;++c) std::memcpy(static_cast<float *>(prepared.channel(c))+t*h*w,frame.channel(c).data,std::size_t(h)*w*4);
         }
-        Package package(request.model_directory,check,true);
+        const auto validation_started=Clock::now();
+        Package package(request.model_directory,check,true,[&](const Progress &) { progress("validating",0); });
+        const auto validation_ms=std::chrono::duration<double,std::milli>(Clock::now()-validation_started).count();
         int gpu=-1;Json gpu_info=nullptr;std::unique_ptr<ncnn::PipelineCache> pipelines;
         if (request.vulkan) {
             init_gpu();gpu=request.gpu_index<0?ncnn::get_default_gpu_index():request.gpu_index;
@@ -137,9 +142,20 @@ Result<std::string> run_video(const VideoRequest &request,ImageObserver observer
             {"media_version",media_version()},{"host_operations",{"video codecs","resizing","layouts","posterior sampling","Euler endpoint"}},
             {"dispatch","EXPLICIT_PER_LAYER_NO_BACKEND_FALLBACK"},{"stages",stages},{"diagnostics",diagnostics},
             {"total_ms",std::chrono::duration<double,std::milli>(Clock::now()-started).count()}};
-#if defined(__linux__)
-        report["executable_sha256"]=hash("/proc/self/exe");
-#endif
+        report["implementation"]=implementation_identity();
+        if (report["implementation"].contains("executable_sha256")) report["executable_sha256"]=report["implementation"]["executable_sha256"];
+        report["resources"]=process_resources();
+        report["weight_io"]=request.mapped_weights?"mapped":"buffered";
+        const auto &preflight=std::get<Preflight>(ready);
+        report["resources"]["package_bytes"]=preflight.package_bytes;
+        report["resources"]["largest_graph_weight_bytes"]=preflight.largest_graph_bytes;
+        double loads=0,compute=0;
+        for (const auto &stage:stages) {loads+=stage.at("load_ms").get<double>();compute+=stage.at("compute_ms").get<double>();}
+        report["timing"]={{"package_validation_ms",validation_ms},{"graph_load_ms",loads},{"graph_compute_ms",compute},
+            {"other_host_wait_and_cleanup_ms",report.at("total_ms").get<double>()-validation_ms-loads-compute}};
+        report["package_authenticated"]=true;
+        report["converter_ncnn_commit"]=package.manifest.at("ncnn_commit");
+
         const auto result=report.dump(2);std::ofstream f(request.output_directory/"run.partial.json");f<<result<<'\n';f.close();
         if (!f) throw std::runtime_error("Cannot write video execution report");
         check();std::filesystem::rename(request.output_directory/"output.partial.mp4",request.output_directory/"output.mp4");

@@ -95,7 +95,7 @@ def main():
     report = dict(schema_version='vae-video-export-v1', reference_profile='FP32-B',
                   scope='Whole-clip original causal VAE, B=1, memory disabled; no streaming cache',
                   checkpoint=dict(sha256=digest(args.checkpoint), tensors=len(state), revision=lock['revision']),
-                  official_sources=verify_sources(), ncnn_commit=json.loads((ROOT/'engine-dependencies.lock.json').read_text())['ncnn']['commit'],
+                  official_sources=verify_sources(), ncnn_commit=json.loads((ROOT/'converter-dependencies.lock.json').read_text())['ncnn']['commit'],
                   pnnx_sha256=digest(args.pnnx), model_verified=False, parts=[], cases=[],
                   tolerance=dict(atol=1e-4, rtol=1e-3, calibration='DIAGNOSTIC_NOT_MODEL_CERTIFICATION'))
     for part in ('encoder', 'decoder'):

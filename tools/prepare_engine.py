@@ -9,8 +9,8 @@ import urllib.request
 from pathlib import Path
 
 
-def locked_source(root, offline=False):
-    dep = json.loads((root/'engine-dependencies.lock.json').read_text())['ncnn']
+def locked_source(root, offline=False, lock_name="engine-dependencies.lock.json"):
+    dep = json.loads((root/lock_name).read_text())['ncnn']
     archive = root/'.cache/archives'/f"ncnn-{dep['commit']}.tar.gz"
     archive.parent.mkdir(parents=True, exist_ok=True)
     if not archive.exists():

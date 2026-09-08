@@ -1,3 +1,5 @@
+#include "provenance.hpp"
+#include "weight_io.hpp"
 #include "awa.hpp"
 #include "video_layers.hpp"
 #include "graph.hpp"
@@ -30,7 +32,7 @@ using namespace detail;
 } // namespace
 std::string build_status() {
     return Json{{"ncnn_linked", true},
-                {"ncnn_commit", SEEDVR2_NCNN_COMMIT},
+                {"ncnn_commit", SEEDVR2_NCNN_COMMIT}, {"implementation", implementation_identity()},
                 {"ncnn_version", NCNN_VERSION_STRING},
                 {"awa_cpu", true},
                 {"awa_vulkan", true},
@@ -176,7 +178,7 @@ Result<std::string> run_awa(const CaseRequest &request) {
             {"case_sha256", case_hash},
             {"backend", request.vulkan ? "ncnn-vulkan" : "ncnn-cpu"},
             {"precision", "fp32"},
-            {"ncnn_commit", SEEDVR2_NCNN_COMMIT},
+            {"ncnn_commit", SEEDVR2_NCNN_COMMIT}, {"implementation", implementation_identity()},
             {"device", gpu},
             {"cpu_calls", trace.cpu_calls.load()},
             {"vulkan_calls", trace.vulkan_calls.load()},
@@ -284,6 +286,7 @@ Result<std::string> run_graph_case(const CaseRequest &request, bool dit) {
             !std::filesystem::is_empty(request.output_directory))
             throw std::runtime_error("Output directory is not empty");
         ExecutionTrace awa_trace;
+        std::unique_ptr<MappedWeights> mapped;
         ncnn::Net net;
         net.opt.use_vulkan_compute = request.vulkan;
         net.opt.use_packing_layout = false;
@@ -323,7 +326,8 @@ Result<std::string> run_graph_case(const CaseRequest &request, bool dit) {
         if (dit && (awa_count != 1 || awa_trace.heads != 20 ||
                     awa_trace.shifted != doc.at("block_index").get<int>() % 2))
             throw std::runtime_error("A complete DiT block must contain exactly one AWA");
-        if (net.load_model(binary.string().c_str()) != 0)
+        if (request.mapped_weights) mapped=std::make_unique<MappedWeights>(binary);
+        if ((mapped?net.load_model(*mapped):net.load_model(binary.string().c_str())) != 0 || (mapped && !mapped->consumed()))
             throw std::runtime_error("Cannot load graph weights");
         std::vector<ncnn::Mat> outputs(expected_shapes.size());
         Json trace = Json::array();
@@ -370,7 +374,7 @@ Result<std::string> run_graph_case(const CaseRequest &request, bool dit) {
         Json report = {{"schema_version", "ncnn-graph-execution-v1"}, {"status", "EXECUTED"},
             {"case_id", doc.at("case_id")}, {"case_sha256", case_hash}, {"component", component},
             {"backend", request.vulkan ? "ncnn-vulkan" : "ncnn-cpu"}, {"precision", "fp32"},
-            {"ncnn_commit", SEEDVR2_NCNN_COMMIT}, {"device", gpu}, {"layers", trace},
+            {"ncnn_commit", SEEDVR2_NCNN_COMMIT}, {"implementation", implementation_identity()}, {"device", gpu}, {"layers", trace},
             {"cpu_calls", request.vulkan ? 0 : trace.size()},
             {"vulkan_calls", request.vulkan ? trace.size() : 0},
             {"dispatch", "EXPLICIT_PER_LAYER_NO_BACKEND_FALLBACK"}, {"model_verified", false},
@@ -495,7 +499,7 @@ Result<std::string> self_test(bool vulkan, int gpu_index, int threads) {
                     {"status", passed ? "PASS" : "FAIL"}, {"passed", passed},
                     {"scope", "Synthetic AWA operator smoke test; no checkpoint or whole model"},
                     {"backend", vulkan ? "ncnn-vulkan" : "ncnn-cpu"},
-                    {"ncnn_commit", SEEDVR2_NCNN_COMMIT},
+                    {"ncnn_commit", SEEDVR2_NCNN_COMMIT}, {"implementation", implementation_identity()},
                     {"fixture_provenance_sha256", hash(directory / "provenance.json")},
                     {"reference_profile", "FP32-B"}, {"atol", 1e-5}, {"rtol", 1e-4},
                     {"cases", cases}, {"raw_outputs_retained", false}, {"model_verified", false}}

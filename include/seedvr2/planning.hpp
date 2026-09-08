@@ -1,11 +1,11 @@
 #pragma once
+#include "seedvr2/media.hpp"
 
 #include "seedvr2/result.hpp"
 #include <cstdint>
 #include <vector>
 
 namespace seedvr2 {
-enum class MediaKind { image, video };
 
 struct Extent {
     std::uint32_t width = 0;

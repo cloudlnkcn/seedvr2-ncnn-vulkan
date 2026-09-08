@@ -60,17 +60,17 @@ int main(int argc, char **argv) {
         const auto cancelled=[] { return cancel_requested != 0; };
         const auto kind=doc.value("kind","image");
         if (kind!="image" && kind!="video") throw std::runtime_error("Unknown media kind");
-        seedvr2::engine::VideoRequest video_settings;
-        static_cast<seedvr2::engine::ImageRequest &>(video_settings)=settings;
-        if (kind=="video") video_settings.max_frames=doc.at("max_frames").get<int>();
-        const auto result=kind=="video"?seedvr2::engine::run_video(video_settings,observe,cancelled):
-            seedvr2::engine::run_image(settings,observe,cancelled);
+        const seedvr2::RestoreRequest native{settings.model_directory,settings.input_file,settings.output_directory,
+            kind=="video"?seedvr2::MediaKind::video:seedvr2::MediaKind::image,
+            settings.vulkan?seedvr2::Backend::vulkan:seedvr2::Backend::cpu,settings.gpu_index,settings.threads,
+            settings.long_side,kind=="video"?doc.at("max_frames").get<int>():1,settings.seed,false};
+        const auto result=seedvr2::restore(native,observe,cancelled);
         if (seedvr2::is_error(result)) {
             const auto &error = std::get<seedvr2::Error>(result);
             emit({{"type", "error"}, {"code", error.code}, {"message", error.message}});
             return error.code == "CANCELLED" ? 130 : 1;
         }
-        emit({{"type", "result"}, {"report", Json::parse(std::get<std::string>(result))}});
+        emit({{"type", "result"}, {"report", Json::parse(std::get<seedvr2::RunResult>(result).report_json)}});
         return 0;
     } catch (const std::exception &e) {
         emit({{"type", "error"}, {"code", "WORKER_ERROR"}, {"message", e.what()}});

@@ -52,8 +52,17 @@ inline std::string hash(const std::filesystem::path &path) {
         out << std::setw(2) << static_cast<unsigned>(x);
     return out.str();
 }
+inline std::string hash_text(std::string_view text) {
+    std::array<unsigned char,32> digest{};
+    unsigned size=0;
+    if (EVP_Digest(text.data(),text.size(),digest.data(),&size,EVP_sha256(),nullptr)!=1 || size!=32)
+        throw std::runtime_error("Content hash failed");
+    std::ostringstream out;out << std::hex << std::setfill('0');
+    for (auto x:digest) out << std::setw(2) << static_cast<unsigned>(x);
+    return out.str();
+}
 inline std::filesystem::path artifact(const std::filesystem::path &root, const Json &row,
-                               std::uint64_t max_bytes = 256ULL * 1024 * 1024) {
+                               std::uint64_t max_bytes = 256ULL * 1024 * 1024, bool verify_hash = true) {
     const auto name = row.at("path").get<std::string>();
     const auto p = seedvr2::utf8_path(name);
     if (p.empty() || p.is_absolute() || name.find('\\') != std::string::npos)
@@ -67,9 +76,10 @@ inline std::filesystem::path artifact(const std::filesystem::path &root, const J
             throw std::runtime_error("Artifact symlinks are not supported");
     }
     if (!std::filesystem::is_regular_file(resolved) ||
-        std::filesystem::file_size(resolved) > max_bytes)
+        std::filesystem::file_size(resolved) > max_bytes ||
+        (row.contains("bytes") && row.at("bytes") != std::filesystem::file_size(resolved)))
         throw std::runtime_error("Missing or oversized artifact");
-    if (hash(resolved) != row.at("sha256").get<std::string>())
+    if (verify_hash && hash(resolved) != row.at("sha256").get<std::string>())
         throw std::runtime_error("Artifact hash mismatch");
     return resolved;
 }

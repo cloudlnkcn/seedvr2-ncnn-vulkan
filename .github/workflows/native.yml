@@ -1,0 +1,64 @@
+name: Native Linux delivery
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - compiler: g++
+            web: 'OFF'
+          - compiler: clang++
+            web: 'OFF'
+          - compiler: g++
+            web: 'ON'
+    env:
+      CXX: ${{ matrix.compiler }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5, verified 2026-09-08
+      - name: Native system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build pkg-config ripgrep libssl-dev libjpeg-dev libsqlite3-dev libvulkan-dev glslang-dev glslang-tools spirv-tools mesa-vulkan-drivers vulkan-validationlayers libavformat-dev libavcodec-dev libavutil-dev libswscale-dev libomp-dev uuid-dev zlib1g-dev bubblewrap
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        if: matrix.web == 'ON'
+        with:
+          node-version: '24.18.0'
+      - name: Locked dependencies and native build
+        env:
+          BUILD_WEB: ${{ matrix.web }}
+        run: |
+          if [ "$BUILD_WEB" = ON ]; then
+            python3 tools/prepare_native.py --jobs 2
+            npm ci --prefix apps/studio --ignore-scripts
+            npm run build --prefix apps/studio
+          else
+            python3 tools/prepare_native.py --cli-only --jobs 2
+          fi
+          python3 tools/prepare_engine.py --jobs 2
+          cmake -S . -B build/ci -G Ninja -DCMAKE_BUILD_TYPE=Release -DSEEDVR2_BUILD_WEB="$BUILD_WEB" -DCMAKE_INSTALL_PREFIX="$PWD/dist/ci"
+          cmake --build build/ci --parallel 2
+          cmake --install build/ci
+      - name: Native execution, installed SDK and negative evidence tests
+        run: bash tools/native_ci.sh build/ci dist/ci artifacts/ci
+      - name: Native Web host contracts
+        if: matrix.web == 'ON'
+        run: python3 tools/check_web.py dist/ci/bin/seedvr2-web dist/ci/bin/seedvr2 --output artifacts/ci/web.json
+      - name: Retain evidence including failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: native-${{ matrix.compiler }}-web-${{ matrix.web }}
+          path: |
+            artifacts/ci
+            build/ci/Testing/Temporary
+            .cache/ncnn-build.log
+            .cache/native-build.log
+          if-no-files-found: warn

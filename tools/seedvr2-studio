@@ -1,0 +1,13 @@
+#!/bin/sh
+set -eu
+app_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+image_model=${SEEDVR2_MODEL_DIR:-"$app_root/models/image"}
+video_model=${SEEDVR2_VIDEO_MODEL_DIR:-"$app_root/models/video"}
+if [ ! -f "$image_model/manifest.json" ]; then
+  printf '%s\n' 'Image model is missing. Set SEEDVR2_MODEL_DIR, or use seedvr2 models copy to place it in models/image.' >&2
+  exit 2
+fi
+if [ -f "$video_model/manifest.json" ]; then
+  exec "$app_root/bin/seedvr2-web" --model "$image_model" --video-model "$video_model" "$@"
+fi
+exec "$app_root/bin/seedvr2-web" --model "$image_model" "$@"

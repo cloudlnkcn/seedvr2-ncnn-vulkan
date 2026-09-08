@@ -105,7 +105,7 @@ def main():
         print(case['case_id'],'exported; scripted reference PASS',flush=True)
     suite['cases']=new_cases;suite['parent_suite_sha256']=sha(args.suite)
     (args.output/'suite.json').write_text(json.dumps(suite,indent=2)+'\n')
-    lock=json.loads((Path(__file__).resolve().parents[1]/'engine-dependencies.lock.json').read_text())
+    lock=json.loads((Path(__file__).resolve().parents[1]/'converter-dependencies.lock.json').read_text())
     report={'schema_version':'awa-export-v1','pnnx_sha256':sha(args.pnnx),'ncnn_commit':lock['ncnn']['commit'],
         'torch':torch.__version__,'module_source_sha256':sha(Path(__file__).with_name('awa_export_module.py')),
         'lowerer_sha256':sha(Path(__file__)),'passed':True,'total':len(reports),'cases':reports,'model_verified':False}

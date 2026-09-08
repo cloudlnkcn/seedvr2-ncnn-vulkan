@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.25)
+project(seedvr2_sdk_consumer LANGUAGES CXX)
+find_package(seedvr2 0.6 CONFIG REQUIRED)
+add_executable(seedvr2-sdk-example main.cpp)
+target_link_libraries(seedvr2-sdk-example PRIVATE seedvr2::sdk)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build pnnx from the same immutable ncnn commit and the private export environment."""
+"""Build pnnx from the independently locked ncnn converter commit and the private export environment."""
 import argparse
 import hashlib
 import json
@@ -26,7 +26,7 @@ def main():
         'torch_dir=str(Path(torch.__file__).parent))))'], text=True))
     if environment['python'][:2] != [3, 13] or environment['torch'] != '2.9.0+cpu':
         raise SystemExit('Use the pinned Python 3.13 / torch 2.9.0+cpu export environment')
-    source, dep = locked_source(root, args.offline)
+    source, dep = locked_source(root, args.offline, 'converter-dependencies.lock.json')
     build = root/'.deps/build'/f"pnnx-{dep['commit'][:12]}-torch290"
     torch_dir = Path(environment['torch_dir'])
     commands = [

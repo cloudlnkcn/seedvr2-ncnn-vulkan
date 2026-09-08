@@ -1,6 +1,8 @@
 # SeedVR2 ncnn Vulkan
 
-**0.5.0 video preview：官方 3B 权重已能在 ncnn CPU / Vulkan 上完成真实图片和整段短片处理。** 本地 Web 提供图片/视频导入、持久队列、进度、取消/重试、图片滑动对比、视频同步播放/逐帧比较、PNG/MP4 与运行记录下载。CLI 可独立处理两种媒体。图片长边最高 512；短片为开头 1–17 帧、长边最高 128。**视频数值验收仍有失败，功能为实验性预览，完整模型认证尚未通过。**
+**0.6.0 原生预览：官方 SeedVR2 3B 已接通可安装的 C++ SDK、独立 CLI 和本地 Web，使用 ncnn CPU / Vulkan 完成真实图片与整段短片处理。** 新增模型包身份/完整性校验、参数预检、离线复制、外部 SDK 示例和原生 CI。安装版 SDK 已在禁网、隐藏源码和中文路径下完成真实图片推理；新的自然 JPEG 完整轨迹 73/73 通过官方 FP32-B 对照，输出最大相差 1。**17 帧视频仍有数值失败，单张自然图的全参考画质指标也低于插值基线，完整模型认证未通过。**
+
+[首次使用和离线搬移](docs/FIRST-RUN.md) · [架构与源码导航](docs/ARCHITECTURE.md) · [分项实测、失败和限制](docs/DELIVERY-RESULTS.md) · [可复用 Discussion 草稿](docs/DISCUSSION-DRAFT.md)
 
 React / TypeScript / Ant Design 界面内嵌于 Drogon C++ 服务。共享 C++20 推理核心，由独立 worker 执行，SQLite 保存任务与有序事件。运行时无需 Node、Python、云服务或 CDN。本机验证平台为 Linux x86_64 / RTX 4060 Laptop GPU；尚未形成跨平台便携发行版。
 
@@ -9,8 +11,7 @@ React / TypeScript / Ant Design 界面内嵌于 Drogon C++ 服务。共享 C++20
 已有本地构建和完整模型包时，从项目目录启动：
 
 ```sh
-build/dev/seedvr2-web --model .cache/image-package-fp32 \
-  --video-model .cache/video-package-fp32
+dist/seedvr2-0.6.0/bin/seedvr2-studio
 ```
 
 打开打印的地址，默认 `http://127.0.0.1:8877/`。导入 PNG/JPEG 或 MP4/MOV/WebM/MKV，选择输出长边、设备和片段帧数，开始处理。刷新或关闭浏览器后，服务进程会继续处理。任务页保留历史；服务退出会中断未完成任务，重开设置会创建一次新运行。
@@ -27,7 +28,7 @@ build/dev/seedvr2-web --model .cache/image-package-fp32 \
 ## 独立 CLI
 
 ```sh
-build/dev/seedvr2 run-video --model .cache/video-package-fp32 \
+dist/seedvr2-0.6.0/bin/seedvr2 run-video --model .cache/video-package-fp32 \
   --input /path/to/input.mp4 --output /path/to/new-video-result \
   --frames 17 --size 128 --backend vulkan --gpu 0 --seed 666
 ```
@@ -35,12 +36,12 @@ build/dev/seedvr2 run-video --model .cache/video-package-fp32 \
 视频完整时序链路、包准备和复现命令见 [video-runtime.md](docs/video-runtime.md)。
 
 ```sh
-build/dev/seedvr2 run --model .cache/image-package-fp32 \
+dist/seedvr2-0.6.0/bin/seedvr2 run --model .cache/image-package-fp32 \
   --input /path/to/input.png --output /path/to/new-result \
   --size 512 --backend vulkan --gpu 0 --seed 666
 
 # 无需启动 Web，CPU 使用同一条完整处理链
-build/dev/seedvr2 run --model .cache/image-package-fp32 \
+dist/seedvr2-0.6.0/bin/seedvr2 run --model .cache/image-package-fp32 \
   --input /path/to/input.jpg --output /path/to/another-result \
   --size 256 --backend cpu --threads 4
 ```
@@ -48,34 +49,34 @@ build/dev/seedvr2 run --model .cache/image-package-fp32 \
 图片输出目录须不存在或为空，包含 `output.png`、与结果对齐的 `comparison-input.png` 和 `run.json`。标准输出为结果 JSON，标准错误输出进度与诊断。`--diagnostic-tensors` 额外保存中间张量供开发数值验证。CLI 运行结果保存在指定目录，不会自动加入 Web 队列。
 
 ```sh
-build/dev/seedvr2 engine status
-build/dev/seedvr2 engine devices
-build/dev/seedvr2 engine self-test --backend cpu --save
-build/dev/seedvr2 engine self-test --backend vulkan --gpu 0 --save
-build/dev/seedvr2 plan --request examples/plan-720p.json --save
-build/dev/seedvr2 models status
-build/dev/seedvr2 models audit --bundle examples/model-evidence-empty
-build/dev/seedvr2 history list --kind operator-test
+dist/seedvr2-0.6.0/bin/seedvr2 engine status
+dist/seedvr2-0.6.0/bin/seedvr2 engine devices
+dist/seedvr2-0.6.0/bin/seedvr2 engine self-test --backend cpu --save
+dist/seedvr2-0.6.0/bin/seedvr2 engine self-test --backend vulkan --gpu 0 --save
+dist/seedvr2-0.6.0/bin/seedvr2 plan --request examples/plan-720p.json --save
+dist/seedvr2-0.6.0/bin/seedvr2 models status
+dist/seedvr2-0.6.0/bin/seedvr2 models audit --bundle examples/model-evidence-empty
+dist/seedvr2-0.6.0/bin/seedvr2 history list --kind operator-test
 ```
 
 空证据包审计退出 **6** 是预期结果，表示没有模型证书。`models status` 查询退出 0 只表示查询成功。规划记录为 `PLANNED`，与真实图像任务分开保存。CLI 的全局 `--database PATH` 置于子命令前，可与 Web 共用工作区。
 
 ## 构建
 
-开发依赖：C++20、CMake 3.25+、Ninja、Python 3.12+、Node 24+；OpenSSL、SQLite、zlib、uuid、Vulkan headers/loader、glslang 与 SPIRV-Tools；新增 pkg-config 与 FFmpeg 开发库 libavformat/libavcodec/libavutil/libswscale，视频输出需要 libx264 编码器。运行时需要对应共享库 ABI，具体版本/许可在 `third_party/media`。导出还需要项目私有 PyTorch 环境，见[完整模型包准备](docs/image-runtime.md)。
+开发依赖：C++20、CMake 3.25+、Ninja、Python 3.12+、Node 24+；OpenSSL、SQLite、libjpeg、zlib、uuid、Vulkan headers/loader、glslang 与 SPIRV-Tools；pkg-config 与 FFmpeg 开发库 libavformat/libavcodec/libavutil/libswscale，视频输出需要 libx264 编码器。运行时需要对应共享库 ABI，具体版本/许可在 `third_party/media`。导出还需要项目私有 PyTorch 环境，见[完整模型包准备](docs/image-runtime.md)。
 
 ```sh
 python3 tools/prepare_native.py
 python3 tools/prepare_engine.py --jobs 4
 npm ci --prefix apps/studio --ignore-scripts
 npm run build --prefix apps/studio
-cmake --preset dev
-cmake --build --preset dev --parallel 4
-ctest --preset dev
-cmake --install build/dev --prefix dist/native-dev
+cmake --preset release
+cmake --build --preset release --parallel 4
+ctest --preset release
+cmake --install build/release --prefix dist/seedvr2-0.6.0
 ```
 
-依赖准备显式联网，版本和归档 SHA-256 已锁定；缓存齐全后使用 `--offline`。CMake 不下载依赖。ncnn / pnnx 来自独立获取的官方提交 `6a1bf000f363714839a36793addc8c879d3d899e`，没有使用相邻本地工作树。这是已验证的固定版本，构建不会自动追随远端 HEAD。
+依赖准备显式联网，版本和归档 SHA-256 已锁定；缓存齐全后使用 `--offline`。CMake 不下载依赖。运行库已更新为本轮查询时官方 HEAD `3b7bdba7fc8aea8fd46779533eee027df77c639d`，转换器继续独立固定 `6a1bf000f363714839a36793addc8c879d3d899e`，没有使用相邻本地工作树。旧导出及实验仍绑定原版本，不重新标注为新运行库；构建不会自动追随远端 HEAD。
 
 只构建 CLI 和 worker：
 
@@ -89,6 +90,8 @@ cmake --build --preset cli --parallel 4
 该构建不寻找 Drogon、不构建 React，不要求 Node 或启动浏览器。
 
 ## 模型实测与架构
+
+本轮 SDK、JPEG 修正、离线验证、组件复核、ABBA 内存/时间测量与 CI 的当前结论见 [DELIVERY-RESULTS.md](docs/DELIVERY-RESULTS.md)。以下旧图像/视频报告保留各自执行版本，不能代替当前构建的实测。公共 SDK 源码导航见 [ARCHITECTURE.md](docs/ARCHITECTURE.md)。
 
 完整处理包含 VAE 编码、随机后验采样与缩放、patch 投影、32 层 DiT、自定义 AWA、单步 Euler endpoint 和 VAE 解码。图层按指定后端执行；请求 Vulkan 时不自动回退 CPU。预处理、张量布局、噪声和 Euler 标量运算在主机侧完成，并在报告中注明。
 

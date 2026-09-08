@@ -1,22 +1,22 @@
 {
-  "project_version": "0.5.0-video-preview",
-  "architecture_version": "0.8-media-jobs",
-  "date": "2026-09-07",
-  "checked_at_utc": "2026-09-07T02:05:03.535627+00:00",
+  "project_version": "0.6.0-native-preview",
+  "architecture_version": "shared-native-sdk",
+  "date": "2026-09-08",
+  "checked_at_utc": "2026-09-08T12:26:01.499353+00:00",
   "product_policy": {
     "single_application": true,
     "testing_builtin": true,
     "local_web": true,
-    "independent_cli": true
+    "independent_cli": true,
+    "installed_cpp_sdk": true
   },
   "model_execution": "IMAGE_AND_WHOLE_SHORT_VIDEO_FP32_B",
   "ncnn_linked": true,
-  "ncnn_commit": "6a1bf000f363714839a36793addc8c879d3d899e",
+  "ncnn_commit": "3b7bdba7fc8aea8fd46779533eee027df77c639d",
   "ncnn_source": {
-    "selection": "Freshly fetched official HEAD at recorded source query time; pinned for this validation",
+    "selection": "Official HEAD queried and pinned on 2026-09-08",
     "local_neighbor_checkout_used": false,
-    "patches": [],
-    "later_observed_official_head": "88a29d8ef42be81b0d67f5fc53ba7695d380cc64"
+    "patches": []
   },
   "implemented": [
     {
@@ -79,11 +79,11 @@
     "quality_benchmark": false,
     "report": "examples/image-demo-job.json"
   },
-  "gpu_performance": "SINGLE_RUN_TIMINGS_ONLY; NO_COLD_WARM_STATISTICAL_BENCHMARK",
-  "peak_memory_validation": "NOT_RUN",
+  "gpu_performance": "FOUR_ABBA_OBSERVATIONS; NO_STATISTICAL_OR_EXCLUSIVE_GPU_CLAIM",
+  "peak_memory_validation": "SAMPLED_PROCESS_RSS_ANON_FILE_SWAP_AND_WHOLE_CARD; ALLOCATOR_CATEGORIES_NOT_MEASURED",
   "video_restoration": true,
   "windows_runtime": "NOT_TESTED",
-  "portable_distribution": "NOT_QUALIFIED; system media ABI and complete license qualification pending",
+  "portable_distribution": "SAME_HOST_ABI_OFFLINE_RELOCATION_PASSED; CROSS_DISTRIBUTION_NOT_QUALIFIED",
   "external_publication": "NOT_PERFORMED",
   "workspace_schema_version": 3,
   "http_task_events": "DURABLE_CURSOR_POLLING",
@@ -98,6 +98,23 @@
   "model_policy_calibration": "NOT_FROZEN",
   "formal_gate_status": "12_MISSING_EVIDENCE; DEVELOPMENT_REPORTS_NOT_ASSEMBLED_IN_FORMAL_BUNDLE",
   "evidence": [
+    "DELIVERY-RESULTS.md",
+    "FIRST-RUN.md",
+    "ARCHITECTURE.md",
+    "../artifacts/2026-09-08/delivery-v1/natural-jpeg-fixed-parity.json",
+    "../artifacts/2026-09-08/delivery-v1/offline-delivery.json",
+    "../artifacts/2026-09-08/delivery-v1/image-jobs.json",
+    "../artifacts/2026-09-08/delivery-v1/video-jobs.json",
+    "../artifacts/2026-09-08/delivery-v1/weight-io-experiment.json"
+  ],
+  "next_implementation": [
+    "Investigate remaining 17-frame accumulated numerical differences without relaxing existing thresholds",
+    "Representative natural-video quality and temporal consistency",
+    "Official BF16 reference A and separately reviewed low precision",
+    "Demand-led high resolution, temporal cache, audio and long clips",
+    "Additional devices and distribution qualification"
+  ],
+  "historical_evidence": [
     "video-validation.md",
     "video-manifest.json",
     "video-vae-native-validation.json",
@@ -122,17 +139,7 @@
     "video-cli-validation.json",
     "video-engine-validation.json",
     "video-build-capabilities.json",
-    "video-model-status.json"
-  ],
-  "next_implementation": [
-    "Isolate later DiT video differences without relaxing strict thresholds",
-    "Natural-video/motion/cut coverage and frozen quality holdout",
-    "Reference A and broader FP32 inputs/shapes, then low precision",
-    "Streaming causal cache and chunk-boundary parity; audio and long video",
-    "Higher resolution, measured peak memory and repeatable performance",
-    "Media ABI, complete license and portable release qualification"
-  ],
-  "historical_evidence": [
+    "video-model-status.json",
     "image-validation.md",
     "image-manifest.json",
     "image-browser-validation.json",
@@ -342,5 +349,32 @@
     "total_ms": 49084.996841,
     "quality_benchmark": false,
     "report": "examples/video-demo-job.json"
+  },
+  "converter_ncnn_commit": "6a1bf000f363714839a36793addc8c879d3d899e",
+  "delivery_0_6": {
+    "sdk_library_sha256": "a3a1e06c863bc1bb6cd83944733faaaf7e0bf96bf4adf80cd50bcda7f8eaaa4c",
+    "ctest": {
+      "passed": 6,
+      "total": 6
+    },
+    "image_jobs": {
+      "passed": 39,
+      "total": 39
+    },
+    "video_jobs": {
+      "passed": 49,
+      "total": 49
+    },
+    "natural_jpeg_numerical": {
+      "passed": 73,
+      "total": 73,
+      "max_uint8_error": 1
+    },
+    "natural_quality": "SINGLE_EXAMPLE; PSNR_SSIM_BELOW_BICUBIC_BASELINE",
+    "offline_full_sdk_image": true,
+    "full_model_certification": false,
+    "runtime_weight_io_default": "buffered",
+    "remote_native_ci": "CONFIGURED_NOT_RUN",
+    "full_model_ci": "SEPARATE_REAL_DEVICE_RECORDS"
   }
 }

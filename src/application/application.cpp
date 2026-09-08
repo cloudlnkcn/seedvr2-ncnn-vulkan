@@ -59,8 +59,11 @@ Result<std::string> Application::self_test_and_save(std::string_view request) {
 }
 std::string application_capabilities() {
     return Json{{"schema_version", "1.0"},
-                {"build", "0.5.0-video-preview"},
-                {"architecture", "0.8-media-jobs"},
+                {"build", "0.6.0-native-preview"},
+                {"architecture", "shared-native-sdk"},
+                {"installed_cpp_sdk",true},
+                {"reviewed_package_identity",true},
+                {"offline_model_copy",true},
                 {"frontend", "react-typescript-antd"},
                 {"http_framework", "Drogon 1.9.13"},
                 {"planning", true},
