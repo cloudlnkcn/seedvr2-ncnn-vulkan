@@ -1,12 +1,14 @@
 # 首次使用与离线搬移
 
-0.6.0 原生预览，Linux x86_64。图片和短片通过同一套 C++ SDK 执行，CLI 不依赖 Web。完整模型认证未通过，当前范围和失败记录见 [交付实测](DELIVERY-RESULTS.md)。
+0.7.0 原生预览，Linux x86_64。图片和短片通过同一套 C++ SDK 执行，CLI 不依赖 Web。完整模型认证未通过，当前范围和失败记录见 [交付实测](DELIVERY-RESULTS.md) 与 [0.7.0 内存及算子验证](MEMORY-VALIDATION.md)。
+
+**首次从 GitHub 克隆的读者请从 [教程第 1 课](TUTORIAL.md#1-从干净克隆开始) 开始。** 下文 `dist/seedvr2-0.7.0` 是维护者已经准备好的本机安装，不随 Git 提供。教程构建默认输出为 `dist/tutorial`。
 
 2026-09-08 的后续数值修复已安装到本机：保留的 17 帧、128×128 短片在 CPU 和 Vulkan 上各通过 73/73 项原协议对照。CPU 时序编码器使用误差更小、计算更慢的直接卷积；CLI、Web 和 SDK 自动共用此策略。适用范围、成本与回归记录见 [视频数值修复](VIDEO-NUMERICS.md)。
 
 ## 已准备好的本机安装
 
-本轮安装位于项目的 `dist/seedvr2-0.6.0/`，包含 CLI、本地 Web、worker、共享 SDK、头文件、CMake 配置，以及独立复制并校验过的图片和视频模型包。进入该目录后运行：
+本轮安装位于项目的 `dist/seedvr2-0.7.0/`，包含 CLI、本地 Web、worker、共享 SDK、头文件、CMake 配置，以及独立复制并校验过的图片和视频模型包。进入该目录后运行：
 
 ```sh
 ./bin/seedvr2-studio
@@ -14,7 +16,35 @@
 
 打开终端打印的本地地址，默认 http://127.0.0.1:8877/ 。已有服务占用端口时运行 `./bin/seedvr2-studio --port 0`，使用系统分配的端口。界面支持导入、队列、进度、取消、重新运行、对比和下载；每次执行一个任务，未完成队列最多八个。
 
-`SEEDVR2_MODEL_DIR` 与 `SEEDVR2_VIDEO_MODEL_DIR` 可指定其他已校验包。`--database "/路径/工作区.sqlite3"` 选择任务工作区。模型包和工作区分开保存，搬移模型不会自动搬移历史任务。
+启动脚本按自身所在的安装目录定位 `models/image` 和 `models/video`，所以也可以从任意工作目录使用脚本的完整路径启动。`SEEDVR2_MODEL_DIR` 与 `SEEDVR2_VIDEO_MODEL_DIR` 可指定其他已校验包。`--database "/路径/工作区.sqlite3"` 选择任务工作区。模型包和工作区分开保存，搬移模型不会自动搬移历史任务。
+
+模型是独立文件，不内嵌在脚本或二进制里。启动脚本不会下载或转换模型，也不会自动打开浏览器：图片包缺失时会给出错误；视频包存在时才同时传给 Web。终端中按 Ctrl+C 可停止服务；只关闭浏览器不会停止服务。
+
+## 已转换模型与自动化范围
+
+本机安装已经包含以下完整 ncnn 包，直接使用它们无需再次下载官方 checkpoint 或重新转换：
+
+| 安装目录中的位置 | 模型包 | 大小 |
+| --- | --- | --- |
+| `models/image/` | `seedvr2-3b-image-fp32-b-v1`，36 张图 | 约 20.44 GB |
+| `models/video/` | `seedvr2-3b-video-fp32-b-v1`，36 张图 | 约 21.10 GB |
+
+每个包包含 `.param` 图结构、`.bin` 权重、常量和 `manifest.json`。这些大文件保存在本机忽略目录中，不随 Git 克隆或 `cmake --install` 自动获取；目前没有公开托管的转换包下载流程。
+
+源码目录已有分阶段自动化工具：
+
+| 工具 | 已实现的工作 |
+| --- | --- |
+| `tools/seedvr2-studio`（安装后为 `bin/seedvr2-studio`） | 定位安装模型，启动本地 Web 与任务服务 |
+| `tools/build_native.py` | 检查开发依赖，串起原生依赖准备、构建、小型测试和安装；不下载模型 |
+| `tools/prepare_native.py`、`tools/prepare_engine.py`、`tools/prepare_pnnx.py` | 按各自锁文件准备原生依赖、ncnn 和转换器 |
+| `tools/prepare_models.py` | 下载固定 revision 的官方 checkpoint，支持断点续传，校验文件大小与 SHA-256；已校验缓存会复用 |
+| `tools/export_vae_image.py`、`tools/export_dit_block.py`、`tools/export_image_package.py` | 按顺序导出图片组件并组装 ncnn 图片包 |
+| `tools/export_vae_video.py`、`tools/export_video_package.py` | 导出时序 VAE，并复用图片 DiT 组装视频包 |
+| `tools/native_ci.sh` | 对已有构建和安装执行小型测试、参数边界、Mesa Vulkan 与外部 SDK 检查；完整 3B 实机验证另行执行 |
+| `seedvr2 models verify` / `models copy` | 校验模型身份与文件完整性，或复制并复核离线模型包 |
+
+从源码准备应用可运行 `python3 tools/build_native.py --jobs 2`，或执行下方分解命令。模型按教程中的图片/视频导出顺序准备；尚未提供一条命令完成空机器系统依赖安装、权重下载、转换和模型部署的总脚本。`prepare_models.py --list` 可先看下载清单，`--offline` 校验缓存；它下载官方权重，不会直接产出可运行的 ncnn 包。
 
 ## CLI：先检查，再执行
 
@@ -54,6 +84,8 @@
 
 实机范围是本机 RTX 4060 Laptop 8 GB 与 CPU。软件 Vulkan 只执行小型 CI 测试。预检不能精确预测整个任务的显存峰值，设备分配失败会保留错误；8 GB 不是其他设备的统一保证。当前 FP32 图片包约 20.44 GB，视频包约 21.10 GB，两份独立离线副本合计约 41.54 GB；工作区和诊断张量另计。
 
+Vulkan 默认 `--weights auto`，按当前图的权重估算与设备预算选择 GPU 或主机内存；日常使用无需手动设置。它不保证整个任务不会内存不足，也不包含激活卸载或分配失败后的重试，详见 [0.7.0 测量与边界](MEMORY-VALIDATION.md)。
+
 默认 `--weight-io buffered`。可选 `mapped` 是 Linux 实验项：本轮减少了匿名内存，但未显示速度收益，详见 [测量记录](DELIVERY-RESULTS.md)。运行期间请保持模型文件不变。
 
 ## 从源码准备
@@ -68,7 +100,7 @@ npm run build --prefix apps/studio
 cmake --preset release
 cmake --build --preset release --parallel 4
 ctest --preset release
-cmake --install build/release --prefix dist/seedvr2-0.6.0
+cmake --install build/release --prefix dist/seedvr2-0.7.0
 ```
 
 依赖脚本按锁文件显式下载；已有完整归档缓存时加 `--offline`。CMake 自身不下载依赖。只构建 CLI/SDK 时，准备依赖加 `--cli-only`，CMake 设置 `-DSEEDVR2_BUILD_WEB=OFF`。转换模型另需专用 PyTorch/pnnx 环境，完整命令见 [图片导出](image-runtime.md) 和 [视频导出](video-runtime.md)。转换器与运行库分别锁定，重新构建运行库不要求无理由重导出已验证模型。
@@ -89,8 +121,8 @@ cmake --install build/release --prefix dist/seedvr2-0.6.0
 ## C++ SDK
 
 ```cmake
-find_package(seedvr2 0.6 CONFIG REQUIRED)
+find_package(seedvr2 0.7 CONFIG REQUIRED)
 target_link_libraries(my_app PRIVATE seedvr2::sdk)
 ```
 
-配置外部工程时设置 `-DCMAKE_PREFIX_PATH=/安装目录`。公共入口是 `seedvr2/pipeline.hpp`，以 `RestoreRequest` 调用 `preflight()` 和 `restore()`，通过回调接收进度和请求取消。可编译示例在 [examples/sdk](../examples/sdk)。调用方无需安装 ncnn、CLI11 或 JSON 头文件。当前 SDK 为 0.6 预览 ABI，升级时需重新核实二进制兼容性；同一进程的并发多任务推理尚未资格验证，当前应用逐任务执行。
+配置外部工程时设置 `-DCMAKE_PREFIX_PATH=/安装目录`。公共入口是 `seedvr2/pipeline.hpp`，以 `RestoreRequest` 调用 `preflight()` 和 `restore()`，通过回调接收进度和请求取消。可编译示例在 [examples/sdk](../examples/sdk)。调用方无需安装 ncnn、CLI11 或 JSON 头文件。当前 SDK 为 0.7 预览 ABI，旧版调用方需重新构建；复用外部示例构建目录时使用 `cmake --fresh` 清除旧安装的路径缓存。同一进程的并发多任务推理尚未资格验证，当前应用逐任务执行。

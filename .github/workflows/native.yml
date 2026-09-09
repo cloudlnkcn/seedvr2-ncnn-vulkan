@@ -23,6 +23,10 @@ jobs:
       CXX: ${{ matrix.compiler }}
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5, verified 2026-09-08
+      - name: Source package and downloader contracts
+        run: |
+          python3 tools/check_source_package.py --output artifacts/ci/source-package.json
+          python3 -m unittest discover -s tests -p test_model_download.py -v
       - name: Native system dependencies
         run: |
           sudo apt-get update
@@ -36,16 +40,10 @@ jobs:
           BUILD_WEB: ${{ matrix.web }}
         run: |
           if [ "$BUILD_WEB" = ON ]; then
-            python3 tools/prepare_native.py --jobs 2
-            npm ci --prefix apps/studio --ignore-scripts
-            npm run build --prefix apps/studio
+            python3 tools/build_native.py --jobs 2 --build-dir build/ci --prefix dist/ci
           else
-            python3 tools/prepare_native.py --cli-only --jobs 2
+            python3 tools/build_native.py --cli-only --jobs 2 --build-dir build/ci --prefix dist/ci
           fi
-          python3 tools/prepare_engine.py --jobs 2
-          cmake -S . -B build/ci -G Ninja -DCMAKE_BUILD_TYPE=Release -DSEEDVR2_BUILD_WEB="$BUILD_WEB" -DCMAKE_INSTALL_PREFIX="$PWD/dist/ci"
-          cmake --build build/ci --parallel 2
-          cmake --install build/ci
       - name: Native execution, installed SDK and negative evidence tests
         run: bash tools/native_ci.sh build/ci dist/ci artifacts/ci
       - name: Native Web host contracts
@@ -60,5 +58,5 @@ jobs:
             artifacts/ci
             build/ci/Testing/Temporary
             .cache/ncnn-build.log
-            .cache/native-build.log
+            .cache/*-build.log
           if-no-files-found: warn

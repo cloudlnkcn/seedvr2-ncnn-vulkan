@@ -270,7 +270,7 @@ install(FILES tests/reference/Apache-2.0.txt DESTINATION ${CMAKE_INSTALL_DATADIR
 install(FILES docs/provenance.md DESTINATION ${CMAKE_INSTALL_DATADIR}/seedvr2)
 install(DIRECTORY docs/ DESTINATION ${CMAKE_INSTALL_DATADIR}/seedvr2/docs
     FILES_MATCHING PATTERN "*.md" PATTERN "*.json" PATTERN "*.png" PATTERN "*.mp4")
-install(FILES README.md DESTINATION ${CMAKE_INSTALL_DATADIR}/seedvr2)
+install(FILES README.md README.en.md LICENSE NOTICE CONTRIBUTING.md DESTINATION ${CMAKE_INSTALL_DATADIR}/seedvr2)
 install(DIRECTORY artifacts/2026-09-08/delivery-v1 artifacts/2026-09-08/video-numerics-v1
     artifacts/2026-09-08/memory-v1
     DESTINATION ${CMAKE_INSTALL_DATADIR}/seedvr2/artifacts/2026-09-08)

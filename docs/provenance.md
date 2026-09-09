@@ -1,10 +1,10 @@
 # 来源与派生范围
 
-当前版本 0.6.0-native-preview，2026-09-08。当前实现与独立版本证据见 [DELIVERY-RESULTS.md](DELIVERY-RESULTS.md)，此前图像/视频证据保留各自身份。native-*、foundation-*、web-*、framework-* 是以前版本的历史记录；其“未链接 ncnn”等结论不描述当前版本。
+当前版本 0.7.0-native-preview，源码发布说明更新于 2026-09-10。当前实现与独立版本证据见 [MEMORY-VALIDATION.md](MEMORY-VALIDATION.md)，初次 SDK 交付见 [DELIVERY-RESULTS.md](DELIVERY-RESULTS.md)。此前图像/视频证据保留各自身份。native-*、foundation-*、web-*、framework-* 是以前版本的历史记录；其“未链接 ncnn”等结论不描述当前版本。
 
 ## ncnn 与 pnnx
 
-本轮从 [Tencent/ncnn 官方远端](https://github.com/Tencent/ncnn/commit/3b7bdba7fc8aea8fd46779533eee027df77c639d) 查询 HEAD，运行库锁定 `3b7bdba7fc8aea8fd46779533eee027df77c639d`，身份在 `engine-dependencies.lock.json`。转换器独立固定 `6a1bf000f363714839a36793addc8c879d3d899e`，身份在 `converter-dependencies.lock.json`。两者均为未修改的官方源码，准备脚本复用缓存前逐文件与已验证归档比对，没有链接相邻的 ncnn 工作树。旧模型包的转换器字段仍描述当时导出，兼容新运行库不等于重新导出。
+2026-09-08 从 [Tencent/ncnn 官方远端](https://github.com/Tencent/ncnn/commit/3b7bdba7fc8aea8fd46779533eee027df77c639d) 查询 HEAD，运行库锁定 `3b7bdba7fc8aea8fd46779533eee027df77c639d`，身份在 `engine-dependencies.lock.json`；不宣称它永远是远端最新版本。转换器独立固定 `6a1bf000f363714839a36793addc8c879d3d899e`，身份在 `converter-dependencies.lock.json`。两份官方源码归档均未修改，准备脚本复用缓存前逐文件与已验证归档比对，没有链接相邻的 ncnn 工作树。**应用实际编译包含 `host-buffer-v1` 分配器修正副本**，见 [编译规则](../cmake/SeedVR2NcnnAllocator.cmake)，不能把整个应用运行库描述为未修改上游。旧模型包的转换器字段仍描述当时导出，兼容新运行库不等于重新导出。
 
 本机 ncnn 构建启用 Vulkan、系统 glslang，关闭 INT8 和 AVX512。pnnx 由项目私有 Python 3.13 / PyTorch 2.9.0+cpu 开发环境构建，身份记录在 `.deps/bin/pnnx-build.json`。Python 和 pnnx 不进入应用运行时。
 
@@ -14,13 +14,13 @@
 
 参考来源是 [ByteDance-Seed/SeedVR](https://github.com/ByteDance-Seed/SeedVR/tree/e4de8c24441a67e1b7df56abea10645059bb1185)，提交 `e4de8c24441a67e1b7df56abea10645059bb1185`。使用的 attention、RoPE、窗口、DiT block、modulation、embedding、MLP、VAE 类和配置原文保存在 `tests/reference/seedvr`；每个文件的 SHA256 在 `sources.json`，许可证保持原文。旧窗口基线另外保存在 `tests/reference/official_window.py`，其 SHA256 为 `61b3e0235e25d3e901271186bbaa43a90dcc1552f003daa3d2844b5126ce7e84`。
 
-官方权重来自 [ByteDance-Seed/SeedVR2-3B 的固定 revision](https://huggingface.co/ByteDance-Seed/SeedVR2-3B/tree/37255ff8cccfb01071b87f635a5948ca8d53117c)。`model-sources.lock.json` 固定四个文件：3B DiT、VAE、正向与负向文本 embedding；实际下载后逐个核对官方 LFS SHA256 和精确字节数。原文件位于忽略目录 `.cache/models`，不进入 Git。0.6 本机安装的 `models/image`、`models/video` 包含经过校验的独立导出副本，未公开上传。
+官方权重来自 [ByteDance-Seed/SeedVR2-3B 的固定 revision](https://huggingface.co/ByteDance-Seed/SeedVR2-3B/tree/37255ff8cccfb01071b87f635a5948ca8d53117c)。`model-sources.lock.json` 固定四个文件：3B DiT、VAE、正向与负向文本 embedding；实际下载后逐个核对官方 LFS SHA256 和精确字节数。原文件位于忽略目录 `.cache/models`，不进入 Git。0.7 本机安装的 `models/image`、`models/video` 包含经过校验的独立导出副本，未公开上传。
 
 `tools/awa_reference.py`、`vae_reference.py`、`dit_block_reference.py`、`image_reference.py` 执行上述原始类的方法体，对分布式/缓存外壳、Apex RMSNorm、FlashAttention 及 BF16 转换做显式 FP32-B 适配。原文不修改，适配逻辑可独立审查。AWA 使用合成 projected QKV/RMS；VAE 与 DiT 块使用真实官方 checkpoint。候选导出模块独立实现后与参考比较，不能把候选自己的输出作为 golden。
 
 `src/planning/windows.cpp` 是窗口算法的 C++ 移植；`src/engine/ncnn/awa.cpp` 及 shaders 实现 Q/K RMSNorm、局部 RoPE、窗口 joint attention、视频逆散射和文本等权平均。`tools/vae_image_module.py` 是官方视频 VAE 的 T=1 特化；`dit_block_module.py` 是完整块的 pnnx 可导出表达。实际 lowering、派生范围和已发现的上游 Vulkan buffer 问题见 native-backend.md。本轮没有复制其他个人移植项目的 C++ 或 shader。
 
-数值结论覆盖注明范围的 FP32-B 子模型、完整单图和短片 32 层轨迹；短片结果为 MIXED，17 帧轨迹仍有中间层严格失败。官方 BF16 / FlashAttention 路径 A、长视频恢复和模型阈值校准尚未完成；权重来源与哈希验证也不构成模型证书。
+数值结论覆盖注明范围的 FP32-B 子模型、完整单图和短片 32 层轨迹。早期短片结果为 MIXED，17 帧有中间层严格失败；后续修复对同一保留轨迹取得 CPU/Vulkan 各 73/73，历史失败仍在原报告中。当前 0.7 两种内存策略的对照见 [内存验证](MEMORY-VALIDATION.md)。官方 BF16 / FlashAttention 路径 A、长视频恢复和模型阈值校准尚未完成；权重来源与哈希验证也不构成模型证书。
 
 ## 应用框架
 
@@ -32,7 +32,7 @@
 
 ## 发行状态
 
-本轮已形成可安装的 SDK/CLI/Web、独立模型副本和同系统 ABI 的离线验证，没有发布公开权重包、跨系统便携发行版或外部 Discussion。第三方许可证随安装附带；公开发行仍需项目自身许可决定、完整运行库与模型分发资格、目标平台实测。本说明不代替这些尚未完成的事项。
+本项目以 Apache-2.0 发布原创源码和文档，保留第三方原始许可，见 [LICENSE](../LICENSE)、[NOTICE](../NOTICE) 和 [分发范围](LICENSING.md)。已形成可安装的 SDK/CLI/Web、独立本机模型副本和同系统 ABI 的离线验证，没有公开权重下载包或跨系统便携二进制发行版。第三方许可证随安装附带；包含 GPL-enabled FFmpeg/libx264 的完整二进制分发仍须满足相关依赖许可并补齐目标平台实测。
 
 ## 0.6.0 JPEG 与自然样例
 
