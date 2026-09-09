@@ -47,7 +47,11 @@ AWA 参考和导出使用已存在且版本固定的 Python 3.13 / PyTorch 2.9.0
 
 [原生 Linux CI](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/actions/workflows/native.yml)
 包含 Ubuntu 24.04 上 GCC CLI、Clang CLI、GCC Web 三个任务，使用实际网络准备依赖。
-远端是否通过应查看对应提交的运行结果；本地成功不代替 GitHub 成功。
+这三项已在提交 `b8e6611788272e25d9e4c0f463ba0a7f36a343b2` 上实际全部通过：
+每项 14/14 原生测试、5/5 Mesa 回归、外部 SDK 身份核对，Web 另有 54/54 检查。
+首轮产物曾遗漏隐藏目录中的依赖构建日志；修正上传配置后，已重新下载产物确认八份预期日志全部存在。
+两轮原始报告、缺口和修复见 [远端 CI 证据](../artifacts/2026-09-10/github-ci-v1/README.md)。
+之后只提交文档和这些原始报告，使用 `[skip ci]` 避免为归档重复相同构建；未来代码改动仍须验证对应新提交。
 CI 执行小测试与软件 Vulkan，不下载完整 3B 权重，不代表独立显卡性能或完整模型质量。
 
 仍缺少的交付项按用途区分：

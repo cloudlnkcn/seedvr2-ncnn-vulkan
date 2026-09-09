@@ -118,7 +118,10 @@ not perceptual-quality acceptance.
 
 [GitHub Actions](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/actions/workflows/native.yml)
 builds/tests native Linux and software Vulkan without full model weights. Full 3B GPU
-validation is a separate real-device protocol. Historical raw model/tensor paths in
+validation is a separate real-device protocol. The Ubuntu GCC CLI, Clang CLI and GCC
+Web jobs passed at the [recorded CI commit](artifacts/2026-09-10/github-ci-v1/README.md);
+raw reports and the artifact-log retention fix are retained in that archive.
+Historical raw model/tensor paths in
 reports belong to the developer's machine; the large files are not in Git.
 
 ## License

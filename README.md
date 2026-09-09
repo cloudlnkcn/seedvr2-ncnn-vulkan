@@ -6,7 +6,7 @@
 
 **0.7.0 原生预览：SeedVR2 3B 已接通可安装的 C++ SDK、独立 CLI 和本地 Web，使用 ncnn CPU / Vulkan 完成真实图片与整段短片处理。** 提供模型包身份/完整性校验、参数预检、离线复制、外部 SDK 示例和原生 CI。保留的 0.7.0 安装版 SDK 已在禁网、隐藏源码和中文路径下完成真实图片推理；自然 JPEG 完整轨迹 73/73 通过官方 FP32-B 对照，输出最大相差 1。**保留的 17 帧视频 CPU/Vulkan 均达到 73/73 数值通过；单张自然图的全参考画质负结果仍保留，完整模型认证未通过。** 这些大模型结论绑定原始测试候选；教程新构建的验证另见[交付核验](docs/TUTORIAL-READINESS.md)。
 
-新增逐图 GPU/RAM 自动权重选择与可复算的算子/组件对照。保留 CLI，Web 和 SDK 使用同一默认策略；本轮修复了 RAM 权重路径的两项 Vulkan 校验错误。设置、验证与内存/速度代价见 [MEMORY-VALIDATION.md](docs/MEMORY-VALIDATION.md)。
+支持逐图 GPU/RAM 自动权重选择与可复算的算子/组件对照。CLI、Web 和 SDK 使用同一默认策略；0.7.0 修复了 RAM 权重路径的两项 Vulkan 校验错误。设置、验证与内存/速度代价见 [MEMORY-VALIDATION.md](docs/MEMORY-VALIDATION.md)。
 [首次使用和离线搬移](docs/FIRST-RUN.md) · [架构与源码导航](docs/ARCHITECTURE.md) · [17 帧数值修复与代价](docs/VIDEO-NUMERICS.md) · [分项实测、失败和限制](docs/DELIVERY-RESULTS.md) · [可复用 Discussion 草稿](docs/DISCUSSION-DRAFT.md)
 
 React / TypeScript / Ant Design 界面内嵌于 Drogon C++ 服务。共享 C++20 推理核心，由独立 worker 执行，SQLite 保存任务与有序事件。运行时无需 Node、Python、云服务或 CDN。本机验证平台为 Linux x86_64 / RTX 4060 Laptop GPU；尚未形成跨平台便携发行版。
@@ -34,6 +34,8 @@ python3 tools/prepare_models.py
 ```
 
 固定官方 revision、约 14.57 GB，支持续传和 SHA-256 校验；`--offline` 仅验证缓存。下载后还需 pnnx 转换，详见教程。源仓库包含小型测试夹具和历史报告，未上传官方大权重、转换包或便携二进制。原生 CI 的实际结果见 [GitHub Actions](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/actions/workflows/native.yml)，大模型实机记录单独保留。
+
+Ubuntu GCC CLI、Clang CLI、GCC Web 三项远端 CI 已通过；对应提交、原始报告与日志收集修复见[远端验证归档](artifacts/2026-09-10/github-ci-v1/README.md)。
 
 ## 已有本机安装时使用
 
@@ -107,7 +109,7 @@ ctest --preset release
 cmake --install build/release --prefix dist/seedvr2-0.7.0
 ```
 
-依赖准备显式联网，版本和归档 SHA-256 已锁定；缓存齐全后使用 `--offline`。CMake 不下载依赖。运行库已更新为本轮查询时官方 HEAD `3b7bdba7fc8aea8fd46779533eee027df77c639d`，转换器继续独立固定 `6a1bf000f363714839a36793addc8c879d3d899e`，没有使用相邻本地工作树。0.7.0 应用编译了经过哈希校验的 `host-buffer-v1` 分配器修正副本，原始 ncnn 源目录与归档不变；运行报告明确记录该修正和实际加载 SDK 的身份。旧导出及实验仍绑定原版本，不重新标注为新运行库；构建不会自动追随远端 HEAD。
+依赖准备显式联网，版本和归档 SHA-256 已锁定；缓存齐全后使用 `--offline`。CMake 不下载依赖。运行库锁定为 2026-09-08 查询时的官方 HEAD `3b7bdba7fc8aea8fd46779533eee027df77c639d`，转换器独立固定 `6a1bf000f363714839a36793addc8c879d3d899e`，没有使用相邻本地工作树。0.7.0 应用编译了经过哈希校验的 `host-buffer-v1` 分配器修正副本，原始 ncnn 源目录与归档不变；运行报告明确记录该修正和实际加载 SDK 的身份。旧导出及实验仍绑定原版本，不重新标注为新运行库；构建不会自动追随远端 HEAD。
 
 只构建 CLI 和 worker：
 

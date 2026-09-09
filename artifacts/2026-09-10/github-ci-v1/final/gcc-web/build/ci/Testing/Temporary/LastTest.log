@@ -1,0 +1,205 @@
+Start testing: Sep 09 22:16 UTC
+----------------------------------------------------------
+2/14 Testing: engine.memory-vulkan
+2/14 Test: engine.memory-vulkan
+Command: "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2_memory_vulkan_tests"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.memory-vulkan" start time: Sep 09 22:16 UTC
+Output:
+----------------------------------------------------------
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+{
+  "device": {
+    "api_version": 4211006,
+    "device_id": 0,
+    "driver_version": 104865800,
+    "index": 0,
+    "name": "llvmpipe (LLVM 20.1.2, 256 bits)",
+    "subgroup_size": 8,
+    "vendor_id": 65541
+  },
+  "live_driver_budget": {
+    "budget_bytes": 16766414848,
+    "heap_index": 0,
+    "source": "VK_EXT_memory_budget_estimate",
+    "usage_bytes": 1175302144
+  },
+  "passed": true,
+  "scope": "Four real Vulkan GEMMs; controlled budgets are not physical VRAM exhaustion",
+  "steps": [
+    {
+      "activation_offload": false,
+      "actual_weight_memory": "not_instrumented",
+      "available_bytes": 200,
+      "before_load": {
+        "budget_bytes": 200,
+        "heap_index": 0,
+        "source": "VK_EXT_memory_budget_estimate",
+        "usage_bytes": 0
+      },
+      "estimated_weight_bytes": 40,
+      "exact_output": true,
+      "observed_weight_device_local": true,
+      "oom_recovery": false,
+      "policy": "auto",
+      "reason": "budget_available",
+      "requested_memory": "device",
+      "reserve_bytes": 20,
+      "reserve_policy": "explicit_bytes",
+      "scope": "weight placement before graph loading"
+    },
+    {
+      "activation_offload": false,
+      "actual_weight_memory": "not_instrumented",
+      "available_bytes": 30,
+      "before_load": {
+        "budget_bytes": 200,
+        "heap_index": 0,
+        "source": "VK_EXT_memory_budget_estimate",
+        "usage_bytes": 170
+      },
+      "estimated_weight_bytes": 40,
+      "exact_output": true,
+      "observed_weight_device_local": true,
+      "oom_recovery": false,
+      "policy": "auto",
+      "reason": "budget_pressure",
+      "requested_memory": "host",
+      "reserve_bytes": 20,
+      "reserve_policy": "explicit_bytes",
+      "scope": "weight placement before graph loading"
+    },
+    {
+      "activation_offload": false,
+      "actual_weight_memory": "not_instrumented",
+      "available_bytes": 200,
+      "before_load": {
+        "budget_bytes": 200,
+        "heap_index": 0,
+        "source": "VK_EXT_memory_budget_estimate",
+        "usage_bytes": 0
+      },
+      "estimated_weight_bytes": 40,
+      "exact_output": true,
+      "observed_weight_device_local": true,
+      "oom_recovery": false,
+      "policy": "auto",
+      "reason": "budget_available",
+      "requested_memory": "device",
+      "reserve_bytes": 20,
+      "reserve_policy": "explicit_bytes",
+      "scope": "weight placement before graph loading"
+    },
+    {
+      "activation_offload": false,
+      "actual_weight_memory": "not_instrumented",
+      "available_bytes": null,
+      "before_load": null,
+      "estimated_weight_bytes": 40,
+      "exact_output": true,
+      "observed_weight_device_local": true,
+      "oom_recovery": false,
+      "policy": "auto",
+      "reason": "budget_unavailable",
+      "requested_memory": "host",
+      "reserve_bytes": 20,
+      "reserve_policy": "explicit_bytes",
+      "scope": "weight placement before graph loading"
+    }
+  ]
+}
+<end of output>
+Test time =   0.17 sec
+----------------------------------------------------------
+Test Passed.
+"engine.memory-vulkan" end time: Sep 09 22:16 UTC
+"engine.memory-vulkan" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/14 Testing: engine.awa-rope-vulkan
+4/14 Test: engine.awa-rope-vulkan
+Command: "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2_awa_rope_tests" "vulkan"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.awa-rope-vulkan" start time: Sep 09 22:16 UTC
+Output:
+----------------------------------------------------------
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+checked=3792 finite_max_abs=1.3024e-07 nonfinite=0 violations=0
+<end of output>
+Test time =   0.30 sec
+----------------------------------------------------------
+Test Passed.
+"engine.awa-rope-vulkan" end time: Sep 09 22:16 UTC
+"engine.awa-rope-vulkan" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/14 Testing: engine.awa-sdpa-fp32-vulkan
+6/14 Test: engine.awa-sdpa-fp32-vulkan
+Command: "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2_awa_rope_tests" "vulkan" "sdpa"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.awa-sdpa-fp32-vulkan" start time: Sep 09 22:16 UTC
+Output:
+----------------------------------------------------------
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+checked=40448 finite_max_abs=0 nonfinite=0 violations=0
+<end of output>
+Test time =   0.30 sec
+----------------------------------------------------------
+Test Passed.
+"engine.awa-sdpa-fp32-vulkan" end time: Sep 09 22:16 UTC
+"engine.awa-sdpa-fp32-vulkan" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/14 Testing: engine.awa-rope-vulkan-host
+7/14 Test: engine.awa-rope-vulkan-host
+Command: "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2_awa_rope_tests" "vulkan" "host"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.awa-rope-vulkan-host" start time: Sep 09 22:16 UTC
+Output:
+----------------------------------------------------------
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+checked=3792 finite_max_abs=1.3024e-07 nonfinite=0 violations=0
+<end of output>
+Test time =   0.30 sec
+----------------------------------------------------------
+Test Passed.
+"engine.awa-rope-vulkan-host" end time: Sep 09 22:16 UTC
+"engine.awa-rope-vulkan-host" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/14 Testing: engine.awa-sdpa-fp32-vulkan-host
+8/14 Test: engine.awa-sdpa-fp32-vulkan-host
+Command: "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2_awa_rope_tests" "vulkan" "sdpa" "host"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.awa-sdpa-fp32-vulkan-host" start time: Sep 09 22:16 UTC
+Output:
+----------------------------------------------------------
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+checked=40448 finite_max_abs=0 nonfinite=0 violations=0
+<end of output>
+Test time =   0.30 sec
+----------------------------------------------------------
+Test Passed.
+"engine.awa-sdpa-fp32-vulkan-host" end time: Sep 09 22:16 UTC
+"engine.awa-sdpa-fp32-vulkan-host" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Sep 09 22:16 UTC
+
+vulkan =   1.37 sec*proc
+
