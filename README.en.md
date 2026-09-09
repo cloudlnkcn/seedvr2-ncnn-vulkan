@@ -1,6 +1,6 @@
 # SeedVR2 ncnn Vulkan
 
-[中文](README.md) · [Step-by-step tutorial (Chinese)](docs/TUTORIAL.md) · [Contributing](CONTRIBUTING.md) · [License](LICENSE)
+[中文](README.md) · [Step-by-step tutorial (Chinese)](docs/TUTORIAL.md) · [Delivery evidence](artifacts/2026-09-10/tutorial-v1/README.md) · [Contributing](CONTRIBUTING.md) · [License](LICENSE)
 
 An independent, executable case study in porting **SeedVR2 3B** from its official
 PyTorch implementation to a native C++20 application using **ncnn CPU/Vulkan**.

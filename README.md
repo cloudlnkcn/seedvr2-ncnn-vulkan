@@ -1,10 +1,10 @@
 # SeedVR2 ncnn Vulkan
 
-[English](README.en.md) · [从零开始的教程](docs/TUTORIAL.md) · [贡献方法](CONTRIBUTING.md) · [许可证](LICENSE)
+[English](README.en.md) · [从零开始的教程](docs/TUTORIAL.md) · [教程交付核验](docs/TUTORIAL-READINESS.md) · [贡献方法](CONTRIBUTING.md) · [许可证](LICENSE)
 
 面向已有 C++、PyTorch 和基本 Vulkan 经验读者的**独立进阶移植教程与可执行案例**：从官方 SeedVR2 3B 拆分真实组件，使用 pnnx 保留自定义 adaptive window attention 边界，再接通 ncnn CPU/Vulkan、CLI、本地 Web 和共享 SDK。项目不属于 ByteDance 或 Tencent 官方发行。
 
-**0.7.0 原生预览：官方 SeedVR2 3B 已接通可安装的 C++ SDK、独立 CLI 和本地 Web，使用 ncnn CPU / Vulkan 完成真实图片与整段短片处理。** 新增模型包身份/完整性校验、参数预检、离线复制、外部 SDK 示例和原生 CI。安装版 SDK 已在禁网、隐藏源码和中文路径下完成真实图片推理；新的自然 JPEG 完整轨迹 73/73 通过官方 FP32-B 对照，输出最大相差 1。**本轮修复后，保留的 17 帧视频 CPU/Vulkan 均达到 73/73 数值通过；单张自然图的全参考画质负结果仍保留，完整模型认证未通过。**
+**0.7.0 原生预览：SeedVR2 3B 已接通可安装的 C++ SDK、独立 CLI 和本地 Web，使用 ncnn CPU / Vulkan 完成真实图片与整段短片处理。** 提供模型包身份/完整性校验、参数预检、离线复制、外部 SDK 示例和原生 CI。保留的 0.7.0 安装版 SDK 已在禁网、隐藏源码和中文路径下完成真实图片推理；自然 JPEG 完整轨迹 73/73 通过官方 FP32-B 对照，输出最大相差 1。**保留的 17 帧视频 CPU/Vulkan 均达到 73/73 数值通过；单张自然图的全参考画质负结果仍保留，完整模型认证未通过。** 这些大模型结论绑定原始测试候选；教程新构建的验证另见[交付核验](docs/TUTORIAL-READINESS.md)。
 
 新增逐图 GPU/RAM 自动权重选择与可复算的算子/组件对照。保留 CLI，Web 和 SDK 使用同一默认策略；本轮修复了 RAM 权重路径的两项 Vulkan 校验错误。设置、验证与内存/速度代价见 [MEMORY-VALIDATION.md](docs/MEMORY-VALIDATION.md)。
 [首次使用和离线搬移](docs/FIRST-RUN.md) · [架构与源码导航](docs/ARCHITECTURE.md) · [17 帧数值修复与代价](docs/VIDEO-NUMERICS.md) · [分项实测、失败和限制](docs/DELIVERY-RESULTS.md) · [可复用 Discussion 草稿](docs/DISCUSSION-DRAFT.md)

@@ -1,0 +1,739 @@
+{
+  "schema_version": "awa-validation-v1",
+  "scope": "Synthetic projected QKV and RMS weights; official attention body FP32-B; no SeedVR2 checkpoint",
+  "oracle": "official NaSwinAttention.forward with documented FP32-B adapters",
+  "suite_sha256": "cfa7740a90682d8a25e0a368bf461587881499614f8740bfbe91fa5b98838d61",
+  "binary_sha256": "bd07054aa8479c6c78f7533ba1e03b349da6425ce3f8f9efd6dc2e63eee9c773",
+  "threshold": {
+    "atol": 1e-05,
+    "rtol": 0.0001,
+    "status": "FP32 operator diagnostic threshold; not a calibrated whole-model gate"
+  },
+  "validation_layer_requested": true,
+  "cases": [
+    {
+      "case_id": "t1-h2-w3-heads2-text5-regular",
+      "backend": "cpu",
+      "exit_code": 0,
+      "comparisons": [
+        {
+          "tensor": "video",
+          "reference_sha256": "e2d3338d61e4db448c73d960578c0f6f14f78f72792d28512dd170e8a601c9ca",
+          "candidate_sha256": "e03033c390641b75b05a1fa1fe8cffedb0d273dad3203ff405d09789b0e385a3",
+          "elements": 1536,
+          "max_abs": 5.960464477539062e-07,
+          "rmse": 1.1686365256255744e-07,
+          "violations": 0,
+          "finite": true,
+          "passed": true
+        },
+        {
+          "tensor": "text",
+          "reference_sha256": "7dd050955c1d9c472df94820aa66c67d10f5df3db264b67c8dd0b761c9c6afdf",
+          "candidate_sha256": "ab98c9004e53fe950010332f362d13d62e2444f52fc46700b229304554a23590",
+          "elements": 1280,
+          "max_abs": 9.834766387939453e-07,
+          "rmse": 1.6189576035295904e-07,
+          "violations": 0,
+          "finite": true,
+          "passed": true
+        }
+      ],
+      "passed": true,
+      "execution": {
+        "backend": "ncnn-cpu",
+        "case_id": "t1-h2-w3-heads2-text5-regular",
+        "case_sha256": "b3f53ab694adb15df0ac3967f12b36da92b6930120acb61a2a987bf70cad7844",
+        "cpu_calls": 1,
+        "device": null,
+        "implementation": {
+          "executable_sha256": "bd07054aa8479c6c78f7533ba1e03b349da6425ce3f8f9efd6dc2e63eee9c773",
+          "ncnn_runtime_patches": [
+            {
+              "compiled_allocator_sha256": "b8398e0d5ef5a367f80c5d2f13af1c8f170a83a39d0a1b458a40100924a55320",
+              "id": "host-buffer-v1",
+              "original_allocator_sha256": "601d69dab40823366fa6aa2be00c8e37bb0f1e960fe96323c36daed887c4fda2",
+              "scope": "Imported-host buffer declaration and weight-buffer transfer-source usage"
+            }
+          ],
+          "sdk_library_sha256": "dd92e7fa79f7c13e6bbffbe470e0bb0d904bcf9aceb135501246e0c3bd715ed7"
+        },
+        "model_verified": false,
+        "ncnn_commit": "3b7bdba7fc8aea8fd46779533eee027df77c639d",
+        "numerical_validation": "NOT_PERFORMED_BY_RUNNER",
+        "outputs": {
+          "text": {
+            "dtype": "f32le",
+            "elements": 1280,
+            "path": "text.f32",
+            "sha256": "ab98c9004e53fe950010332f362d13d62e2444f52fc46700b229304554a23590",
+            "shape": [
+              5,
+              256
+            ]
+          },
+          "video": {
+            "dtype": "f32le",
+            "elements": 1536,
+            "path": "video.f32",
+            "sha256": "e03033c390641b75b05a1fa1fe8cffedb0d273dad3203ff405d09789b0e385a3",
+            "shape": [
+              1,
+              2,
+              3,
+              256
+            ]
+          }
+        },
+        "precision": "fp32",
+        "schema_version": "awa-execution-v1",
+        "sdpa_calls": 1,
+        "status": "EXECUTED",
+        "timing_ms": {
+          "extract_including_transfers": 0.21667,
+          "total": 90.075337
+        },
+        "vulkan_calls": 0,
+        "windows": 1
+      }
+    },
+    {
+      "case_id": "t1-h2-w3-heads2-text5-regular",
+      "backend": "vulkan",
+      "exit_code": 0,
+      "comparisons": [
+        {
+          "tensor": "video",
+          "reference_sha256": "e2d3338d61e4db448c73d960578c0f6f14f78f72792d28512dd170e8a601c9ca",
+          "candidate_sha256": "a1c351f966d8e5e099fcb2f5ae162a9d5a24d923c2dcf09175954b020ea22b2b",
+          "elements": 1536,
+          "max_abs": 4.4889748096466064e-07,
+          "rmse": 9.96410588921502e-08,
+          "violations": 0,
+          "finite": true,
+          "passed": true
+        },
+        {
+          "tensor": "text",
+          "reference_sha256": "7dd050955c1d9c472df94820aa66c67d10f5df3db264b67c8dd0b761c9c6afdf",
+          "candidate_sha256": "61650b5f0fd4572fcc7c8224d29412cd6f82ab3857274a33e5cb5c8b84b912b5",
+          "elements": 1280,
+          "max_abs": 5.960464477539062e-07,
+          "rmse": 1.4244278911559316e-07,
+          "violations": 0,
+          "finite": true,
+          "passed": true
+        }
+      ],
+      "passed": true,
+      "execution": {
+        "backend": "ncnn-vulkan",
+        "case_id": "t1-h2-w3-heads2-text5-regular",
+        "case_sha256": "b3f53ab694adb15df0ac3967f12b36da92b6930120acb61a2a987bf70cad7844",
+        "cpu_calls": 0,
+        "device": {
+          "api_version": 4211017,
+          "device_id": 10464,
+          "driver_version": 2497102272,
+          "index": 0,
+          "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+          "subgroup_size": 32,
+          "vendor_id": 4318
+        },
+        "implementation": {
+          "executable_sha256": "bd07054aa8479c6c78f7533ba1e03b349da6425ce3f8f9efd6dc2e63eee9c773",
+          "ncnn_runtime_patches": [
+            {
+              "compiled_allocator_sha256": "b8398e0d5ef5a367f80c5d2f13af1c8f170a83a39d0a1b458a40100924a55320",
+              "id": "host-buffer-v1",
+              "original_allocator_sha256": "601d69dab40823366fa6aa2be00c8e37bb0f1e960fe96323c36daed887c4fda2",
+              "scope": "Imported-host buffer declaration and weight-buffer transfer-source usage"
+            }
+          ],
+          "sdk_library_sha256": "dd92e7fa79f7c13e6bbffbe470e0bb0d904bcf9aceb135501246e0c3bd715ed7"
+        },
+        "model_verified": false,
+        "ncnn_commit": "3b7bdba7fc8aea8fd46779533eee027df77c639d",
+        "numerical_validation": "NOT_PERFORMED_BY_RUNNER",
+        "outputs": {
+          "text": {
+            "dtype": "f32le",
+            "elements": 1280,
+            "path": "text.f32",
+            "sha256": "61650b5f0fd4572fcc7c8224d29412cd6f82ab3857274a33e5cb5c8b84b912b5",
+            "shape": [
+              5,
+              256
+            ]
+          },
+          "video": {
+            "dtype": "f32le",
+            "elements": 1536,
+            "path": "video.f32",
+            "sha256": "a1c351f966d8e5e099fcb2f5ae162a9d5a24d923c2dcf09175954b020ea22b2b",
+            "shape": [
+              1,
+              2,
+              3,
+              256
+            ]
+          }
+        },
+        "precision": "fp32",
+        "schema_version": "awa-execution-v1",
+        "sdpa_calls": 1,
+        "status": "EXECUTED",
+        "timing_ms": {
+          "extract_including_transfers": 24.919653,
+          "total": 983.109516
+        },
+        "vulkan_calls": 1,
+        "windows": 1
+      }
+    },
+    {
+      "case_id": "t1-h2-w3-heads2-text5-shifted",
+      "backend": "cpu",
+      "exit_code": 0,
+      "comparisons": [
+        {
+          "tensor": "video",
+          "reference_sha256": "e2d3338d61e4db448c73d960578c0f6f14f78f72792d28512dd170e8a601c9ca",
+          "candidate_sha256": "e03033c390641b75b05a1fa1fe8cffedb0d273dad3203ff405d09789b0e385a3",
+          "elements": 1536,
+          "max_abs": 5.960464477539062e-07,
+          "rmse": 1.1686365256255744e-07,
+          "violations": 0,
+          "finite": true,
+          "passed": true
+        },
+        {
+          "tensor": "text",
+          "reference_sha256": "7dd050955c1d9c472df94820aa66c67d10f5df3db264b67c8dd0b761c9c6afdf",
+          "candidate_sha256": "ab98c9004e53fe950010332f362d13d62e2444f52fc46700b229304554a23590",
+          "elements": 1280,
+          "max_abs": 9.834766387939453e-07,
+          "rmse": 1.6189576035295904e-07,
+          "violations": 0,
+          "finite": true,
+          "passed": true
+        }
+      ],
+      "passed": true,
+      "execution": {
+        "backend": "ncnn-cpu",
+        "case_id": "t1-h2-w3-heads2-text5-shifted",
+        "case_sha256": "122ecfc50758746bf8b1b82ef05d7d886e581e968ed00c5a4ffad16000d0bc96",
+        "cpu_calls": 1,
+        "device": null,
+        "implementation": {
+          "executable_sha256": "bd07054aa8479c6c78f7533ba1e03b349da6425ce3f8f9efd6dc2e63eee9c773",
+          "ncnn_runtime_patches": [
+            {
+              "compiled_allocator_sha256": "b8398e0d5ef5a367f80c5d2f13af1c8f170a83a39d0a1b458a40100924a55320",
+              "id": "host-buffer-v1",
+              "original_allocator_sha256": "601d69dab40823366fa6aa2be00c8e37bb0f1e960fe96323c36daed887c4fda2",
+              "scope": "Imported-host buffer declaration and weight-buffer transfer-source usage"
+            }
+          ],
+          "sdk_library_sha256": "dd92e7fa79f7c13e6bbffbe470e0bb0d904bcf9aceb135501246e0c3bd715ed7"
+        },
+        "model_verified": false,
+        "ncnn_commit": "3b7bdba7fc8aea8fd46779533eee027df77c639d",
+        "numerical_validation": "NOT_PERFORMED_BY_RUNNER",
+        "outputs": {
+          "text": {
+            "dtype": "f32le",
+            "elements": 1280,
+            "path": "text.f32",
+            "sha256": "ab98c9004e53fe950010332f362d13d62e2444f52fc46700b229304554a23590",
+            "shape": [
+              5,
+              256
+            ]
+          },
+          "video": {
+            "dtype": "f32le",
+            "elements": 1536,
+            "path": "video.f32",
+            "sha256": "e03033c390641b75b05a1fa1fe8cffedb0d273dad3203ff405d09789b0e385a3",
+            "shape": [
+              1,
+              2,
+              3,
+              256
+            ]
+          }
+        },
+        "precision": "fp32",
+        "schema_version": "awa-execution-v1",
+        "sdpa_calls": 1,
+        "status": "EXECUTED",
+        "timing_ms": {
+          "extract_including_transfers": 0.733958,
+          "total": 68.889898
+        },
+        "vulkan_calls": 0,
+        "windows": 1
+      }
+    },
+    {
+      "case_id": "t1-h2-w3-heads2-text5-shifted",
+      "backend": "vulkan",
+      "exit_code": 0,
+      "comparisons": [
+        {
+          "tensor": "video",
+          "reference_sha256": "e2d3338d61e4db448c73d960578c0f6f14f78f72792d28512dd170e8a601c9ca",
+          "candidate_sha256": "a1c351f966d8e5e099fcb2f5ae162a9d5a24d923c2dcf09175954b020ea22b2b",
+          "elements": 1536,
+          "max_abs": 4.4889748096466064e-07,
+          "rmse": 9.96410588921502e-08,
+          "violations": 0,
+          "finite": true,
+          "passed": true
+        },
+        {
+          "tensor": "text",
+          "reference_sha256": "7dd050955c1d9c472df94820aa66c67d10f5df3db264b67c8dd0b761c9c6afdf",
+          "candidate_sha256": "61650b5f0fd4572fcc7c8224d29412cd6f82ab3857274a33e5cb5c8b84b912b5",
+          "elements": 1280,
+          "max_abs": 5.960464477539062e-07,
+          "rmse": 1.4244278911559316e-07,
+          "violations": 0,
+          "finite": true,
+          "passed": true
+        }
+      ],
+      "passed": true,
+      "execution": {
+        "backend": "ncnn-vulkan",
+        "case_id": "t1-h2-w3-heads2-text5-shifted",
+        "case_sha256": "122ecfc50758746bf8b1b82ef05d7d886e581e968ed00c5a4ffad16000d0bc96",
+        "cpu_calls": 0,
+        "device": {
+          "api_version": 4211017,
+          "device_id": 10464,
+          "driver_version": 2497102272,
+          "index": 0,
+          "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+          "subgroup_size": 32,
+          "vendor_id": 4318
+        },
+        "implementation": {
+          "executable_sha256": "bd07054aa8479c6c78f7533ba1e03b349da6425ce3f8f9efd6dc2e63eee9c773",
+          "ncnn_runtime_patches": [
+            {
+              "compiled_allocator_sha256": "b8398e0d5ef5a367f80c5d2f13af1c8f170a83a39d0a1b458a40100924a55320",
+              "id": "host-buffer-v1",
+              "original_allocator_sha256": "601d69dab40823366fa6aa2be00c8e37bb0f1e960fe96323c36daed887c4fda2",
+              "scope": "Imported-host buffer declaration and weight-buffer transfer-source usage"
+            }
+          ],
+          "sdk_library_sha256": "dd92e7fa79f7c13e6bbffbe470e0bb0d904bcf9aceb135501246e0c3bd715ed7"
+        },
+        "model_verified": false,
+        "ncnn_commit": "3b7bdba7fc8aea8fd46779533eee027df77c639d",
+        "numerical_validation": "NOT_PERFORMED_BY_RUNNER",
+        "outputs": {
+          "text": {
+            "dtype": "f32le",
+            "elements": 1280,
+            "path": "text.f32",
+            "sha256": "61650b5f0fd4572fcc7c8224d29412cd6f82ab3857274a33e5cb5c8b84b912b5",
+            "shape": [
+              5,
+              256
+            ]
+          },
+          "video": {
+            "dtype": "f32le",
+            "elements": 1536,
+            "path": "video.f32",
+            "sha256": "a1c351f966d8e5e099fcb2f5ae162a9d5a24d923c2dcf09175954b020ea22b2b",
+            "shape": [
+              1,
+              2,
+              3,
+              256
+            ]
+          }
+        },
+        "precision": "fp32",
+        "schema_version": "awa-execution-v1",
+        "sdpa_calls": 1,
+        "status": "EXECUTED",
+        "timing_ms": {
+          "extract_including_transfers": 10.339716,
+          "total": 773.056303
+        },
+        "vulkan_calls": 1,
+        "windows": 1
+      }
+    },
+    {
+      "case_id": "t2-h3-w4-heads2-text5-regular",
+      "backend": "cpu",
+      "exit_code": 0,
+      "comparisons": [
+        {
+          "tensor": "video",
+          "reference_sha256": "2494df0491ed341a4f4fa77c4b51dd68b47841ab902d69a2cdcaa1fa79671424",
+          "candidate_sha256": "f5902cf61ee7f167ef4f60b1119245e95b44582bef8eef4747c3e2cc7d8b71e0",
+          "elements": 6144,
+          "max_abs": 4.76837158203125e-07,
+          "rmse": 8.13293336579357e-08,
+          "violations": 0,
+          "finite": true,
+          "passed": true
+        },
+        {
+          "tensor": "text",
+          "reference_sha256": "ccdb6e01b303df7a6f303c8821b22b9188154f39e3d4f6251b5db0900955d00c",
+          "candidate_sha256": "f006a7f9dbcfa4f7fa90008fa4d31ef55454fa223f6f8430b5696e226aeb76ea",
+          "elements": 1280,
+          "max_abs": 2.682209014892578e-07,
+          "rmse": 6.365226894108944e-08,
+          "violations": 0,
+          "finite": true,
+          "passed": true
+        }
+      ],
+      "passed": true,
+      "execution": {
+        "backend": "ncnn-cpu",
+        "case_id": "t2-h3-w4-heads2-text5-regular",
+        "case_sha256": "79b405e443f1de423d629b6e63c0b278730d04100a05196ee3e56f818c5f4fd3",
+        "cpu_calls": 1,
+        "device": null,
+        "implementation": {
+          "executable_sha256": "bd07054aa8479c6c78f7533ba1e03b349da6425ce3f8f9efd6dc2e63eee9c773",
+          "ncnn_runtime_patches": [
+            {
+              "compiled_allocator_sha256": "b8398e0d5ef5a367f80c5d2f13af1c8f170a83a39d0a1b458a40100924a55320",
+              "id": "host-buffer-v1",
+              "original_allocator_sha256": "601d69dab40823366fa6aa2be00c8e37bb0f1e960fe96323c36daed887c4fda2",
+              "scope": "Imported-host buffer declaration and weight-buffer transfer-source usage"
+            }
+          ],
+          "sdk_library_sha256": "dd92e7fa79f7c13e6bbffbe470e0bb0d904bcf9aceb135501246e0c3bd715ed7"
+        },
+        "model_verified": false,
+        "ncnn_commit": "3b7bdba7fc8aea8fd46779533eee027df77c639d",
+        "numerical_validation": "NOT_PERFORMED_BY_RUNNER",
+        "outputs": {
+          "text": {
+            "dtype": "f32le",
+            "elements": 1280,
+            "path": "text.f32",
+            "sha256": "f006a7f9dbcfa4f7fa90008fa4d31ef55454fa223f6f8430b5696e226aeb76ea",
+            "shape": [
+              5,
+              256
+            ]
+          },
+          "video": {
+            "dtype": "f32le",
+            "elements": 6144,
+            "path": "video.f32",
+            "sha256": "f5902cf61ee7f167ef4f60b1119245e95b44582bef8eef4747c3e2cc7d8b71e0",
+            "shape": [
+              2,
+              3,
+              4,
+              256
+            ]
+          }
+        },
+        "precision": "fp32",
+        "schema_version": "awa-execution-v1",
+        "sdpa_calls": 2,
+        "status": "EXECUTED",
+        "timing_ms": {
+          "extract_including_transfers": 0.235967,
+          "total": 68.788466
+        },
+        "vulkan_calls": 0,
+        "windows": 2
+      }
+    },
+    {
+      "case_id": "t2-h3-w4-heads2-text5-regular",
+      "backend": "vulkan",
+      "exit_code": 0,
+      "comparisons": [
+        {
+          "tensor": "video",
+          "reference_sha256": "2494df0491ed341a4f4fa77c4b51dd68b47841ab902d69a2cdcaa1fa79671424",
+          "candidate_sha256": "64ada39230df79b432ceb31326d6d674ed6498ba2e64b1f08314bd1d0f601389",
+          "elements": 6144,
+          "max_abs": 4.917383193969727e-07,
+          "rmse": 7.311677197353006e-08,
+          "violations": 0,
+          "finite": true,
+          "passed": true
+        },
+        {
+          "tensor": "text",
+          "reference_sha256": "ccdb6e01b303df7a6f303c8821b22b9188154f39e3d4f6251b5db0900955d00c",
+          "candidate_sha256": "b24c933a00142e0cdb60b756d64947a7bb5dd3edef442c5fe57ffb1a6ccaa739",
+          "elements": 1280,
+          "max_abs": 2.5331974029541016e-07,
+          "rmse": 5.366926101447907e-08,
+          "violations": 0,
+          "finite": true,
+          "passed": true
+        }
+      ],
+      "passed": true,
+      "execution": {
+        "backend": "ncnn-vulkan",
+        "case_id": "t2-h3-w4-heads2-text5-regular",
+        "case_sha256": "79b405e443f1de423d629b6e63c0b278730d04100a05196ee3e56f818c5f4fd3",
+        "cpu_calls": 0,
+        "device": {
+          "api_version": 4211017,
+          "device_id": 10464,
+          "driver_version": 2497102272,
+          "index": 0,
+          "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+          "subgroup_size": 32,
+          "vendor_id": 4318
+        },
+        "implementation": {
+          "executable_sha256": "bd07054aa8479c6c78f7533ba1e03b349da6425ce3f8f9efd6dc2e63eee9c773",
+          "ncnn_runtime_patches": [
+            {
+              "compiled_allocator_sha256": "b8398e0d5ef5a367f80c5d2f13af1c8f170a83a39d0a1b458a40100924a55320",
+              "id": "host-buffer-v1",
+              "original_allocator_sha256": "601d69dab40823366fa6aa2be00c8e37bb0f1e960fe96323c36daed887c4fda2",
+              "scope": "Imported-host buffer declaration and weight-buffer transfer-source usage"
+            }
+          ],
+          "sdk_library_sha256": "dd92e7fa79f7c13e6bbffbe470e0bb0d904bcf9aceb135501246e0c3bd715ed7"
+        },
+        "model_verified": false,
+        "ncnn_commit": "3b7bdba7fc8aea8fd46779533eee027df77c639d",
+        "numerical_validation": "NOT_PERFORMED_BY_RUNNER",
+        "outputs": {
+          "text": {
+            "dtype": "f32le",
+            "elements": 1280,
+            "path": "text.f32",
+            "sha256": "b24c933a00142e0cdb60b756d64947a7bb5dd3edef442c5fe57ffb1a6ccaa739",
+            "shape": [
+              5,
+              256
+            ]
+          },
+          "video": {
+            "dtype": "f32le",
+            "elements": 6144,
+            "path": "video.f32",
+            "sha256": "64ada39230df79b432ceb31326d6d674ed6498ba2e64b1f08314bd1d0f601389",
+            "shape": [
+              2,
+              3,
+              4,
+              256
+            ]
+          }
+        },
+        "precision": "fp32",
+        "schema_version": "awa-execution-v1",
+        "sdpa_calls": 2,
+        "status": "EXECUTED",
+        "timing_ms": {
+          "extract_including_transfers": 10.157141,
+          "total": 791.338121
+        },
+        "vulkan_calls": 1,
+        "windows": 2
+      }
+    },
+    {
+      "case_id": "t2-h3-w4-heads2-text5-shifted",
+      "backend": "cpu",
+      "exit_code": 0,
+      "comparisons": [
+        {
+          "tensor": "video",
+          "reference_sha256": "2494df0491ed341a4f4fa77c4b51dd68b47841ab902d69a2cdcaa1fa79671424",
+          "candidate_sha256": "f5902cf61ee7f167ef4f60b1119245e95b44582bef8eef4747c3e2cc7d8b71e0",
+          "elements": 6144,
+          "max_abs": 4.76837158203125e-07,
+          "rmse": 8.13293336579357e-08,
+          "violations": 0,
+          "finite": true,
+          "passed": true
+        },
+        {
+          "tensor": "text",
+          "reference_sha256": "ccdb6e01b303df7a6f303c8821b22b9188154f39e3d4f6251b5db0900955d00c",
+          "candidate_sha256": "f006a7f9dbcfa4f7fa90008fa4d31ef55454fa223f6f8430b5696e226aeb76ea",
+          "elements": 1280,
+          "max_abs": 2.682209014892578e-07,
+          "rmse": 6.365226894108944e-08,
+          "violations": 0,
+          "finite": true,
+          "passed": true
+        }
+      ],
+      "passed": true,
+      "execution": {
+        "backend": "ncnn-cpu",
+        "case_id": "t2-h3-w4-heads2-text5-shifted",
+        "case_sha256": "b97f6746f59d7a434ea6b281ac8d4a04a59876f11d923b0925ce95c97f5283ea",
+        "cpu_calls": 1,
+        "device": null,
+        "implementation": {
+          "executable_sha256": "bd07054aa8479c6c78f7533ba1e03b349da6425ce3f8f9efd6dc2e63eee9c773",
+          "ncnn_runtime_patches": [
+            {
+              "compiled_allocator_sha256": "b8398e0d5ef5a367f80c5d2f13af1c8f170a83a39d0a1b458a40100924a55320",
+              "id": "host-buffer-v1",
+              "original_allocator_sha256": "601d69dab40823366fa6aa2be00c8e37bb0f1e960fe96323c36daed887c4fda2",
+              "scope": "Imported-host buffer declaration and weight-buffer transfer-source usage"
+            }
+          ],
+          "sdk_library_sha256": "dd92e7fa79f7c13e6bbffbe470e0bb0d904bcf9aceb135501246e0c3bd715ed7"
+        },
+        "model_verified": false,
+        "ncnn_commit": "3b7bdba7fc8aea8fd46779533eee027df77c639d",
+        "numerical_validation": "NOT_PERFORMED_BY_RUNNER",
+        "outputs": {
+          "text": {
+            "dtype": "f32le",
+            "elements": 1280,
+            "path": "text.f32",
+            "sha256": "f006a7f9dbcfa4f7fa90008fa4d31ef55454fa223f6f8430b5696e226aeb76ea",
+            "shape": [
+              5,
+              256
+            ]
+          },
+          "video": {
+            "dtype": "f32le",
+            "elements": 6144,
+            "path": "video.f32",
+            "sha256": "f5902cf61ee7f167ef4f60b1119245e95b44582bef8eef4747c3e2cc7d8b71e0",
+            "shape": [
+              2,
+              3,
+              4,
+              256
+            ]
+          }
+        },
+        "precision": "fp32",
+        "schema_version": "awa-execution-v1",
+        "sdpa_calls": 2,
+        "status": "EXECUTED",
+        "timing_ms": {
+          "extract_including_transfers": 0.23774,
+          "total": 69.859813
+        },
+        "vulkan_calls": 0,
+        "windows": 2
+      }
+    },
+    {
+      "case_id": "t2-h3-w4-heads2-text5-shifted",
+      "backend": "vulkan",
+      "exit_code": 0,
+      "comparisons": [
+        {
+          "tensor": "video",
+          "reference_sha256": "2494df0491ed341a4f4fa77c4b51dd68b47841ab902d69a2cdcaa1fa79671424",
+          "candidate_sha256": "64ada39230df79b432ceb31326d6d674ed6498ba2e64b1f08314bd1d0f601389",
+          "elements": 6144,
+          "max_abs": 4.917383193969727e-07,
+          "rmse": 7.311677197353006e-08,
+          "violations": 0,
+          "finite": true,
+          "passed": true
+        },
+        {
+          "tensor": "text",
+          "reference_sha256": "ccdb6e01b303df7a6f303c8821b22b9188154f39e3d4f6251b5db0900955d00c",
+          "candidate_sha256": "b24c933a00142e0cdb60b756d64947a7bb5dd3edef442c5fe57ffb1a6ccaa739",
+          "elements": 1280,
+          "max_abs": 2.5331974029541016e-07,
+          "rmse": 5.366926101447907e-08,
+          "violations": 0,
+          "finite": true,
+          "passed": true
+        }
+      ],
+      "passed": true,
+      "execution": {
+        "backend": "ncnn-vulkan",
+        "case_id": "t2-h3-w4-heads2-text5-shifted",
+        "case_sha256": "b97f6746f59d7a434ea6b281ac8d4a04a59876f11d923b0925ce95c97f5283ea",
+        "cpu_calls": 0,
+        "device": {
+          "api_version": 4211017,
+          "device_id": 10464,
+          "driver_version": 2497102272,
+          "index": 0,
+          "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+          "subgroup_size": 32,
+          "vendor_id": 4318
+        },
+        "implementation": {
+          "executable_sha256": "bd07054aa8479c6c78f7533ba1e03b349da6425ce3f8f9efd6dc2e63eee9c773",
+          "ncnn_runtime_patches": [
+            {
+              "compiled_allocator_sha256": "b8398e0d5ef5a367f80c5d2f13af1c8f170a83a39d0a1b458a40100924a55320",
+              "id": "host-buffer-v1",
+              "original_allocator_sha256": "601d69dab40823366fa6aa2be00c8e37bb0f1e960fe96323c36daed887c4fda2",
+              "scope": "Imported-host buffer declaration and weight-buffer transfer-source usage"
+            }
+          ],
+          "sdk_library_sha256": "dd92e7fa79f7c13e6bbffbe470e0bb0d904bcf9aceb135501246e0c3bd715ed7"
+        },
+        "model_verified": false,
+        "ncnn_commit": "3b7bdba7fc8aea8fd46779533eee027df77c639d",
+        "numerical_validation": "NOT_PERFORMED_BY_RUNNER",
+        "outputs": {
+          "text": {
+            "dtype": "f32le",
+            "elements": 1280,
+            "path": "text.f32",
+            "sha256": "b24c933a00142e0cdb60b756d64947a7bb5dd3edef442c5fe57ffb1a6ccaa739",
+            "shape": [
+              5,
+              256
+            ]
+          },
+          "video": {
+            "dtype": "f32le",
+            "elements": 6144,
+            "path": "video.f32",
+            "sha256": "64ada39230df79b432ceb31326d6d674ed6498ba2e64b1f08314bd1d0f601389",
+            "shape": [
+              2,
+              3,
+              4,
+              256
+            ]
+          }
+        },
+        "precision": "fp32",
+        "schema_version": "awa-execution-v1",
+        "sdpa_calls": 2,
+        "status": "EXECUTED",
+        "timing_ms": {
+          "extract_including_transfers": 11.047675,
+          "total": 784.770409
+        },
+        "vulkan_calls": 1,
+        "windows": 2
+      }
+    }
+  ],
+  "passed": true,
+  "passed_count": 8,
+  "total": 8,
+  "model_verified": false
+}
