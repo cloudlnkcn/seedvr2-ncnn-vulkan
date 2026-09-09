@@ -54,9 +54,13 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: native-${{ matrix.compiler }}-web-${{ matrix.web }}
+          # Explicit log paths only; upload-artifact otherwise omits .cache files.
+          include-hidden-files: true
           path: |
             artifacts/ci
             build/ci/Testing/Temporary
             .cache/ncnn-build.log
-            .cache/*-build.log
+            .cache/cli11-build.log
+            .cache/jsoncpp-build.log
+            .cache/drogon-build.log
           if-no-files-found: warn
