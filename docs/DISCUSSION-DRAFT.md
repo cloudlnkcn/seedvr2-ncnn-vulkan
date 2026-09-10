@@ -2,7 +2,7 @@
 
 > 已于 2026-09-10 发布到 Tencent/ncnn 的 Show and tell：[Discussion #6991](https://github.com/Tencent/ncnn/discussions/6991)。下文为已发布正文，保留原文件路径以兼容已有链接；数值修复及远端 CI 在提交 `7e56479` 核验。[发布记录](DISCUSSION-PUBLICATION.json)。
 
-[SeedVR2 ncnn Vulkan](https://github.com/mingshi2333/seedvr2-ncnn-vulkan) 使用 C++20 和 ncnn 实现 SeedVR2 3B 的本地推理，支持 Vulkan 加速，可用于图片与短视频修复。提供独立 CLI、本地 Web 界面和可安装的 C++ SDK，输出 PNG、MP4 及 JSON 运行报告。模型准备完成后可离线使用，推理无需 Python。
+[SeedVR2 ncnn Vulkan](https://github.com/mingshi2333/seedvr2-ncnn-vulkan) 于 **2026 年 9 月 6 日** 开始开发，使用 C++20 和 ncnn 实现 SeedVR2 3B 的本地推理，支持 Vulkan 加速，可用于图片与短视频修复。提供独立 CLI、本地 Web 界面和可安装的 C++ SDK，输出 PNG、MP4 及 JSON 运行报告。模型准备完成后可离线使用，推理无需 Python。
 
 项目是一个完整移植案例：从官方权重、pnnx 导出和自定义算子，到原生流水线、相同输入验证和应用交付。当前验证配置为 **3B、FP32-B、单步、CFG=1**。
 
