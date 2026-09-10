@@ -1,17 +1,94 @@
 # SeedVR2 ncnn Vulkan
 
-[English](README.en.md) · [从零开始的教程](docs/TUTORIAL.md) · [教程交付核验](docs/TUTORIAL-READINESS.md) · [贡献方法](CONTRIBUTING.md) · [许可证](LICENSE)
+[English](README.en.md) · [实测对照](#实测结果与对照图) · [从零开始的教程](docs/TUTORIAL.md) · [架构与源码导航](docs/ARCHITECTURE.md) · [贡献方法](CONTRIBUTING.md) · [许可证](LICENSE)
 
-面向已有 C++、PyTorch 和基本 Vulkan 经验读者的**独立进阶移植教程与可执行案例**：从官方 SeedVR2 3B 拆分真实组件，使用 pnnx 保留自定义 adaptive window attention 边界，再接通 ncnn CPU/Vulkan、CLI、本地 Web 和共享 SDK。项目不属于 ByteDance 或 Tencent 官方发行。
+将官方 **SeedVR2 3B** 移植为使用 **ncnn CPU/Vulkan** 的原生 C++20 图片与短视频修复应用。提供 **独立 CLI、本地 Web 和可安装的 C++ SDK**，共用同一推理实现；教程覆盖 pnnx 导出、自定义 adaptive window attention、时序 VAE 和逐组件验证。
 
-**0.7.0 原生预览：SeedVR2 3B 已接通可安装的 C++ SDK、独立 CLI 和本地 Web，使用 ncnn CPU / Vulkan 完成真实图片与整段短片处理。** 提供模型包身份/完整性校验、参数预检、离线复制、外部 SDK 示例和原生 CI。保留的 0.7.0 安装版 SDK 已在禁网、隐藏源码和中文路径下完成真实图片推理；自然 JPEG 完整轨迹 73/73 通过官方 FP32-B 对照，输出最大相差 1。**保留的 17 帧视频 CPU/Vulkan 均达到 73/73 数值通过；单张自然图的全参考画质负结果仍保留，完整模型认证未通过。** 这些大模型结论绑定原始测试候选；教程新构建的验证另见[交付核验](docs/TUTORIAL-READINESS.md)。
+**状态：0.7.0 原生预览，完整模型认证尚未通过。** 图片输出长边最高 512，视频最多 17 帧、长边最高 128，输出为无音轨 SDR MP4。真实推理已接通，数值和画质限制见下面的实测。项目面向已有 C++、PyTorch 和基本 Vulkan 经验的读者，不属于 ByteDance 或 Tencent 官方发行。
 
-**2026-09-10 新增自然短片验证：** 128×80 的 9 帧、8 帧补齐、17 帧人工切换案例分别为 **63/73、71/73、73/73**。前两例中间张量仍有数值失败；三例编码前原生/官方 RGB8 最大差均为 1，但相对固定目标的画质指标均低于 bicubic。新增 AWA 8/8 通过。完整结果、同输入定位及可直接使用的测试短片见[有界视频实测](docs/BOUNDED-VIDEO-RESULTS.md)。历史合成片的通过不能覆盖这些新失败。
+支持模型身份/完整性校验、参数预检、进度与取消、离线模型复制、逐图 GPU/RAM 权重选择。React / TypeScript / Ant Design 界面内嵌于 Drogon C++ 服务；运行时无需 Python、Node 或云服务。首次使用见[安装与离线搬移](docs/FIRST-RUN.md)，内存策略及代价见[内存验证](docs/MEMORY-VALIDATION.md)。
 
-支持逐图 GPU/RAM 自动权重选择与可复算的算子/组件对照。CLI、Web 和 SDK 使用同一默认策略；0.7.0 修复了 RAM 权重路径的两项 Vulkan 校验错误。设置、验证与内存/速度代价见 [MEMORY-VALIDATION.md](docs/MEMORY-VALIDATION.md)。
-[首次使用和离线搬移](docs/FIRST-RUN.md) · [架构与源码导航](docs/ARCHITECTURE.md) · [17 帧数值修复与代价](docs/VIDEO-NUMERICS.md) · [分项实测、失败和限制](docs/DELIVERY-RESULTS.md) · [可复用 Discussion 草稿](docs/DISCUSSION-DRAFT.md)
+## 实测结果与对照图
 
-React / TypeScript / Ant Design 界面内嵌于 Drogon C++ 服务。共享 C++20 推理核心，由独立 worker 执行，SQLite 保存任务与有序事件。运行时无需 Node、Python、云服务或 CDN。本机验证平台为 Linux x86_64 / RTX 4060 Laptop GPU；尚未形成跨平台便携发行版。
+记录日期 **2026-09-10**。使用冻结的 **0.7.0 原生 CLI/SDK**、SeedVR2 **3B / 单步 FP32-B**，设备为 **Linux x86_64 / RTX 4060 Laptop 8 GiB**，主机内存 32 GiB。输入为 **64×40、8 fps**，输出均为 **128×80**。三个案例来自同一自然素材，退化方式固定，镜头切换为人工拼接；这是开发样例，尚不构成代表性视频质量基准。
+
+**三个短片都能完整执行；其中两个完整数值对照仍失败，三个案例的固定目标画质指标均低于 bicubic。** 以下直接展示这些结果。
+
+每张图从左到右依次为 **bicubic 输入基线 → 原生 ncnn/Vulkan → 官方 FP32-B → 固定目标**。直接引用已归档的编码前 RGB8 对照图，没有再次增强；`f0` 表示第 0 帧。固定目标来自已压缩的源视频，不是相机原始真值。
+
+### 自然运动 · 9 帧
+
+展示第 0、4、8 帧，无需时序补齐。
+
+![motion-9：相同帧的 bicubic、原生、官方 FP32-B 与目标对照](artifacts/2026-09-10/bounded-video-v1/quality/motion-9/comparison.png)
+
+[输入短片](tests/fixtures/video-bounded/motion-9/input.mp4) · [原生实际输出 MP4](artifacts/2026-09-10/bounded-video-v1/motion-9-output.mp4) · [官方预览 MP4](artifacts/2026-09-10/bounded-video-v1/quality/motion-9/official.mp4) · [逐帧数据](artifacts/2026-09-10/bounded-video-v1/quality/motion-9/report.json)
+
+### 尾帧补齐 · 8 帧 → 9 帧 → 8 帧
+
+展示第 0、4、7 帧。模型输入重复尾帧补至 9 帧，实际输出再裁回 8 帧。
+
+![padding-8：相同帧的 bicubic、原生、官方 FP32-B 与目标对照](artifacts/2026-09-10/bounded-video-v1/quality/padding-8/comparison.png)
+
+[输入短片](tests/fixtures/video-bounded/padding-8/input.mp4) · [原生实际输出 MP4](artifacts/2026-09-10/bounded-video-v1/padding-8-output.mp4) · [官方预览 MP4](artifacts/2026-09-10/bounded-video-v1/quality/padding-8/official.mp4) · [逐帧数据](artifacts/2026-09-10/bounded-video-v1/quality/padding-8/report.json)
+
+### 人工镜头切换 · 17 帧
+
+展示第 0、7、8、16 帧。切换发生在第 8 帧之前，图中保留切换前后两帧。
+
+![cut-17：相同帧的 bicubic、原生、官方 FP32-B 与目标对照](artifacts/2026-09-10/bounded-video-v1/quality/cut-17/comparison.png)
+
+[输入短片](tests/fixtures/video-bounded/cut-17/input.mp4) · [原生实际输出 MP4](artifacts/2026-09-10/bounded-video-v1/cut-17-output.mp4) · [官方预览 MP4](artifacts/2026-09-10/bounded-video-v1/quality/cut-17/official.mp4) · [逐帧数据](artifacts/2026-09-10/bounded-video-v1/quality/cut-17/report.json)
+
+### 数值与输出检查
+
+| 案例 | 完整张量边界 | RGB8 最大差¹ | 原生图执行 | 原始参考报告 |
+| --- | --- | --- | --- | --- |
+| motion-9 | **63/73 · 未通过** | 1 | 36/36 Vulkan | [JSON](artifacts/2026-09-10/bounded-video-v1/motion-9-reference.json) |
+| padding-8 | **71/73 · 未通过** | 1 | 36/36 Vulkan | [JSON](artifacts/2026-09-10/bounded-video-v1/padding-8-reference.json) |
+| cut-17 | **73/73 · 此例通过** | 1 | 36/36 Vulkan | [JSON](artifacts/2026-09-10/bounded-video-v1/cut-17-reference.json) |
+
+
+¹ 原生与官方在编码前的 0–255 通道值差异。三个最终 `decoded` FP32 边界均通过，但不能豁免此前中间张量的失败。输出帧数、尺寸、时间戳和无音轨检查均通过；图层均由 Vulkan 执行，无 CPU 回退，保留日志无 Vulkan 校验错误。73 个边界沿用 `atol=rtol=0.001` 的诊断容差。
+
+### 修复质量数据
+
+每格为 **PSNR（dB）/ RGB SSIM**，对实际输出帧取均值，不裁边；数值越高表示越接近本例固定目标，补齐帧不参与统计。
+
+| 案例 | bicubic 基线 | 原生 ncnn/Vulkan | 官方 FP32-B |
+| --- | --- | --- | --- |
+| motion-9 | 26.93 / 0.8560 | 20.01 / 0.6187 | 20.01 / 0.6187 |
+| padding-8 | 26.82 / 0.8539 | 19.70 / 0.5973 | 19.70 / 0.5973 |
+| cut-17 | 26.80 / 0.8405 | 23.24 / 0.7686 | 23.24 / 0.7686 |
+
+
+**这三个样例中，原生与官方 FP32-B 的指标都低于 bicubic。** 对照图可见喙部与羽毛细节偏离目标。原生和官方数值分别计算，在表格显示精度下接近；这是当前低分辨率设置中的负结果，不代表已评估官方默认 BF16/FlashAttention 路径。没有根据这些结果事后设置画质通过门槛。
+
+### 耗时与内存
+
+| 案例 | 原生总耗时（秒） | 进程 RSS 采样峰值（GiB） | 整卡显存采样峰值（MiB） |
+| --- | --- | --- | --- |
+| motion-9 | 28.09 | 1.184 | 3633 |
+| padding-8 | 27.62 | 1.126 | 4202 |
+| cut-17 | 31.31 | 0.893 | 5521 |
+
+
+每例只做一次串行实测，总耗时包含模型包哈希、权重载入和计算，不据此宣称加速。整卡显存包含桌面等其他进程，不能视为模型独占显存；RSS 也不是权重、激活和工作区的独立分项峰值。完整采样见[原始汇总](artifacts/2026-09-10/bounded-video-v1/summary.json)。
+
+### 算子验证与失败定位
+
+| 检查 | 结果 | 验证范围 |
+| --- | --- | --- |
+| AWA CPU / Vulkan | 8/8 | 4 个 pnnx 导出案例、16 组输出；最大绝对差 1.61e-6 |
+| motion-9 · blocks 19–31 | 26/26 | 每块使用相同官方输入 |
+| padding-8 · blocks 15–17 | 6/6 | 每块使用相同官方输入 |
+| motion-9 · all 32 DiT blocks | 64/64 | 仅替换官方起点，后续仍消费原生输出 |
+| motion-9 · block 19 replay | **失败复现** | 两个输出与原失败轨迹逐字节一致 |
+
+
+AWA 使用 `(3,5,8)`、`(5,5,8)` 两种网格，各含 regular/shifted、20 heads、58 个文本位置，QKV 为合成输入；DiT 隔离检查使用真实 checkpoint 权重。实验支持进入 DiT 前的差异在后续计算中被放大，尚未唯一定位到一个上游算子，也未修复原始 63/73 和 71/73 轨迹。
+
+[协议与复现命令](docs/BOUNDED-VIDEO-RESULTS.md) · [报告及失败日志](artifacts/2026-09-10/bounded-video-v1/README.md) · [素材来源](tests/fixtures/video-bounded/SOURCE.md) · [机器可读结果](artifacts/2026-09-10/bounded-video-v1/summary.json)
 
 ## 第一次克隆：先做不需要大模型的实验
 
