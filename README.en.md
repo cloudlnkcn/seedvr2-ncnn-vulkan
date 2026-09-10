@@ -1,6 +1,6 @@
 # SeedVR2 ncnn Vulkan
 
-[中文](README.md) · [Architecture](#architecture-and-design) · [Measured results](#measured-results-and-visual-comparisons) · [Tutorial (Chinese)](docs/TUTORIAL.md) · [Source guide](docs/ARCHITECTURE.md) · [Contributing](CONTRIBUTING.md) · [License](LICENSE)
+[中文](README.md) · [Architecture](#architecture-and-design) · [Measured results](#measured-results-and-visual-comparisons) · [Tutorial (Chinese)](docs/TUTORIAL.md) · [Source guide](docs/ARCHITECTURE.md) · [ncnn Discussion](https://github.com/Tencent/ncnn/discussions/6991) · [Contributing](CONTRIBUTING.md) · [License](LICENSE)
 
 A native **C++20 / ncnn CPU/Vulkan** port of the official **SeedVR2 3B** image and short-video restoration model. The **standalone CLI, local Web application and installed C++ SDK** share one inference implementation. The tutorial covers pnnx export, custom adaptive window attention, temporal VAE and component-by-component validation.
 

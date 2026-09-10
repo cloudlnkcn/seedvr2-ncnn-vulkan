@@ -1,6 +1,6 @@
 # SeedVR2 3B 图片与短视频修复：原生 C++ / ncnn / Vulkan 移植
 
-> GitHub Discussion 草稿，尚未发布。下面的链接使用公开仓库路径；数值修复及远端 CI 已在提交 `7e56479` 核验，全文保留各项验证范围。
+> 已于 2026-09-10 发布到 Tencent/ncnn 的 Show and tell：[Discussion #6991](https://github.com/Tencent/ncnn/discussions/6991)。下文为已发布正文，保留原文件路径以兼容已有链接；数值修复及远端 CI 在提交 `7e56479` 核验。[发布记录](DISCUSSION-PUBLICATION.json)。
 
 我做了一个 [SeedVR2 ncnn Vulkan](https://github.com/mingshi2333/seedvr2-ncnn-vulkan) 项目，把官方 SeedVR2 3B 接到原生 C++20 应用中。输入图片或短片，输出 PNG / MP4 和 JSON 报告；提供独立 CLI、本地 Web 和可安装的 C++ SDK。模型准备完成后可以离线使用，推理无需 Python。
 

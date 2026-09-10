@@ -17,4 +17,4 @@
 
 本模型没有自回归 KV cache。没有当前需求的插件框架、通用调度层、7B 移植和研究性精度优化，不作为本次 3B 数值修复交付的前置条件。
 
-发布材料应同时链接通过记录、画质负结果和设备边界。GitHub Discussion 当前只提供[草稿](DISCUSSION-DRAFT.md)；仓库开源、CI 通过、模型包哈希通过和任务画质通过分别报告。
+发布材料应同时链接通过记录、画质负结果和设备边界。项目分享已发布到 Tencent/ncnn 的 [Discussion #6991](https://github.com/Tencent/ncnn/discussions/6991)，仓库保留[发布正文](DISCUSSION-DRAFT.md)；仓库开源、CI 通过、模型包哈希通过和任务画质通过分别报告。

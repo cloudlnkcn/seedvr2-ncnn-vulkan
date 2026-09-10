@@ -1,6 +1,6 @@
 # SeedVR2 ncnn Vulkan
 
-[English](README.en.md) · [架构设计](#架构设计) · [实测对照](#实测结果与对照图) · [从零开始的教程](docs/TUTORIAL.md) · [源码导航](docs/ARCHITECTURE.md) · [贡献方法](CONTRIBUTING.md) · [许可证](LICENSE)
+[English](README.en.md) · [架构设计](#架构设计) · [实测对照](#实测结果与对照图) · [从零开始的教程](docs/TUTORIAL.md) · [源码导航](docs/ARCHITECTURE.md) · [ncnn Discussion](https://github.com/Tencent/ncnn/discussions/6991) · [贡献方法](CONTRIBUTING.md) · [许可证](LICENSE)
 
 将官方 **SeedVR2 3B** 移植为使用 **ncnn CPU/Vulkan** 的原生 C++20 图片与短视频修复应用。提供 **独立 CLI、本地 Web 和可安装的 C++ SDK**，共用同一推理实现；教程覆盖 pnnx 导出、自定义 adaptive window attention、时序 VAE 和逐组件验证。
 
