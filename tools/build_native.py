@@ -18,7 +18,7 @@ def prerequisites(web):
     if sys.version_info < (3, 12):
         errors.append('Python 3.12 or newer is required')
     compiler = shlex.split(os.environ.get('CXX', 'c++'))
-    commands = ['cmake', 'ninja', 'pkg-config', 'glslangValidator']
+    commands = ['cmake', 'ninja', 'pkg-config', 'glslangValidator', 'spirv-val']
     if not compiler or not shutil.which(compiler[0]):
         errors.append('A C++20 compiler is required (set CXX to g++ or clang++)')
     if web:
