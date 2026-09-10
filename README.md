@@ -214,7 +214,7 @@ python3 tools/prepare_models.py
 
 固定官方 revision、约 14.57 GB，支持续传和 SHA-256 校验；`--offline` 仅验证缓存。下载后还需 pnnx 转换，详见教程。源仓库包含小型测试夹具和历史报告，未上传官方大权重、转换包或便携二进制。原生 CI 的实际结果见 [GitHub Actions](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/actions/workflows/native.yml)，大模型实机记录单独保留。
 
-Ubuntu GCC CLI、Clang CLI、GCC Web 三项远端 CI 已通过；对应提交、原始报告与日志收集修复见[远端验证归档](artifacts/2026-09-10/github-ci-v1/README.md)。
+数值修复版提交 `7e56479` 的 Ubuntu GCC CLI、Clang CLI、GCC Web 三项远端 CI 全部通过；每项原生测试为 **24 项通过、12 项能力跳过**，Web 另有 **54/54** 接口检查。对应提交、原始日志和跳过原因见[本轮远端验证归档](artifacts/2026-09-10/github-ci-numerics-v2/README.md)；完整 3B 的 CPU/NVIDIA 实测单独记录，不由远端软件 Vulkan 测试替代。
 
 ## 本地 Web
 

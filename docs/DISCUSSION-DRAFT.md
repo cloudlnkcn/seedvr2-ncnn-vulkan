@@ -1,6 +1,6 @@
 # SeedVR2 3B 图片与短视频修复：原生 C++ / ncnn / Vulkan 移植
 
-> GitHub Discussion 草稿，尚未发布。下面的链接使用公开仓库路径，发布前应确认对应提交和 CI 记录。
+> GitHub Discussion 草稿，尚未发布。下面的链接使用公开仓库路径；数值修复及远端 CI 已在提交 `7e56479` 核验，全文保留各项验证范围。
 
 我做了一个 [SeedVR2 ncnn Vulkan](https://github.com/mingshi2333/seedvr2-ncnn-vulkan) 项目，把官方 SeedVR2 3B 接到原生 C++20 应用中。输入图片或短片，输出 PNG / MP4 和 JSON 报告；提供独立 CLI、本地 Web 和可安装的 C++ SDK。模型准备完成后可以离线使用，推理无需 Python。
 
@@ -39,6 +39,8 @@ Linux x86_64，RTX 4060 Laptop 8 GiB，约 32 GiB RAM。对照使用锁定官方
 [教程](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/blob/main/docs/TUTORIAL.md)从干净克隆和不需要大权重的算子测试开始，再进入官方权重下载、pnnx 转换和真实模型运行。下载脚本支持固定 revision、续传和 SHA-256 校验；下载的是官方权重，还需要转换。仓库暂未提供预编译 Release 或可直接下载的完整 ncnn 模型包。
 
 应用已包含参数预检、Unicode 路径、进度与取消、模型身份/完整性校验、离线模型复制和安装 SDK。本机原生测试 **36/36**。Mesa 的小型测试为 **10 项通过、12 项能力跳过**：本机 llvmpipe 不保留这些补偿算子要求的 FMA 残差，程序会在模型加载前明确拒绝。能力探测和数值验收分开；大模型实机证据不由 CI 小型测试替代。
+
+提交 `7e56479` 的 Ubuntu GCC CLI、Clang CLI、GCC Web 远端 CI 全部通过：每项原生套件 **24 项通过、12 项能力跳过**，Web 另有 **54/54** 接口检查。[下载归档的原始报告](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/blob/main/artifacts/2026-09-10/github-ci-numerics-v2/README.md)保留依赖日志、安装验证和跳过原因；远端 CI 没有运行完整 3B 权重。
 
 当前图片输出长边 ≤512；视频 ≤17 帧、长边 ≤128，输出无音轨 SDR MP4。官方 CUDA BF16/Apex/FlashAttention 默认路径、更高分辨率、长片、音轨、更多设备和代表性时序画质仍是后续工作。[具体缺口与验收范围](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/blob/main/docs/CURRENT-GAPS.md)。
 

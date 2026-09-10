@@ -1,6 +1,6 @@
 # SeedVR2 框架设计
 
-实现检查点：0.8-media-jobs / 0.5.0-video-preview，2026-09-07。完整图片与整段短片恢复已接通官方 3B 权重、全部 32 个 DiT block、CPU/Vulkan、独立 worker、持久任务及本地 Web 对比。当前事实见 [status.json](status.json) 与 [视频验证](video-validation.md)。本文保留模型执行和扩展边界；长视频、时间缓存、多 GPU、低精度及正式模型认证仍是目标。
+实现检查点：0.8-media-jobs / 0.5.0-video-preview，2026-09-07。完整图片与整段短片恢复已接通官方 3B 权重、全部 32 个 DiT block、CPU/Vulkan、独立 worker、持久任务及本地 Web 对比。本文保留当时的模型执行与验证状态；当前事实见 [status.json](status.json)、[数值修复](NUMERICS-REPAIR.md)与[现行源码导航](ARCHITECTURE.md)。长视频、时间缓存、多 GPU、低精度及正式模型认证仍是目标。
 
 现行工程选型为 React / TypeScript / Ant Design + Drogon + SQLite + CLI11，详见 [完整应用框架](full-stack-framework.md)。模型验收独立规范见 [model-validation.md](model-validation.md)。下文重点保留模型执行与资源边界。
 

@@ -1,0 +1,607 @@
+Start testing: Sep 10 13:46 UTC
+----------------------------------------------------------
+2/36 Testing: engine.memory-vulkan
+2/36 Test: engine.memory-vulkan
+Command: "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2_memory_vulkan_tests"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.memory-vulkan" start time: Sep 10 13:46 UTC
+Output:
+----------------------------------------------------------
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+{
+  "device": {
+    "api_version": 4211006,
+    "device_id": 0,
+    "driver_version": 104865800,
+    "index": 0,
+    "name": "llvmpipe (LLVM 20.1.2, 256 bits)",
+    "subgroup_size": 8,
+    "vendor_id": 65541
+  },
+  "live_driver_budget": {
+    "budget_bytes": 16766414848,
+    "heap_index": 0,
+    "source": "VK_EXT_memory_budget_estimate",
+    "usage_bytes": 1251930112
+  },
+  "passed": true,
+  "scope": "Four real Vulkan GEMMs; controlled budgets are not physical VRAM exhaustion",
+  "steps": [
+    {
+      "activation_offload": false,
+      "actual_weight_memory": "not_instrumented",
+      "available_bytes": 200,
+      "before_load": {
+        "budget_bytes": 200,
+        "heap_index": 0,
+        "source": "VK_EXT_memory_budget_estimate",
+        "usage_bytes": 0
+      },
+      "estimated_weight_bytes": 40,
+      "exact_output": true,
+      "observed_weight_device_local": true,
+      "oom_recovery": false,
+      "policy": "auto",
+      "reason": "budget_available",
+      "requested_memory": "device",
+      "reserve_bytes": 20,
+      "reserve_policy": "explicit_bytes",
+      "scope": "weight placement before graph loading"
+    },
+    {
+      "activation_offload": false,
+      "actual_weight_memory": "not_instrumented",
+      "available_bytes": 30,
+      "before_load": {
+        "budget_bytes": 200,
+        "heap_index": 0,
+        "source": "VK_EXT_memory_budget_estimate",
+        "usage_bytes": 170
+      },
+      "estimated_weight_bytes": 40,
+      "exact_output": true,
+      "observed_weight_device_local": true,
+      "oom_recovery": false,
+      "policy": "auto",
+      "reason": "budget_pressure",
+      "requested_memory": "host",
+      "reserve_bytes": 20,
+      "reserve_policy": "explicit_bytes",
+      "scope": "weight placement before graph loading"
+    },
+    {
+      "activation_offload": false,
+      "actual_weight_memory": "not_instrumented",
+      "available_bytes": 200,
+      "before_load": {
+        "budget_bytes": 200,
+        "heap_index": 0,
+        "source": "VK_EXT_memory_budget_estimate",
+        "usage_bytes": 0
+      },
+      "estimated_weight_bytes": 40,
+      "exact_output": true,
+      "observed_weight_device_local": true,
+      "oom_recovery": false,
+      "policy": "auto",
+      "reason": "budget_available",
+      "requested_memory": "device",
+      "reserve_bytes": 20,
+      "reserve_policy": "explicit_bytes",
+      "scope": "weight placement before graph loading"
+    },
+    {
+      "activation_offload": false,
+      "actual_weight_memory": "not_instrumented",
+      "available_bytes": null,
+      "before_load": null,
+      "estimated_weight_bytes": 40,
+      "exact_output": true,
+      "observed_weight_device_local": true,
+      "oom_recovery": false,
+      "policy": "auto",
+      "reason": "budget_unavailable",
+      "requested_memory": "host",
+      "reserve_bytes": 20,
+      "reserve_policy": "explicit_bytes",
+      "scope": "weight placement before graph loading"
+    }
+  ]
+}
+<end of output>
+Test time =   0.17 sec
+----------------------------------------------------------
+Test Passed.
+"engine.memory-vulkan" end time: Sep 10 13:46 UTC
+"engine.memory-vulkan" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/36 Testing: engine.awa-rope-vulkan
+4/36 Test: engine.awa-rope-vulkan
+Command: "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2_awa_rope_tests" "vulkan"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.awa-rope-vulkan" start time: Sep 10 13:46 UTC
+Output:
+----------------------------------------------------------
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+checked=3792 finite_max_abs=1.35118e-07 nonfinite=0 violations=0
+<end of output>
+Test time =   0.21 sec
+----------------------------------------------------------
+Test Passed.
+"engine.awa-rope-vulkan" end time: Sep 10 13:46 UTC
+"engine.awa-rope-vulkan" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/36 Testing: engine.awa-sdpa-fp32-vulkan
+6/36 Test: engine.awa-sdpa-fp32-vulkan
+Command: "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2_awa_rope_tests" "vulkan" "sdpa"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.awa-sdpa-fp32-vulkan" start time: Sep 10 13:46 UTC
+Output:
+----------------------------------------------------------
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+checked=40448 finite_max_abs=0 nonfinite=0 violations=0
+<end of output>
+Test time =   0.21 sec
+----------------------------------------------------------
+Test Passed.
+"engine.awa-sdpa-fp32-vulkan" end time: Sep 10 13:46 UTC
+"engine.awa-sdpa-fp32-vulkan" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/36 Testing: engine.awa-rope-vulkan-host
+7/36 Test: engine.awa-rope-vulkan-host
+Command: "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2_awa_rope_tests" "vulkan" "host"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.awa-rope-vulkan-host" start time: Sep 10 13:46 UTC
+Output:
+----------------------------------------------------------
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+checked=3792 finite_max_abs=1.35118e-07 nonfinite=0 violations=0
+<end of output>
+Test time =   0.21 sec
+----------------------------------------------------------
+Test Passed.
+"engine.awa-rope-vulkan-host" end time: Sep 10 13:46 UTC
+"engine.awa-rope-vulkan-host" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/36 Testing: engine.awa-sdpa-fp32-vulkan-host
+8/36 Test: engine.awa-sdpa-fp32-vulkan-host
+Command: "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2_awa_rope_tests" "vulkan" "sdpa" "host"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.awa-sdpa-fp32-vulkan-host" start time: Sep 10 13:46 UTC
+Output:
+----------------------------------------------------------
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+checked=40448 finite_max_abs=0 nonfinite=0 violations=0
+<end of output>
+Test time =   0.21 sec
+----------------------------------------------------------
+Test Passed.
+"engine.awa-sdpa-fp32-vulkan-host" end time: Sep 10 13:46 UTC
+"engine.awa-sdpa-fp32-vulkan-host" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/36 Testing: engine.temporal-conv-bias-vulkan
+10/36 Test: engine.temporal-conv-bias-vulkan
+Command: "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2_temporal_conv_tests" "vulkan"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.temporal-conv-bias-vulkan" start time: Sep 10 13:46 UTC
+Output:
+----------------------------------------------------------
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+PASS: pointwise temporal convolution retains bias after cancellation; checked=288 failed=0 max_abs=0
+<end of output>
+Test time =   0.22 sec
+----------------------------------------------------------
+Test Passed.
+"engine.temporal-conv-bias-vulkan" end time: Sep 10 13:46 UTC
+"engine.temporal-conv-bias-vulkan" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/36 Testing: engine.awa-rounding-vulkan
+11/36 Test: engine.awa-rounding-vulkan
+Command: "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2_awa_rounding_tests" "vulkan"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.awa-rounding-vulkan" start time: Sep 10 13:46 UTC
+Output:
+----------------------------------------------------------
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+checked=3792 finite_max_abs=0 nonfinite=0 violations=0
+<end of output>
+Test time =   0.21 sec
+----------------------------------------------------------
+Test Passed.
+"engine.awa-rounding-vulkan" end time: Sep 10 13:46 UTC
+"engine.awa-rounding-vulkan" time elapsed: 00:00:00
+----------------------------------------------------------
+
+14/36 Testing: engine.fp32-device-contract
+14/36 Test: engine.fp32-device-contract
+Command: "/usr/bin/python3.12" "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/tests/check_fp32_device.py" "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2" "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/tests/fixtures/natural/astronaut-degraded.jpg"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.fp32-device-contract" start time: Sep 10 13:46 UTC
+Output:
+----------------------------------------------------------
+{
+  "passed": true,
+  "device": "llvmpipe (LLVM 20.1.2, 256 bits)",
+  "arithmetic": {
+    "checked": 8,
+    "failed": 8,
+    "model_verified": false,
+    "protocol": "fp32-fma-residual-v1",
+    "scope": "Required arithmetic prerequisite; not a full numerical or model validation",
+    "supported": false,
+    "values": [
+      {
+        "actual": 0.0,
+        "expected": -1.4901161193847656e-08,
+        "matched": false
+      },
+      {
+        "actual": 0.0,
+        "expected": 3.725290298461914e-09,
+        "matched": false
+      },
+      {
+        "actual": 0.0,
+        "expected": -9.313225746154785e-10,
+        "matched": false
+      },
+      {
+        "actual": 0.0,
+        "expected": 2.3283064365386963e-10,
+        "matched": false
+      },
+      {
+        "actual": 0.0,
+        "expected": -5.820766091346741e-11,
+        "matched": false
+      },
+      {
+        "actual": 0.0,
+        "expected": 1.4551915228366852e-11,
+        "matched": false
+      },
+      {
+        "actual": 0.0,
+        "expected": -3.637978807091713e-12,
+        "matched": false
+      },
+      {
+        "actual": 0.0,
+        "expected": 9.094947017729282e-13,
+        "matched": false
+      }
+    ]
+  },
+  "preflight_error": {
+    "code": "PREFLIGHT_FAILED",
+    "field": "device",
+    "message": "Vulkan device does not preserve FP32 fused multiply-add residuals required by SeedVR2 FP32-B; explicitly choose CPU or a device that passes the arithmetic probe in engine devices"
+  },
+  "scope": "Capability and preflight contract; no model weights loaded"
+}
+<end of output>
+Test time =   0.37 sec
+----------------------------------------------------------
+Test Passed.
+"engine.fp32-device-contract" end time: Sep 10 13:46 UTC
+"engine.fp32-device-contract" time elapsed: 00:00:00
+----------------------------------------------------------
+
+15/36 Testing: engine.rms-norm-fp32
+15/36 Test: engine.rms-norm-fp32
+Command: "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2_rms_norm_tests" "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/tests/fixtures/rms-norm"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.rms-norm-fp32" start time: Sep 10 13:46 UTC
+Output:
+----------------------------------------------------------
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+SKIP: device lacks the FP32 FMA residual prerequisite; full FP32-B inference is rejected by preflight
+<end of output>
+Test time =   0.13 sec
+----------------------------------------------------------
+Test Passed.
+"engine.rms-norm-fp32" end time: Sep 10 13:46 UTC
+"engine.rms-norm-fp32" time elapsed: 00:00:00
+----------------------------------------------------------
+
+16/36 Testing: engine.linear-fp32
+16/36 Test: engine.linear-fp32
+Command: "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2_linear_tests"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.linear-fp32" start time: Sep 10 13:46 UTC
+Output:
+----------------------------------------------------------
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+SKIP: device lacks the FP32 FMA residual prerequisite; full FP32-B inference is rejected by preflight
+<end of output>
+Test time =   0.13 sec
+----------------------------------------------------------
+Test Passed.
+"engine.linear-fp32" end time: Sep 10 13:46 UTC
+"engine.linear-fp32" time elapsed: 00:00:00
+----------------------------------------------------------
+
+17/36 Testing: engine.linear-host-fp32
+17/36 Test: engine.linear-host-fp32
+Command: "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2_linear_tests" "host"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.linear-host-fp32" start time: Sep 10 13:46 UTC
+Output:
+----------------------------------------------------------
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+SKIP: device lacks the FP32 FMA residual prerequisite; full FP32-B inference is rejected by preflight
+<end of output>
+Test time =   0.13 sec
+----------------------------------------------------------
+Test Passed.
+"engine.linear-host-fp32" end time: Sep 10 13:46 UTC
+"engine.linear-host-fp32" time elapsed: 00:00:00
+----------------------------------------------------------
+
+18/36 Testing: engine.silu-fp32
+18/36 Test: engine.silu-fp32
+Command: "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2_silu_tests" "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/tests/fixtures/silu"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.silu-fp32" start time: Sep 10 13:46 UTC
+Output:
+----------------------------------------------------------
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+SKIP: device lacks the FP32 FMA residual prerequisite; full FP32-B inference is rejected by preflight
+<end of output>
+Test time =   0.13 sec
+----------------------------------------------------------
+Test Passed.
+"engine.silu-fp32" end time: Sep 10 13:46 UTC
+"engine.silu-fp32" time elapsed: 00:00:00
+----------------------------------------------------------
+
+19/36 Testing: engine.softmax-fp32
+19/36 Test: engine.softmax-fp32
+Command: "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2_softmax_tests" "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/tests/fixtures/softmax"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.softmax-fp32" start time: Sep 10 13:46 UTC
+Output:
+----------------------------------------------------------
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+SKIP: device lacks the FP32 FMA residual prerequisite; full FP32-B inference is rejected by preflight
+<end of output>
+Test time =   0.13 sec
+----------------------------------------------------------
+Test Passed.
+"engine.softmax-fp32" end time: Sep 10 13:46 UTC
+"engine.softmax-fp32" time elapsed: 00:00:00
+----------------------------------------------------------
+
+20/36 Testing: engine.awa-rms-fp32
+20/36 Test: engine.awa-rms-fp32
+Command: "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2_awa_rms_tests" "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/tests/fixtures/awa-rms"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.awa-rms-fp32" start time: Sep 10 13:46 UTC
+Output:
+----------------------------------------------------------
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+SKIP: device lacks the FP32 FMA residual prerequisite; full FP32-B inference is rejected by preflight
+<end of output>
+Test time =   0.13 sec
+----------------------------------------------------------
+Test Passed.
+"engine.awa-rms-fp32" end time: Sep 10 13:46 UTC
+"engine.awa-rms-fp32" time elapsed: 00:00:00
+----------------------------------------------------------
+
+21/36 Testing: engine.frame-norm-fp32
+21/36 Test: engine.frame-norm-fp32
+Command: "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2_frame_norm_tests" "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/tests/fixtures/frame-norm"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.frame-norm-fp32" start time: Sep 10 13:46 UTC
+Output:
+----------------------------------------------------------
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+SKIP: device lacks the FP32 FMA residual prerequisite; full FP32-B inference is rejected by preflight
+<end of output>
+Test time =   0.13 sec
+----------------------------------------------------------
+Test Passed.
+"engine.frame-norm-fp32" end time: Sep 10 13:46 UTC
+"engine.frame-norm-fp32" time elapsed: 00:00:00
+----------------------------------------------------------
+
+22/36 Testing: engine.frame-norm-cascade-fp32
+22/36 Test: engine.frame-norm-cascade-fp32
+Command: "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2_frame_norm_tests" "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/tests/fixtures/frame-norm-cascade"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.frame-norm-cascade-fp32" start time: Sep 10 13:46 UTC
+Output:
+----------------------------------------------------------
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+SKIP: device lacks the FP32 FMA residual prerequisite; full FP32-B inference is rejected by preflight
+<end of output>
+Test time =   0.13 sec
+----------------------------------------------------------
+Test Passed.
+"engine.frame-norm-cascade-fp32" end time: Sep 10 13:46 UTC
+"engine.frame-norm-cascade-fp32" time elapsed: 00:00:00
+----------------------------------------------------------
+
+24/36 Testing: engine.frame-sdpa-fp32-vulkan
+24/36 Test: engine.frame-sdpa-fp32-vulkan
+Command: "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2_frame_sdpa_tests" "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/tests/fixtures/frame-sdpa" "vulkan"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.frame-sdpa-fp32-vulkan" start time: Sep 10 13:46 UTC
+Output:
+----------------------------------------------------------
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+checked=6144 max_abs=2.08616e-07 violations=0
+<end of output>
+Test time =   0.14 sec
+----------------------------------------------------------
+Test Passed.
+"engine.frame-sdpa-fp32-vulkan" end time: Sep 10 13:46 UTC
+"engine.frame-sdpa-fp32-vulkan" time elapsed: 00:00:00
+----------------------------------------------------------
+
+25/36 Testing: engine.rgb-conv-fp32
+25/36 Test: engine.rgb-conv-fp32
+Command: "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2_rgb_conv_tests" "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/tests/fixtures/rgb-conv"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.rgb-conv-fp32" start time: Sep 10 13:46 UTC
+Output:
+----------------------------------------------------------
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+SKIP: device lacks the FP32 FMA residual prerequisite; full FP32-B inference is rejected by preflight
+<end of output>
+Test time =   0.13 sec
+----------------------------------------------------------
+Test Passed.
+"engine.rgb-conv-fp32" end time: Sep 10 13:46 UTC
+"engine.rgb-conv-fp32" time elapsed: 00:00:00
+----------------------------------------------------------
+
+26/36 Testing: engine.rgb-conv-host-fp32
+26/36 Test: engine.rgb-conv-host-fp32
+Command: "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2_rgb_conv_tests" "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/tests/fixtures/rgb-conv" "host"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.rgb-conv-host-fp32" start time: Sep 10 13:46 UTC
+Output:
+----------------------------------------------------------
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+SKIP: device lacks the FP32 FMA residual prerequisite; full FP32-B inference is rejected by preflight
+<end of output>
+Test time =   0.13 sec
+----------------------------------------------------------
+Test Passed.
+"engine.rgb-conv-host-fp32" end time: Sep 10 13:46 UTC
+"engine.rgb-conv-host-fp32" time elapsed: 00:00:00
+----------------------------------------------------------
+
+27/36 Testing: engine.posterior-projection-fp32
+27/36 Test: engine.posterior-projection-fp32
+Command: "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2_posterior_projection_tests" "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/tests/fixtures/posterior-projection"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.posterior-projection-fp32" start time: Sep 10 13:46 UTC
+Output:
+----------------------------------------------------------
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+SKIP: device lacks the FP32 FMA residual prerequisite; full FP32-B inference is rejected by preflight
+<end of output>
+Test time =   0.13 sec
+----------------------------------------------------------
+Test Passed.
+"engine.posterior-projection-fp32" end time: Sep 10 13:46 UTC
+"engine.posterior-projection-fp32" time elapsed: 00:00:00
+----------------------------------------------------------
+
+28/36 Testing: engine.posterior-projection-host-fp32
+28/36 Test: engine.posterior-projection-host-fp32
+Command: "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2_posterior_projection_tests" "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/tests/fixtures/posterior-projection" "host"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.posterior-projection-host-fp32" start time: Sep 10 13:46 UTC
+Output:
+----------------------------------------------------------
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+SKIP: device lacks the FP32 FMA residual prerequisite; full FP32-B inference is rejected by preflight
+<end of output>
+Test time =   0.13 sec
+----------------------------------------------------------
+Test Passed.
+"engine.posterior-projection-host-fp32" end time: Sep 10 13:46 UTC
+"engine.posterior-projection-host-fp32" time elapsed: 00:00:00
+----------------------------------------------------------
+
+29/36 Testing: engine.text-pool-fp32
+29/36 Test: engine.text-pool-fp32
+Command: "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci/seedvr2_text_pool_tests" "/home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/tests/fixtures/text-pool"
+Directory: /home/runner/work/seedvr2-ncnn-vulkan/seedvr2-ncnn-vulkan/build/ci
+"engine.text-pool-fp32" start time: Sep 10 13:46 UTC
+Output:
+----------------------------------------------------------
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=4
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 20.1.2, 256 bits)]  fp16-cm=0  int8-cm=0  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+windows=1 violations=0
+windows=3 violations=0
+windows=5 violations=0
+windows=4 violations=0
+windows=8 violations=0
+windows=17 violations=0
+windows=32 violations=0
+checked=51968 changed=0 max_abs=0 violations=0
+<end of output>
+Test time =   0.14 sec
+----------------------------------------------------------
+Test Passed.
+"engine.text-pool-fp32" end time: Sep 10 13:46 UTC
+"engine.text-pool-fp32" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Sep 10 13:46 UTC
+
+vulkan =   3.61 sec*proc
+

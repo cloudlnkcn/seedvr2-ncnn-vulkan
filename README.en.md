@@ -297,8 +297,11 @@ not perceptual-quality acceptance.
 [GitHub Actions](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/actions/workflows/native.yml)
 builds/tests native Linux and software Vulkan without full model weights. Full 3B GPU
 validation is a separate real-device protocol. The Ubuntu GCC CLI, Clang CLI and GCC
-Web jobs passed at the [recorded CI commit](artifacts/2026-09-10/github-ci-v1/README.md);
-raw reports and the artifact-log retention fix are retained in that archive.
+Web jobs all passed for numerical repair commit `7e56479`: each native suite reports
+**24 passed and 12 capability skips**, with **54/54** additional Web interface checks.
+The [current CI archive](artifacts/2026-09-10/github-ci-numerics-v2/README.md) retains
+the exact commit, raw dependency/build logs, reports and skip reasons. These software
+Vulkan checks do not replace the separate full-model CPU/NVIDIA measurements.
 Historical raw model/tensor paths in
 reports belong to the developer's machine; the large files are not in Git.
 
