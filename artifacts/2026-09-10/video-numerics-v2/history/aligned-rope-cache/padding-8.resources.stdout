@@ -1,0 +1,2535 @@
+{
+  "backend": "ncnn-vulkan",
+  "build": "0.7.0",
+  "clip": {
+    "decoded_frames": 8,
+    "latent_frames": 3,
+    "padded_frames": 9,
+    "padding": "repeat last frame to 4n+1; crop output to decoded frame count",
+    "requested_max_frames": 8,
+    "streaming_cache": false,
+    "temporal_mode": "joint clip VAE + 3D adaptive window attention",
+    "truncated": false
+  },
+  "comparison_input": "comparison-input.mp4",
+  "converter_ncnn_commit": "6a1bf000f363714839a36793addc8c879d3d899e",
+  "device": {
+    "api_version": 4211017,
+    "device_id": 10464,
+    "driver_version": 2497102272,
+    "index": 0,
+    "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "subgroup_size": 32,
+    "vendor_id": 4318
+  },
+  "diagnostics": {
+    "block-00-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-00-text.f32",
+      "sha256": "f5d074e4776e7e73b8cdf891eabef5f177eec2db2737f58487b61eaafc34f8aa",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-00-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-00-video.f32",
+      "sha256": "707c154a84f8ff4bf53590cb92eba6829b97c16fa008d2a1d7e7ebbc923d7aeb",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-01-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-01-text.f32",
+      "sha256": "e1aafad8483797724da76ed3193edac1ce0fdd5e34d863cddca69f14d77f1cd5",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-01-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-01-video.f32",
+      "sha256": "9ca6ffeace639f81dc20b2122f5e7f20c75e344efcd7d5ce519601c72ff5d084",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-02-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-02-text.f32",
+      "sha256": "7f3f2c6472d4852f8b5ea9337fe37b50a1c6c7b515d22c48610805b6cbe442d3",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-02-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-02-video.f32",
+      "sha256": "54220a6c3fe1e16ad8a37c435b94fab37e61807edf904bf8e13de6196ee79d05",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-03-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-03-text.f32",
+      "sha256": "97d653fade8e7f1bee901ebad16ab0e12fe92e9d18b0b0bbd1902530f61ba48c",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-03-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-03-video.f32",
+      "sha256": "ef05b40d0716ba5321707390e2f5a114de43277d7e4ec40795a9b875f9299320",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-04-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-04-text.f32",
+      "sha256": "6dcebe3cae57df7be794869b6148ba7b1e404de043f2d57f3ae71a98d0a908e5",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-04-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-04-video.f32",
+      "sha256": "55cb8db986b58034bfa486dd3a38726707ca05ef0bd4fdb3a3d96e839e21135f",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-05-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-05-text.f32",
+      "sha256": "12a7689658b78e5e2f7dda99e666e725e803d9849f637a8a9e003e074d503406",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-05-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-05-video.f32",
+      "sha256": "d39e79257ed63c6fdecf06941a4881ab1a6f537a6c5c172a78bd094cf034aea9",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-06-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-06-text.f32",
+      "sha256": "7535ebc8877771a5354328f7f3befb08284bd4bfc7e03ca4bda8b6b8a7779a09",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-06-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-06-video.f32",
+      "sha256": "3eb691e38217f0c492f989e0cc3f04bef3bab8bb8646fcaecb8abbf0bfe398b2",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-07-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-07-text.f32",
+      "sha256": "a5aefef9beb2ade4644d0c3ad2732ee393e63cd6239da0d4cd0d5779a616dfd0",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-07-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-07-video.f32",
+      "sha256": "5f8074a672b24781fc977b23e8f9f7cdc8c627a4f5714c0b366b19689020225f",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-08-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-08-text.f32",
+      "sha256": "9d8a19470c268f045baf44ba70a916b8b9593365af2c65dbb92a10dc0cd8a68f",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-08-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-08-video.f32",
+      "sha256": "831ee07319eb683d992d6806e387f6b6ba5126036f7954a4271dfaad000fc7a4",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-09-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-09-text.f32",
+      "sha256": "b83e0fd15ebb72bd965ff142c4ba93812bc5fda6f8b3ea867d03c8679dedbbb8",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-09-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-09-video.f32",
+      "sha256": "9a95d9d849c2d1ae12b84eb3b8e201fef7e5b4bb185d6f234800cb6ec528c767",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-10-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-10-text.f32",
+      "sha256": "c9b4e70f8be1c78d788b5348690c4fa1c697e7af663e2db9949f9341166b6339",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-10-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-10-video.f32",
+      "sha256": "c509f4db48b41a2ca7442124ddf2e7bf01e50896cb213e49439c6849a240fae3",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-11-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-11-text.f32",
+      "sha256": "848ddcc73c176ca2459c6bc62481b3ba8caebf8d927328ceb24dbca713df9f6f",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-11-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-11-video.f32",
+      "sha256": "5eef5ea47a700f0daa8991a02580fdc79333e9e5bed31d6e4b63ef0301acb62b",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-12-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-12-text.f32",
+      "sha256": "050fff241144c357f3882076d96de8478278d01ef8dc299022baca0fe7218b16",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-12-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-12-video.f32",
+      "sha256": "815b20e39af59bd2751083e0986082e74e87ff97a596ce8044a3e312cab51635",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-13-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-13-text.f32",
+      "sha256": "2eff2b1fdcaf627c715ac0b5512d7de193fb7a84b84d292b8971a0716326e7e7",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-13-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-13-video.f32",
+      "sha256": "827e14e446e90d265fd83562a012d6dcfbdcdc35910ef64f3a3e503647d6a660",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-14-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-14-text.f32",
+      "sha256": "f079fe7813c7e01d8e691be635f5bd1471704d30b3bc261926c9f7fc9f89531c",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-14-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-14-video.f32",
+      "sha256": "deb5939d670f2df25e43ed2c35e83c0c924da8199a2ecafa44e8920c7bd7aa81",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-15-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-15-text.f32",
+      "sha256": "cf334ff3c45998cbdf3c177f09ba23d88f3c0312210960b0ba26f2ce9d04f5fe",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-15-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-15-video.f32",
+      "sha256": "7efb636df1e4c7220597cb538a6b09746c13f5bf897a333126b124f4f5d57b62",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-16-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-16-text.f32",
+      "sha256": "01001b0f7cf41d286a56bec138411473c94218239da110421d2923131b4b4276",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-16-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-16-video.f32",
+      "sha256": "94d59fc5e07781012518549846fb08ca36d5de58b397265966c2ca3b0c70c6e2",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-17-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-17-text.f32",
+      "sha256": "5f72b1cd03b35cf2860081e7735376f71d7f0167bbdace7f177255e9b004e880",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-17-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-17-video.f32",
+      "sha256": "6e0b623dee095203b23b047c47aef40501671f15aaaac2c38196a43bd8ba154d",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-18-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-18-text.f32",
+      "sha256": "7b890c5e4d99e279e906450322888c3a135c9b53944aa152770946b72acaa2be",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-18-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-18-video.f32",
+      "sha256": "6eb00dd55b5f7a9ceaf4c67b1507c84c8d0d31a7af237df48b0b7de49cb356a8",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-19-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-19-text.f32",
+      "sha256": "aad66886129ef4cb968c4ffa4c0050a2653b1720c0f6518ee64d41164b166420",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-19-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-19-video.f32",
+      "sha256": "450f63015bf046de6126cb4dc25bf7ad116f4bd6a9c57448c8ef210d7b452dca",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-20-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-20-text.f32",
+      "sha256": "ec7bbaa9dd6fc335c0c091cec171f5554836be09ba2f18bc44bac8fb3e155060",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-20-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-20-video.f32",
+      "sha256": "c70d0997ef4670ce6597b4edacbf4bf0c73b24e0e182bba425bcd14d64d1cb2c",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-21-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-21-text.f32",
+      "sha256": "51c035f51d53a4e82135881eb80b9695467db90f2939ff616dbcec6bfa22d19b",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-21-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-21-video.f32",
+      "sha256": "6c453dce97ede90e0962475722f1e0b323462874abbe5c163cfbee4e84463e4d",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-22-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-22-text.f32",
+      "sha256": "e8b8002f66fe8c787906201162e643ec4edab51b7b2c749633a9fa80b044f168",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-22-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-22-video.f32",
+      "sha256": "686cdc081ca867aff27109ef510030e80e1358df7db72097db8638bc8f8c7850",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-23-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-23-text.f32",
+      "sha256": "92caa8225d35b346a23312a5780a28c803f60eb2bce14410d2c58a9028495f5f",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-23-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-23-video.f32",
+      "sha256": "caad87f70ebc61bcbc42a1d34e12cf1646f001af262b3c7491c0e26f69664a2f",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-24-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-24-text.f32",
+      "sha256": "0ce2b5cfc7a8c417fe634086facaae88079c4f01e5a7a5b188897e69ca789b6c",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-24-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-24-video.f32",
+      "sha256": "398491419d79e05169ada4c38198b317f40e8ac2fca22fc5563411a42367dcbd",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-25-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-25-text.f32",
+      "sha256": "7bcd949cba44ac6ed1ed352f32460eba34a73bc198b8de1124d894ef22fb7248",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-25-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-25-video.f32",
+      "sha256": "78efab4e11550692c35f9b840857cdfdb9c692c9a85f941a43c164dcb1aa1254",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-26-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-26-text.f32",
+      "sha256": "1aec7e6dc8bc89657cc504640e7348bfdf16fbb63c296fcc599802c22a983f1e",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-26-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-26-video.f32",
+      "sha256": "d7f60bd5b216203b146441b4c49215a3bcd0c243f40af38e7f136ccef4522d32",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-27-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-27-text.f32",
+      "sha256": "1627a105b9fb24f572ec879101b459774552cf004e9b4a27ab6e5b6faee1d281",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-27-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-27-video.f32",
+      "sha256": "c108ee540f89358fd8dc6278a490eb33d5bc995fa131198a3d5cbb849b85efc1",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-28-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-28-text.f32",
+      "sha256": "fee58ecebb9d7439a9d5e174cab22285afc73f054feb07d1ce50c2ee1c838800",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-28-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-28-video.f32",
+      "sha256": "8797434c88bf65debc7646d81c4825ccab81765a9ddd2a43be726a54451827d4",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-29-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-29-text.f32",
+      "sha256": "2b3c687b38d78223c4aac524c29c9cb28b4a643b8142876b84511306fc3af144",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-29-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-29-video.f32",
+      "sha256": "0eeeba0712d8df2bf8818fa4edff9ff9657e852c05a79c7dccc5ee3113765f7c",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-30-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-30-text.f32",
+      "sha256": "74e63c624a7b93610bac3588fbe68638524cd657a636ceacb63b86379ec58802",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-30-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-30-video.f32",
+      "sha256": "e937bf4719bfbd7af97c8d0ab029f2ea0b59b8790198c73734d2104f4ecbb8cd",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "block-31-text": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "block-31-text.f32",
+      "sha256": "d01af7ce9f0c5ef2ab62970e349f23ce461cf33086c34dcd089dfeffe9469006",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "block-31-video": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "block-31-video.f32",
+      "sha256": "0c7055e84af6cf0c4b06ed6d50611118970e941759fd741dde0c4aad86e39c2b",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "conditioned": {
+      "dtype": "f32le",
+      "elements": 7680,
+      "path": "conditioned.f32",
+      "sha256": "fc7496c316c3815d1673e2aec62cd07fb5dfd96244a94b99eb54edc097c19646",
+      "shape": [
+        16,
+        3,
+        10,
+        16
+      ]
+    },
+    "decoded": {
+      "dtype": "f32le",
+      "elements": 276480,
+      "path": "decoded.f32",
+      "sha256": "e8149790c1911cc844a40acd4ea3b5d96c1e5853c2496b3ce1d4d4f586b08d08",
+      "shape": [
+        3,
+        9,
+        80,
+        128
+      ]
+    },
+    "latent": {
+      "dtype": "f32le",
+      "elements": 7680,
+      "path": "latent.f32",
+      "sha256": "c45add0343a10017c335ee86c5cf3b09f7f28cdfd0b34cc6590c077cfb4ec104",
+      "shape": [
+        16,
+        3,
+        10,
+        16
+      ]
+    },
+    "noise": {
+      "dtype": "f32le",
+      "elements": 7680,
+      "path": "noise.f32",
+      "sha256": "bc9145030c67a61470a40d2ada57591ae0d9ca8a1a68dee2883385b67a96081d",
+      "shape": [
+        16,
+        3,
+        10,
+        16
+      ]
+    },
+    "patch-in": {
+      "dtype": "f32le",
+      "elements": 307200,
+      "path": "patch-in.f32",
+      "sha256": "4cf617d863e916798245855de39bc6b26d1ab9708216d1eebf679a17feebd3c4",
+      "shape": [
+        120,
+        2560
+      ]
+    },
+    "patch-out": {
+      "dtype": "f32le",
+      "elements": 7680,
+      "path": "patch-out.f32",
+      "sha256": "65c796c4e4382ccfb49b0c1ef694ce1a1b9023d7d168e5c2f74fa4a1dd406c62",
+      "shape": [
+        120,
+        64
+      ]
+    },
+    "patches": {
+      "dtype": "f32le",
+      "elements": 15840,
+      "path": "patches.f32",
+      "sha256": "1c14c69b6478daeccc2010294399b7990c033415adc92abd9ddef2f628a74f21",
+      "shape": [
+        120,
+        132
+      ]
+    },
+    "posterior": {
+      "dtype": "f32le",
+      "elements": 15360,
+      "path": "posterior.f32",
+      "sha256": "ec98697208d61c961c0b210baf7c98cc507a55ddde764b81e6effbfbfaf8a142",
+      "shape": [
+        32,
+        3,
+        10,
+        16
+      ]
+    },
+    "posterior-noise": {
+      "dtype": "f32le",
+      "elements": 7680,
+      "path": "posterior-noise.f32",
+      "sha256": "2c2222651a333288955c1bedba6f3ab7415ab988e3b2c6eb5468d62fad7fe669",
+      "shape": [
+        16,
+        3,
+        10,
+        16
+      ]
+    },
+    "prepared": {
+      "dtype": "f32le",
+      "elements": 276480,
+      "path": "prepared.f32",
+      "sha256": "00ae3cc3181b4b7fb039e73005c79021adff7f34ab927dc402e27406a953599c",
+      "shape": [
+        3,
+        9,
+        80,
+        128
+      ]
+    },
+    "text-in": {
+      "dtype": "f32le",
+      "elements": 148480,
+      "path": "text-in.f32",
+      "sha256": "c7cecae53e4f83d60cab1ebddeca3bdf028c630ef33feb0cfd58d8c1ab50e42d",
+      "shape": [
+        58,
+        2560
+      ]
+    },
+    "time-in": {
+      "dtype": "f32le",
+      "elements": 15360,
+      "path": "time-in.f32",
+      "sha256": "bd542b62115dab2f055c2ec0ff47df9ebdbe25a9bf1d287b7557c08d20c6e719",
+      "shape": [
+        2560,
+        6
+      ]
+    },
+    "velocity": {
+      "dtype": "f32le",
+      "elements": 7680,
+      "path": "velocity.f32",
+      "sha256": "8742253c6e7883100b5385274b95811bb15233070824f52761c4eabb6ce11de5",
+      "shape": [
+        16,
+        3,
+        10,
+        16
+      ]
+    }
+  },
+  "dispatch": "EXPLICIT_PER_LAYER_NO_BACKEND_FALLBACK",
+  "executable_sha256": "79f7036d73db52226f786dc1e3aa8e93af4eec4abe9de4d09ce5a1763c1a7d25",
+  "host_operations": [
+    "video codecs",
+    "resizing",
+    "layouts",
+    "posterior sampling",
+    "Euler endpoint"
+  ],
+  "implementation": {
+    "executable_sha256": "79f7036d73db52226f786dc1e3aa8e93af4eec4abe9de4d09ce5a1763c1a7d25",
+    "ncnn_runtime_patches": [
+      {
+        "compiled_allocator_sha256": "b8398e0d5ef5a367f80c5d2f13af1c8f170a83a39d0a1b458a40100924a55320",
+        "id": "host-buffer-v1",
+        "original_allocator_sha256": "601d69dab40823366fa6aa2be00c8e37bb0f1e960fe96323c36daed887c4fda2",
+        "scope": "Imported-host buffer declaration and weight-buffer transfer-source usage"
+      }
+    ],
+    "sdk_library_sha256": "601961da6bdbda5aa4846c2de93fa6433bc7dbfbb953e4c119679931385d3bcc"
+  },
+  "input": {
+    "duration_seconds": 1.0,
+    "has_audio": false,
+    "height": 40,
+    "sha256": "4ee1606327095dcc2dff012c85afbbd4d735441a1163cd679b24bb7b2ee66be3",
+    "width": 64
+  },
+  "media_version": "8.0.1",
+  "model_certificate": null,
+  "model_manifest_sha256": "fe38835c367a2a389c689d89ce85c952b0e347d1edfd879b008d796a65374028",
+  "model_verified": false,
+  "ncnn_commit": "3b7bdba7fc8aea8fd46779533eee027df77c639d",
+  "noise_algorithm": "splitmix64-box-muller-v1",
+  "numerical_validation": "NOT_PERFORMED_BY_RUNNER",
+  "output": {
+    "audio": false,
+    "codec": "H.264 / yuv420p / CRF 18",
+    "fps": 8.0,
+    "frames": 8,
+    "height": 80,
+    "path": "output.mp4",
+    "sha256": "a24ee2200d200400a7c6ed294bb482fc20a53decce5eeb5f8ca626946b192a90",
+    "timestamps_90khz": [
+      0,
+      11250,
+      22500,
+      33750,
+      45000,
+      56250,
+      67500,
+      78750
+    ],
+    "width": 128
+  },
+  "package_authenticated": true,
+  "poster": "output.png",
+  "preprocessing": "FFmpeg RGB8 / bicubic antialias / center crop 16 / normalize [-1,1]",
+  "profile": "seedvr2-3b-video-fp32-b-v1",
+  "resources": {
+    "activation_peak_bytes": null,
+    "autoregressive_kv_cache": false,
+    "file_cache_peak_bytes": null,
+    "largest_graph_weight_bytes": 634534028,
+    "package_bytes": 21096916141,
+    "pipeline_cache": "per-run Vulkan shader pipelines; no model weights or autoregressive keys",
+    "process_lifetime_peak_rss_bytes": 978378752,
+    "process_system_cpu_seconds": 10.587465,
+    "process_user_cpu_seconds": 12.755803,
+    "temporal_vae_cache": false,
+    "unmeasured_scope": "Allocator categories are not inferred from process RSS or whole-card VRAM",
+    "weight_placement": {
+      "budget_unavailable": 0,
+      "cache_enabled": false,
+      "cpu_graphs": 0,
+      "device_requests": 36,
+      "host_requests": 0,
+      "scope": "placement requests, not measured allocator residency"
+    },
+    "weight_residency": "one graph at a time",
+    "workspace_peak_bytes": null
+  },
+  "sampling": {
+    "cfg": 1,
+    "color_fix": "none",
+    "latent_scale": 0.9152,
+    "steps": 1,
+    "timestep": 1000
+  },
+  "schema_version": "seedvr2-video-run-v1",
+  "seed": 666,
+  "stages": [
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 0,
+      "awa_windows": 0,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 275.337316,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "encoder",
+      "layers": 98,
+      "load_ms": 548.341427,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6128402432,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 430178304
+        },
+        "after_release": {
+          "budget_bytes": 6130434048,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 699858944
+        },
+        "available_bytes": 6111297536,
+        "before_load": {
+          "budget_bytes": 6128402432,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 17104896
+        },
+        "estimated_weight_bytes": 800371968,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1532100608,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 98,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 0,
+      "awa_windows": 0,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 1.656767,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "patch-in",
+      "layers": 1,
+      "load_ms": 14.538218,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6130434048,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 708247552
+        },
+        "after_release": {
+          "budget_bytes": 6130434048,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 699858944
+        },
+        "available_bytes": 5430575104,
+        "before_load": {
+          "budget_bytes": 6130434048,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 699858944
+        },
+        "estimated_weight_bytes": 2723856,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1532608512,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 1,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 79.163835,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-00",
+      "layers": 83,
+      "load_ms": 353.448344,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6130302976,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1349189632
+        },
+        "after_release": {
+          "budget_bytes": 6130434048,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5430575104,
+        "before_load": {
+          "budget_bytes": 6130434048,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 699858944
+        },
+        "estimated_weight_bytes": 1269068056,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1532608512,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 77.044945,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-01",
+      "layers": 83,
+      "load_ms": 271.694479,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6138429440,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1349189632
+        },
+        "after_release": {
+          "budget_bytes": 6138560512,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5430050816,
+        "before_load": {
+          "budget_bytes": 6130434048,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1269068056,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1532608512,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 80.604976,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-02",
+      "layers": 83,
+      "load_ms": 291.954738,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6140985344,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1349189632
+        },
+        "after_release": {
+          "budget_bytes": 6141116416,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5438177280,
+        "before_load": {
+          "budget_bytes": 6138560512,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1269068056,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1534640128,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 80.597712,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-03",
+      "layers": 83,
+      "load_ms": 309.852839,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6143606784,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1349189632
+        },
+        "after_release": {
+          "budget_bytes": 6143737856,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5440733184,
+        "before_load": {
+          "budget_bytes": 6141116416,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1269068056,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1535279104,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 77.70447,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-04",
+      "layers": 83,
+      "load_ms": 315.570323,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6143606784,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1349189632
+        },
+        "after_release": {
+          "budget_bytes": 6143737856,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5443354624,
+        "before_load": {
+          "budget_bytes": 6143737856,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1269068056,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1535934464,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 80.500098,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-05",
+      "layers": 83,
+      "load_ms": 242.445609,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6143606784,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1349189632
+        },
+        "after_release": {
+          "budget_bytes": 6143737856,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5443354624,
+        "before_load": {
+          "budget_bytes": 6143737856,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1269068056,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1535934464,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 81.979821,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-06",
+      "layers": 83,
+      "load_ms": 235.475701,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6140985344,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1349189632
+        },
+        "after_release": {
+          "budget_bytes": 6141116416,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5443354624,
+        "before_load": {
+          "budget_bytes": 6143737856,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1269068056,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1535934464,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 82.223622,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-07",
+      "layers": 83,
+      "load_ms": 277.427141,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6140985344,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1349189632
+        },
+        "after_release": {
+          "budget_bytes": 6141116416,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5440733184,
+        "before_load": {
+          "budget_bytes": 6141116416,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1269068056,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1535279104,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 82.014056,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-08",
+      "layers": 83,
+      "load_ms": 287.973061,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6140985344,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1349189632
+        },
+        "after_release": {
+          "budget_bytes": 6141116416,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5440733184,
+        "before_load": {
+          "budget_bytes": 6141116416,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1269068056,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1535279104,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 81.49172,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-09",
+      "layers": 83,
+      "load_ms": 287.430056,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6140985344,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1349189632
+        },
+        "after_release": {
+          "budget_bytes": 6141116416,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5440733184,
+        "before_load": {
+          "budget_bytes": 6141116416,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1269068056,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1535279104,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 81.924357,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-10",
+      "layers": 83,
+      "load_ms": 277.276978,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6140985344,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1348796416
+        },
+        "after_release": {
+          "budget_bytes": 6141116416,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5440733184,
+        "before_load": {
+          "budget_bytes": 6141116416,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1268945176,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1535279104,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 80.213587,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-11",
+      "layers": 83,
+      "load_ms": 290.187382,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6140985344,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1348796416
+        },
+        "after_release": {
+          "budget_bytes": 6141116416,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5440733184,
+        "before_load": {
+          "budget_bytes": 6141116416,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1268945176,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1535279104,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 80.620385,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-12",
+      "layers": 83,
+      "load_ms": 288.472785,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6140985344,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1348796416
+        },
+        "after_release": {
+          "budget_bytes": 6141116416,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5440733184,
+        "before_load": {
+          "budget_bytes": 6141116416,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1268945176,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1535279104,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 82.389194,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-13",
+      "layers": 83,
+      "load_ms": 297.303807,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6140985344,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1348796416
+        },
+        "after_release": {
+          "budget_bytes": 6119161856,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5440733184,
+        "before_load": {
+          "budget_bytes": 6141116416,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1268945176,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1535279104,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 80.702741,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-14",
+      "layers": 83,
+      "load_ms": 281.818101,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6119030784,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1348796416
+        },
+        "after_release": {
+          "budget_bytes": 6119161856,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5418778624,
+        "before_load": {
+          "budget_bytes": 6119161856,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1268945176,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1529790464,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 80.121142,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-15",
+      "layers": 83,
+      "load_ms": 317.8889,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6119030784,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1348796416
+        },
+        "after_release": {
+          "budget_bytes": 6119161856,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5418778624,
+        "before_load": {
+          "budget_bytes": 6119161856,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1268945176,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1529790464,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 81.396319,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-16",
+      "layers": 83,
+      "load_ms": 306.128618,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6135808000,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1348796416
+        },
+        "after_release": {
+          "budget_bytes": 6138560512,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5418778624,
+        "before_load": {
+          "budget_bytes": 6119161856,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1268945176,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1529790464,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 80.48002,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-17",
+      "layers": 83,
+      "load_ms": 315.224821,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6138429440,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1348796416
+        },
+        "after_release": {
+          "budget_bytes": 6138560512,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5438177280,
+        "before_load": {
+          "budget_bytes": 6138560512,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1268945176,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1534640128,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 86.482092,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-18",
+      "layers": 83,
+      "load_ms": 311.78705,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6138429440,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1348796416
+        },
+        "after_release": {
+          "budget_bytes": 6139478016,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5438177280,
+        "before_load": {
+          "budget_bytes": 6138560512,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1268945176,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1534640128,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 95.767201,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-19",
+      "layers": 83,
+      "load_ms": 315.782724,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6119227392,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1348796416
+        },
+        "after_release": {
+          "budget_bytes": 6119358464,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5439094784,
+        "before_load": {
+          "budget_bytes": 6139478016,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1268945176,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1534869504,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 84.089465,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-20",
+      "layers": 83,
+      "load_ms": 305.001579,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6119227392,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1348796416
+        },
+        "after_release": {
+          "budget_bytes": 6119358464,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5418975232,
+        "before_load": {
+          "budget_bytes": 6119358464,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1268945176,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1529839616,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 80.418905,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-21",
+      "layers": 83,
+      "load_ms": 314.067766,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6119227392,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1348796416
+        },
+        "after_release": {
+          "budget_bytes": 6119358464,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5418975232,
+        "before_load": {
+          "budget_bytes": 6119358464,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1268945176,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1529839616,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 79.962293,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-22",
+      "layers": 83,
+      "load_ms": 315.189434,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6136004608,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1348796416
+        },
+        "after_release": {
+          "budget_bytes": 6136135680,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5418975232,
+        "before_load": {
+          "budget_bytes": 6119358464,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1268945176,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1529839616,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 79.461196,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-23",
+      "layers": 83,
+      "load_ms": 306.901737,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6136004608,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1348796416
+        },
+        "after_release": {
+          "budget_bytes": 6136135680,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5435752448,
+        "before_load": {
+          "budget_bytes": 6136135680,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1268945176,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1534033920,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 81.817045,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-24",
+      "layers": 83,
+      "load_ms": 308.721983,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6136659968,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1348796416
+        },
+        "after_release": {
+          "budget_bytes": 6136791040,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5435752448,
+        "before_load": {
+          "budget_bytes": 6136135680,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1268945176,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1534033920,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 79.886289,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-25",
+      "layers": 83,
+      "load_ms": 298.744417,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6136659968,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1348796416
+        },
+        "after_release": {
+          "budget_bytes": 6136791040,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5436407808,
+        "before_load": {
+          "budget_bytes": 6136791040,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1268945176,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1534197760,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 80.870608,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-26",
+      "layers": 83,
+      "load_ms": 297.529573,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6136659968,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1348796416
+        },
+        "after_release": {
+          "budget_bytes": 6139412480,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5436407808,
+        "before_load": {
+          "budget_bytes": 6136791040,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1268945176,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1534197760,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 80.33172,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-27",
+      "layers": 83,
+      "load_ms": 296.283781,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6139281408,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1348796416
+        },
+        "after_release": {
+          "budget_bytes": 6139412480,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5439029248,
+        "before_load": {
+          "budget_bytes": 6139412480,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1268945176,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1534853120,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 80.764317,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-28",
+      "layers": 83,
+      "load_ms": 302.331689,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6139281408,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1348796416
+        },
+        "after_release": {
+          "budget_bytes": 6139412480,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5439029248,
+        "before_load": {
+          "budget_bytes": 6139412480,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1268945176,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1534853120,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 81.227221,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-29",
+      "layers": 83,
+      "load_ms": 293.456944,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6141640704,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1348796416
+        },
+        "after_release": {
+          "budget_bytes": 6141771776,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5439029248,
+        "before_load": {
+          "budget_bytes": 6139412480,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1268945176,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1534853120,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 96.476921,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-30",
+      "layers": 83,
+      "load_ms": 307.117164,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6141640704,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1348796416
+        },
+        "after_release": {
+          "budget_bytes": 6141771776,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5441388544,
+        "before_load": {
+          "budget_bytes": 6141771776,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1268945176,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1535442944,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 83,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 1,
+      "awa_windows": 3,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 77.703098,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "block-31",
+      "layers": 51,
+      "load_ms": 206.78786,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6141378560,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1134886912
+        },
+        "after_release": {
+          "budget_bytes": 6141509632,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5441388544,
+        "before_load": {
+          "budget_bytes": 6141771776,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 844271872,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1535442944,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 51,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 0,
+      "awa_windows": 0,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 1.458614,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "patch-out",
+      "layers": 6,
+      "load_ms": 24.592649,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6141509632,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 708902912
+        },
+        "after_release": {
+          "budget_bytes": 6141509632,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "available_bytes": 5441126400,
+        "before_load": {
+          "budget_bytes": 6141509632,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1372680,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1535377408,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 6,
+      "weight_io": "buffered"
+    },
+    {
+      "awa_cpu": 0,
+      "awa_vulkan": 0,
+      "awa_windows": 0,
+      "backend": "ncnn-vulkan",
+      "compute_ms": 697.479708,
+      "cpu_layers": 0,
+      "cpu_temporal_encoder_direct_convolution": false,
+      "id": "decoder",
+      "layers": 136,
+      "load_ms": 396.764761,
+      "memory": {
+        "activation_offload": false,
+        "actual_weight_memory": "not_instrumented",
+        "after_load": {
+          "budget_bytes": 6136659968,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1316421632
+        },
+        "after_release": {
+          "budget_bytes": 6110117888,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 1596522496
+        },
+        "available_bytes": 5441126400,
+        "before_load": {
+          "budget_bytes": 6141509632,
+          "heap_index": 0,
+          "source": "VK_EXT_memory_budget_estimate",
+          "usage_bytes": 700383232
+        },
+        "estimated_weight_bytes": 1204813848,
+        "oom_recovery": false,
+        "policy": "auto",
+        "reason": "budget_available",
+        "requested_memory": "device",
+        "reserve_bytes": 1535377408,
+        "reserve_policy": "quarter_heap_budget",
+        "scope": "weight placement before graph loading"
+      },
+      "vulkan_layers": 136,
+      "weight_io": "buffered"
+    }
+  ],
+  "status": "SUCCEEDED",
+  "timing": {
+    "graph_compute_ms": 3592.3637760000006,
+    "graph_load_ms": 10411.514439,
+    "other_host_wait_and_cleanup_ms": 924.7036089999997,
+    "package_validation_ms": 12355.723155
+  },
+  "total_ms": 27284.304979,
+  "weight_io": "buffered"
+}

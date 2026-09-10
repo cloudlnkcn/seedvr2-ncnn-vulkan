@@ -1,4 +1,5 @@
 #include "video_layers.hpp"
+#include "softmax.hpp"
 #include "awa_shaders.hpp"
 #include <algorithm>
 #include <array>
@@ -41,12 +42,13 @@ public:
     int destroy_pipeline(const ncnn::Option &) override { map_.reset(); return 0; }
 protected:
     void map(const ncnn::VkMat &x, const ncnn::VkMat &y, std::array<int,19> p,
-             ncnn::VkCompute &cmd) const {
-        std::vector<ncnn::vk_constant_type> constants(p.size());
+             ncnn::VkCompute &cmd, const ncnn::VkMat *bias=nullptr, float scale=1.f) const {
+        std::vector<ncnn::vk_constant_type> constants(p.size()+1);
         for (std::size_t i=0;i<p.size();++i) constants[i].i=p[i];
+        constants.back().f=scale;
         ncnn::Mat dispatch;
         dispatch.w=std::min(p[1],65536); dispatch.h=(p[1]+65535)/65536; dispatch.c=1;
-        cmd.record_pipeline(map_.get(),{x,y},{},constants,dispatch);
+        cmd.record_pipeline(map_.get(),{x,y,bias?*bias:x},{},constants,dispatch);
     }
     std::unique_ptr<ncnn::Pipeline> map_;
 };
@@ -67,20 +69,46 @@ public:
     }
     int create_pipeline(const ncnn::Option &opt) override {
         if (VideoLayer::create_pipeline(opt)!=0) return -1;
+        if (opt.use_vulkan_compute && (rgb_input() || blocked_spatial_convolution() || channel_shortcut())) {
+            // FP32-B uses oneDNN's 16-input-channel partial sums for the VAE's
+            // blocked spatial convolutions; the RGB stem uses a plain FMA chain.
+            const int count=ci_*kt_*k_*k_;
+            packed_projection_.create(count,co_/4,size_t(16),4);
+            if (packed_projection_.empty()) return -100;
+            for (int c=0;c<co_;c+=4) for (int j=0;j<count;++j)
+                for (int lane=0;lane<4;++lane)
+                    packed_projection_.row(c/4)[4*j+lane]=weights_[0][(c+lane)*count+j];
+            projection_pipeline_=std::make_unique<ncnn::Pipeline>(vkdev);
+            projection_pipeline_->set_local_size_xyz(128,1,1);
+            return projection_pipeline_->create(shaders::video_projection,sizeof(shaders::video_projection),{});
+        }
         convolution_.reset(opt.use_vulkan_compute ? ncnn::create_layer_vulkan("Convolution") : ncnn::create_layer_cpu("Convolution"));
         if (!convolution_) return -1;
         convolution_->vkdev=vkdev;
         ncnn::ParamDict p;
-        p.set(0,co_);p.set(1,k_);p.set(3,s_);p.set(4,0);p.set(5,1);p.set(6,ci_*co_*kt_*k_*k_);
+        // FP32-B adds bias after the 1x1x1 projection. Seeding the dot
+        // product with bias can lose it when large contributions cancel.
+        p.set(0,co_);p.set(1,k_);p.set(3,s_);p.set(4,0);p.set(5,pointwise()?0:1);p.set(6,ci_*co_*kt_*k_*k_);
         ncnn::ModelBinFromMatArray mb(weights_.data());
         return convolution_->load_param(p)==0 && convolution_->load_model(mb)==0 && convolution_->create_pipeline(opt)==0 ? 0:-1;
     }
     int upload_model(ncnn::VkTransfer &cmd,const ncnn::Option &opt) override {
+        if (projection_pipeline_) {
+            cmd.record_upload(packed_projection_,projection_weights_,opt,false);
+            cmd.record_upload(weights_[1],bias_gpu_,opt,false);
+            if (opt.lightmode) packed_projection_.release();
+            return projection_weights_.empty() || bias_gpu_.empty() ? -100 : 0;
+        }
+        if (pointwise()) {
+            cmd.record_upload(weights_[1],bias_gpu_,opt);
+            if (bias_gpu_.empty()) return -100;
+        }
         return convolution_->upload_model(cmd,opt);
     }
     int destroy_pipeline(const ncnn::Option &opt) override {
         if (convolution_) convolution_->destroy_pipeline(opt);
-        convolution_.reset(); return VideoLayer::destroy_pipeline(opt);
+        convolution_.reset(); bias_gpu_.release(); projection_weights_.release();
+        packed_projection_.release(); projection_pipeline_.reset(); return VideoLayer::destroy_pipeline(opt);
     }
     template<class M> bool geometry(const M &x, int &t,int &h,int &w,int &tile) const {
         if (!valid(x) || x.c!=ci_) return false;
@@ -108,14 +136,28 @@ public:
         if (convolution_->forward(gather,result,opt)!=0 || result.empty() || result.elempack!=1) return -1;
         y.create(w,h,t,co_,size_t(4),1,opt.blob_allocator);
         if (y.empty()) return -100;
-        for (int c=0;c<co_;++c) for (int f=0;f<t;++f) for (int row=0;row<h;++row)
-            std::memcpy(static_cast<float *>(y.channel(c))+(f*h+row)*w,
-                static_cast<const float *>(result.channel(c))+(f*(tile/s_)+row)*result.w,std::size_t(w)*4);
+        for (int c=0;c<co_;++c) for (int f=0;f<t;++f) for (int row=0;row<h;++row) {
+            auto *dst=static_cast<float *>(y.channel(c))+(f*h+row)*w;
+            const auto *src=static_cast<const float *>(result.channel(c))+(f*(tile/s_)+row)*result.w;
+            if (pointwise()) for (int i=0;i<w;++i) dst[i]=src[i]+weights_[1][c];
+            else std::memcpy(dst,src,std::size_t(w)*4);
+        }
         return 0;
     }
     int forward(const ncnn::VkMat &x,ncnn::VkMat &y,ncnn::VkCompute &cmd,const ncnn::Option &opt) const override {
         int t,h,w,tile;
         if (!geometry(x,t,h,w,tile)) return -1;
+        if (projection_pipeline_) {
+            y.create(w,h,t,co_,size_t(4),1,opt.blob_vkallocator);
+            if (y.empty()) return -100;
+            const std::array<int,15> values{x.w,x.h,x.d,int(x.cstep),w,h,t,int(y.cstep),co_,st_,s_,pad_,ci_,channel_shortcut()?2:blocked_spatial_convolution()?1:0,kt_};
+            std::vector<ncnn::vk_constant_type> constants(values.size());
+            for (size_t i=0;i<values.size();++i) constants[i].i=values[i];
+            const int count=w*h*t;
+            ncnn::Mat dispatch;dispatch.w=std::min(count,65536);dispatch.h=(count+65535)/65536;dispatch.c=co_/4;
+            cmd.record_pipeline(projection_pipeline_.get(),{x,projection_weights_,bias_gpu_,y},{},constants,dispatch);
+            return 0;
+        }
         ncnn::VkMat gather(x.w+pad_+end_,t*tile,ci_*kt_,size_t(4),1,opt.workspace_vkallocator);
         if (gather.empty()) return -100;
         map(x,gather,{0,gather.w*gather.h*ci_*kt_,x.w,x.h,x.d,x.c,int(x.cstep),
@@ -131,12 +173,28 @@ public:
         }
         y.create(w,h,t,co_,size_t(4),1,opt.blob_vkallocator);
         if (y.empty() || result.empty()) return -100;
-        map(result,y,{1,w*h*t*co_,result.w,result.h,1,co_,int(result.cstep),w,h,t,co_,int(y.cstep),kt_,st_,s_,pad_,tile/s_,0,0},cmd);
+        map(result,y,{pointwise()?5:1,w*h*t*co_,result.w,result.h,1,co_,int(result.cstep),w,h,t,co_,int(y.cstep),kt_,st_,s_,pad_,tile/s_,0,0},cmd,
+            pointwise()?&bias_gpu_:nullptr);
         return 0;
     }
 private:
+    bool pointwise() const { return kt_==1 && k_==1; }
+    bool channel_shortcut() const {
+        // The reviewed 3B VAE changes channels only at these residual shortcuts.
+        // Their oneDNN 1x1 kernel seeds the FMA chain with bias. Equal-width
+        // attention projections remain GEMM followed by bias.
+        return pointwise() && st_==1 && s_==1 && pad_==0 && end_==0 &&
+            ((ci_==128 && co_==256) || (ci_==256 && co_==512) ||
+             (ci_==512 && co_==256) || (ci_==256 && co_==128));
+    }
+    bool rgb_input() const { return ci_==3 && co_%4==0 && kt_==3 && k_==3 && st_==1 && s_==1; }
+    bool blocked_spatial_convolution() const { return ci_%16==0 && co_%4==0 && k_==3; }
     int ci_=0,co_=0,kt_=0,k_=0,st_=0,s_=0,pad_=0,end_=0;
     std::array<ncnn::Mat,2> weights_;
+    ncnn::VkMat bias_gpu_;
+    ncnn::Mat packed_projection_;
+    ncnn::VkMat projection_weights_;
+    std::unique_ptr<ncnn::Pipeline> projection_pipeline_;
     std::unique_ptr<ncnn::Layer> convolution_;
 };
 
@@ -241,9 +299,10 @@ public:
     FrameSDPA() {one_blob_only=false;}
     int create_pipeline(const ncnn::Option &opt) override {
         if (VideoLayer::create_pipeline(opt)!=0) return -1;
-        sdpa_.reset(opt.use_vulkan_compute?ncnn::create_layer_vulkan("SDPA"):ncnn::create_layer_cpu("SDPA"));
+        sdpa_.reset(opt.use_vulkan_compute?create_fp32_sdpa():ncnn::create_layer_cpu("SDPA"));
         if (!sdpa_) return -1;
         sdpa_->vkdev=vkdev;ncnn::ParamDict p;
+        p.set(6,1.f); // FP32-B scales Q and K separately before their dot product.
         return sdpa_->load_param(p)==0 && sdpa_->create_pipeline(opt)==0 ? 0:-1;
     }
     int destroy_pipeline(const ncnn::Option &opt) override {
@@ -259,12 +318,14 @@ public:
         if (!prepare(x)||out.size()!=1) return -1;
         auto &y=out[0];y.create_like(x[0],opt.blob_allocator);if (y.empty()) return -100;
         const int n=y.w*y.h;
+        const float scale=static_cast<float>(std::sqrt(1./std::sqrt(double(y.c))));
         for (int t=0;t<y.d;++t) {
             std::vector<ncnn::Mat> qkv(3), result(1);
             for (int a=0;a<3;++a) {
                 qkv[a].create(y.c,n,1,size_t(4),1,opt.workspace_allocator);if (qkv[a].empty()) return -100;
                 auto *dst=static_cast<float *>(qkv[a]);
-                for (int c=0;c<y.c;++c) for (int i=0;i<n;++i) dst[i*y.c+c]=static_cast<const float *>(x[a].channel(c))[t*n+i];
+                for (int c=0;c<y.c;++c) for (int i=0;i<n;++i)
+                    dst[i*y.c+c]=static_cast<const float *>(x[a].channel(c))[t*n+i]*(a<2?scale:1.f);
             }
             if (sdpa_->forward(qkv,result,opt)!=0||result[0].empty()) return -1;
             const auto *src=static_cast<const float *>(result[0]);
@@ -276,11 +337,12 @@ public:
         if (!prepare(x)||out.size()!=1) return -1;
         auto &y=out[0];y.create_like(x[0],opt.blob_vkallocator);if (y.empty()) return -100;
         const int n=y.w*y.h;
+        const float scale=static_cast<float>(std::sqrt(1./std::sqrt(double(y.c))));
         for (int t=0;t<y.d;++t) {
             std::vector<ncnn::VkMat> qkv(3),result(1);
             for (int a=0;a<3;++a) {
                 qkv[a].create(y.c,n,1,size_t(4),1,opt.workspace_vkallocator);if (qkv[a].empty()) return -100;
-                map(x[a],qkv[a],{2,n*y.c,y.w,y.h,y.d,y.c,int(x[a].cstep),y.c,n,1,1,int(qkv[a].cstep),0,0,0,0,0,t,0},cmd);
+                map(x[a],qkv[a],{2,n*y.c,y.w,y.h,y.d,y.c,int(x[a].cstep),y.c,n,1,1,int(qkv[a].cstep),0,0,0,0,0,t,0},cmd,nullptr,a<2?scale:1.f);
             }
             if (sdpa_->forward(qkv,result,cmd,opt)!=0 || result[0].empty()) return -1;
             map(result[0],y,{3,n*y.c,y.c,n,1,1,int(result[0].cstep),y.w,y.h,y.d,y.c,int(y.cstep),0,0,0,0,0,t,0},cmd);

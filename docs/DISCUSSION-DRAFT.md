@@ -1,27 +1,45 @@
-# SeedVR2 3B image and short-video restoration with ncnn/Vulkan
+# SeedVR2 3B 图片与短视频修复：原生 C++ / ncnn / Vulkan 移植
 
-Engineering preview, updated 2026-09-10. This draft has not been published.
+> GitHub Discussion 草稿，尚未发布。下面的链接使用公开仓库路径，发布前应确认对应提交和 CI 记录。
 
-The project runs the official SeedVR2 3B weights through a native C++ pipeline: temporal VAE, patch projections, all 32 DiT blocks with adaptive window attention, the original single-step Euler endpoint, and VAE decoding. The local Web application, standalone CLI and installed C++ SDK share the same implementation. Python and pnnx are used for export and independent reference generation, not application inference.
+我做了一个 [SeedVR2 ncnn Vulkan](https://github.com/mingshi2333/seedvr2-ncnn-vulkan) 项目，把官方 SeedVR2 3B 接到原生 C++20 应用中。输入图片或短片，输出 PNG / MP4 和 JSON 报告；提供独立 CLI、本地 Web 和可安装的 C++ SDK。模型准备完成后可以离线使用，推理无需 Python。
 
-The runtime is pinned to ncnn `3b7bdba7fc8aea8fd46779533eee027df77c639d`, with the separately recorded `host-buffer-v1` allocator adaptation in the 0.7.0 application. The original upstream source/archive remains unchanged. Existing exports retain their independently pinned pnnx source `6a1bf000f363714839a36793addc8c879d3d899e`. Official model code and checkpoint revisions are recorded in the repository lock files. Upgrading the runtime does not relabel old export evidence.
+项目是一个完整移植案例：从官方权重、pnnx 导出和自定义算子，到原生流水线、相同输入验证和应用交付。当前验证配置为 **3B、FP32-B、单步、CFG=1**。
 
-Adaptive windows are exported as a custom layer. Native CPU/Vulkan implementations preserve window gather/scatter, Q/K normalization, multimodal 3D RoPE, joint attention and equal averaging of the text result across windows. Standard attention work uses upstream ncnn SDPA. Four temporal VAE operators preserve the causal convolution, normalization and layout behavior required for joint clip processing.
+## 实现结构
 
-Current application limits are image long sides of 64–512 pixels and the first 1–17 video frames at long sides of 64–128 pixels. Video output is an SDR MP4 without audio. Clips are processed jointly; this preview does not implement long-video streaming, temporal cache reuse, tiled high-resolution inference or the 7B model.
+CLI 和 Web worker 调用同一个 SDK。模型拆为 **VAE encoder → patch-in → 32 个 DiT block → patch-out → VAE decoder**，共 36 个图；C++ 负责噪声、条件、Euler 和媒体处理，权重按图装载和释放。
 
-The current SDK passes all 73 retained FP32-B tensor boundaries for the natural JPEG example against the independent official reference with shared raw noise. Maximum output difference is one 8-bit value. The earlier 0.6.0 delivery also completed real image inference through an external C++ SDK consumer with networking isolated, the source tree hidden and Unicode installation/input/output paths. That earlier binary has its own recorded identity. A JPEG decoding mismatch was corrected before those successful runs; the failure remains in the evidence directory.
+AWA 在 pnnx 导出时保留为自定义模块，原生实现根据实际时空网格生成裁剪窗口，再执行 Q/K RMSNorm、3D RoPE、视频/文本联合注意力和窗口文本平均。Vulkan 复用锁定 ncnn 的 SDPA QK/PV 着色器，并补充 FP32 softmax 和 gather/scatter。时序 VAE 保留因果卷积、首帧规则与尾帧补齐，视频按整个短片联合处理。
 
-The retained 17-frame 128-pixel synthetic clip now passes all 73 checks on both CPU and Vulkan with the same final SDK. The original Vulkan 60/73 and CPU 70/73 failures remain archived. Same-input traces isolated Vulkan RoPE phase error, SDPA scaling order, and CPU temporal-encoder convolution rounding. Fixes preserve the official reference, raw noise, model package and historical tolerances. CPU direct convolution is limited to the temporal encoder after measuring its cost. The affected 6-frame 64-pixel Vulkan clip also passes 73/73. These are FP32-B development comparisons; the official BF16/Apex/FlashAttention execution path and representative natural-video quality still require validation. Details and exact identities are in [VIDEO-NUMERICS.md](VIDEO-NUMERICS.md).
+运行库固定为 ncnn `3b7bdba7fc8aea8fd46779533eee027df77c639d`，pnnx 导出单独固定为 `6a1bf000f363714839a36793addc8c879d3d899e`。来源、分配器适配和实际加载 SDK 的哈希都写入报告。[架构与源码导航](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/blob/main/docs/ARCHITECTURE.md)。
 
-Correctness against the reference is also separate from restoration quality. The earlier controlled natural-photo experiment recorded native RGB PSNR/SSIM of 20.01 dB/0.6772 against the target, below the bicubic input baseline of 23.79 dB/0.7568; the official FP32-B result showed the same limitation. This is one synthetic degradation example, not a representative quality benchmark or model certification. Its negative result remains archived; the current JPEG regression checks numerical agreement rather than rerunning that quality evaluation.
+## 对照结果
 
-Weights are loaded one graph at a time. Four paired 17-frame runs on an RTX 4060 Laptop produced byte-identical saved tensors and MP4 output with buffered and mapped readers. Read-only mapping reduced sampled anonymous RSS, but did not show a speed benefit in these observations, so buffered loading remains the default. The measurements include package hashing and graph loading; desktop GPU use, temperature and file-cache state were not controlled. Allocator-specific activation and workspace peaks have not been measured.
+Linux x86_64，RTX 4060 Laptop 8 GiB，约 32 GiB RAM。对照使用锁定官方数学实现的 CPU FP32-B 参考，共享**原始后验噪声和扩散噪声**，逐元素检查全部 73 个张量边界。
 
-The delivery includes model identity/integrity checks, preflight validation, progress and cancellation, an offline model-copy command, an installed CMake SDK target and Linux native CI. The recorded Ubuntu GCC CLI, Clang CLI and GCC Web jobs passed with 14/14 native tests and 5/5 Mesa regressions at their explicit commit; see [the CI archive](../artifacts/2026-09-10/github-ci-v1/README.md). New lightweight video checks are wired into CI but have not run remotely for this change. Full-model real-device evidence is recorded separately from these small tests. The source repository includes small fixtures and reports, not full weights or portable binaries.
+| 测试输入 | 后端 / 输出 | 完整数值结果 |
+| --- | --- | --- |
+| 自然运动 9 帧 | Vulkan，128×80 | 原 63/73 → **73/73** |
+| 尾帧补齐 8 帧 | Vulkan，128×80 | 原 71/73 → **73/73** |
+| 人工镜头切换 17 帧 | Vulkan，128×80 | **73/73** |
+| 合成运动 17 帧 | CPU / Vulkan，128×128 | 两条轨迹均 **73/73** |
+| 自然 JPEG | Vulkan，256×256 | **73/73**，RGB8 最大差 1 |
 
-The new bounded validation uses three fixed 128×80 development clips from one natural source: 9-frame motion, 8-frame tail padding and a 17-frame artificial cut. All complete native and independent official execution. Full numerical results are **63/73, 71/73 and 73/73**; the first two remain failures at unchanged thresholds. Native/official pre-codec RGB8 differences are at most one channel value. Four additional AWA cases pass on CPU/Vulkan (8/8). Same-input checks pass at failing locations, and the motion DiT trajectory passes all 64 outputs when started from official patch/text/time inputs. Replaying its first failing block from retained native inputs reproduces both output tensors byte for byte. This supports amplification of differences entering DiT, without isolating one upstream operator or repairing the original full failures.
+本轮没有修改官方参考、权重、原始噪声或 `atol=rtol=0.001` 的历史全链门槛。误差定位用相同输入的真实组件回放，修复了 VAE 分块卷积和 shortcut bias 顺序、归一化、注意力中的 FP32 舍入，以及 DiT 长点积的误差补偿。还抓到并修复了 CPU 留出视频的 72/73 回归。失败候选和诊断记录都保留在[数值修复报告](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/blob/main/docs/NUMERICS-REPAIR.md)。
 
-Quality is separately negative on these low-resolution, artificially degraded clips: native PSNR is 20.01/19.70/23.24 dB against fixed targets, compared with bicubic 26.93/26.82/26.80 dB. SSIM is also lower; official FP32-B outputs show the same limitation. This single-source experiment is not a representative quality benchmark or an evaluation of the default BF16/FlashAttention path. Frame previews, per-frame values, temporal residual diagnostics, failures and reproduction commands are retained in [BOUNDED-VIDEO-RESULTS.md](BOUNDED-VIDEO-RESULTS.md). This iteration repairs diagnostic grid/SDK loading and metric validation, without changing model mathematics or thresholds.
+下面四列依次为 **bicubic → 原生 ncnn/Vulkan → 官方 FP32-B → 固定目标**；来自实际输出，没有额外增强。
 
-The next bounded task is to isolate preprocessing/VAE/projection error propagation on the retained failing motion clip, then rerun only affected complete cases after a justified fix. Broader quality, default-precision, device and delivery validation remain open. No full-model certificate or general portable-binary claim is made.
+![9 帧自然运动的真实对照](https://raw.githubusercontent.com/mingshi2333/seedvr2-ncnn-vulkan/main/artifacts/2026-09-10/video-numerics-v2/quality/motion-9/comparison.png)
+
+完整张量对照通过之后，画质仍需单独看。三段低分辨率开发视频的原生 PSNR 为 **20.01 / 19.70 / 23.24 dB**，bicubic 为 **26.93 / 26.82 / 26.80 dB**；SSIM 也较低，官方 FP32-B 在这些样例上有相同表现。这些素材来自同一来源和固定人工退化，不是代表性画质基准。[全部图、视频与逐帧数据](https://github.com/mingshi2333/seedvr2-ncnn-vulkan#实测结果与对照图)。
+
+## 使用与当前边界
+
+[教程](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/blob/main/docs/TUTORIAL.md)从干净克隆和不需要大权重的算子测试开始，再进入官方权重下载、pnnx 转换和真实模型运行。下载脚本支持固定 revision、续传和 SHA-256 校验；下载的是官方权重，还需要转换。仓库暂未提供预编译 Release 或可直接下载的完整 ncnn 模型包。
+
+应用已包含参数预检、Unicode 路径、进度与取消、模型身份/完整性校验、离线模型复制和安装 SDK。本机原生测试 **36/36**。Mesa 的小型测试为 **10 项通过、12 项能力跳过**：本机 llvmpipe 不保留这些补偿算子要求的 FMA 残差，程序会在模型加载前明确拒绝。能力探测和数值验收分开；大模型实机证据不由 CI 小型测试替代。
+
+当前图片输出长边 ≤512；视频 ≤17 帧、长边 ≤128，输出无音轨 SDR MP4。官方 CUDA BF16/Apex/FlashAttention 默认路径、更高分辨率、长片、音轨、更多设备和代表性时序画质仍是后续工作。[具体缺口与验收范围](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/blob/main/docs/CURRENT-GAPS.md)。
+
+希望交流两个实现问题：如何在不同 Vulkan 驱动上可靠地保留补偿算法需要的 FMA 行为；以及在保留同输入数值证据的前提下，怎样减少这类逐图大模型执行的权重装载和图间传输成本。欢迎带设备、驱动、参数与 `run.json` 的复现报告。

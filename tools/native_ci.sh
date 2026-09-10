@@ -2,9 +2,9 @@
 set -euo pipefail
 build=${1:?build directory required}
 install=$(realpath "${2:?install prefix required}")
-evidence=${3:?evidence directory required}
+evidence=$(realpath -m "${3:?evidence directory required}")
 mkdir -p "$evidence"
-ctest --test-dir "$build" --output-on-failure > "$evidence/ctest.log" 2>&1
+ctest --test-dir "$build" --output-junit "$evidence/ctest.xml" --output-on-failure > "$evidence/ctest.log" 2>&1
 python3 -m unittest discover -s tests -p test_pipeline_contract.py -v > "$evidence/evidence-contract.log" 2>&1
 python3 tools/check_cli.py "$install/bin/seedvr2" --output "$evidence/cli.json"
 python3 tools/check_engine.py "$install/bin/seedvr2" --output "$evidence/engine-boundaries.json"
@@ -37,6 +37,21 @@ VK_DRIVER_FILES="${icds[0]}" VK_ICD_FILENAMES="${icds[0]}" VK_INSTANCE_LAYERS=VK
   "$install/bin/seedvr2" engine self-test --backend vulkan --gpu 0 > "$evidence/mesa.json" 2> "$evidence/mesa.stderr"
 if rg -i 'vuid-|validation error' "$evidence/mesa.json" "$evidence/mesa.stderr"; then exit 1; fi
 VK_DRIVER_FILES="${icds[0]}" VK_ICD_FILENAMES="${icds[0]}" VK_INSTANCE_LAYERS=VK_LAYER_KHRONOS_validation \
-  ctest --test-dir "$build" -L vulkan --no-tests=error --output-on-failure > "$evidence/mesa-regressions.log" 2>&1
+  "$install/bin/seedvr2" engine devices > "$evidence/mesa-arithmetic.json" 2> "$evidence/mesa-arithmetic.stderr"
+VK_DRIVER_FILES="${icds[0]}" VK_ICD_FILENAMES="${icds[0]}" VK_INSTANCE_LAYERS=VK_LAYER_KHRONOS_validation \
+  ctest --test-dir "$build" -L vulkan --no-tests=error --output-junit "$evidence/mesa-ctest.xml" --output-on-failure > "$evidence/mesa-regressions.log" 2>&1
 if rg -i 'vuid-|validation error' "$evidence/mesa-regressions.log"; then exit 1; fi
-printf '{"scope":"Native Linux small tests and installed SDK; full 3B weights are a separate real-device protocol","full_model":"NOT_RUN_IN_CI"}\n' > "$evidence/scope.json"
+python3 - "$evidence" <<'PY'
+import json,sys,xml.etree.ElementTree as ET
+from pathlib import Path
+root=Path(sys.argv[1])
+def summary(path):
+    rows=ET.parse(path).getroot().findall('.//testcase')
+    skipped=[r.get('name') for r in rows if r.find('skipped') is not None]
+    failed=[r.get('name') for r in rows if r.find('failure') is not None or r.find('error') is not None]
+    return dict(total=len(rows),passed=len(rows)-len(skipped)-len(failed),skipped=skipped,failed=failed)
+report=dict(scope='Native Linux small tests and installed SDK; full 3B weights require separate real-device evidence',
+    full_model='NOT_RUN_IN_CI',native=summary(root/'ctest.xml'),mesa=summary(root/'mesa-ctest.xml'),
+    capability_skip='FP32 FMA prerequisite tested independently and enforced by application preflight; a skip is not a numerical PASS')
+(root/'scope.json').write_text(json.dumps(report,indent=2)+'\n')
+PY

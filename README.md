@@ -4,7 +4,7 @@
 
 将官方 **SeedVR2 3B** 移植为使用 **ncnn CPU/Vulkan** 的原生 C++20 图片与短视频修复应用。提供 **独立 CLI、本地 Web 和可安装的 C++ SDK**，共用同一推理实现；教程覆盖 pnnx 导出、自定义 adaptive window attention、时序 VAE 和逐组件验证。
 
-**已验证模型与配置：SeedVR2 3B，FP32、单步 CFG=1。** 0.7.0 原生预览已在 **256×256 自然图片**和 **17 帧、128×128 短片**的固定样例上通过官方 FP32-B 参考的 **73/73 项张量边界对照**；分别见[图片记录](artifacts/2026-09-08/memory-v1/image-sdk-fixed-parity.json)与[视频记录](artifacts/2026-09-08/memory-v1/video-auto-parity.json)。这些通过结果对应报告中的输入、设备与实现版本，更多样例的数值和画质结果见下方实测。
+**已验证模型与配置：SeedVR2 3B，FP32-B、单步 CFG=1。** 本轮修复后，三段原始短片、留出的 17 帧合成视频 CPU/Vulkan 和 256×256 自然图片，**六条轨迹均通过官方参考的 73/73 项张量边界对照**。原来的自然运动 63/73、尾帧补齐 71/73 数值失败已关闭；权重、官方参考、原始噪声和误差门槛保持不变。[修复过程](docs/NUMERICS-REPAIR.md) · [完整记录](artifacts/2026-09-10/video-numerics-v2/summary.json)。
 
 当前支持图片输出长边最高 512，视频最多 17 帧、长边最高 128，输出为无音轨 SDR MP4。项目面向已有 C++、PyTorch 和基本 Vulkan 经验的读者，不属于 ByteDance 或 Tencent 官方发行。
 
@@ -86,9 +86,9 @@ AWA（adaptive window attention）的窗口大小和边界随时间、空间网�
 
 1. 根据实际网格生成 regular/shifted 的裁剪窗口；shifted 使用半窗口偏移并裁剪边界，不做循环回卷。
 2. 在每个窗口收集视频 Q/K/V，并重复加入完整文本 Q/K/V；执行 Q/K 归一化和多模态 3D RoPE。
-3. 调用 ncnn **SDPA** 计算窗口内的视频/文本联合注意力；视频结果写回对应位置，文本结果在所有窗口间等权平均。
+3. 计算窗口内的视频/文本联合注意力；Vulkan 复用锁定 ncnn 的 SDPA QK/PV 着色器，配合保留 FP32 舍入的 softmax。视频结果写回对应位置，文本结果在所有窗口间等权平均。
 
-Vulkan 实现使用 [gather](src/engine/ncnn/shaders/awa_gather.comp)、[scatter](src/engine/ncnn/shaders/awa_scatter.comp)、[text mean](src/engine/ncnn/shaders/awa_text_mean.comp) 着色器配合 ncnn SDPA；CPU 实现用于同输入对照。请求 Vulkan 时检查每层能力和 AWA 实际调用计数，不自动切换到 CPU。媒体编解码、布局、噪声和 Euler 仍在主机执行，图间边界张量会下载并在下一图上传。
+Vulkan 实现使用 [gather](src/engine/ncnn/shaders/awa_gather.comp)、[scatter](src/engine/ncnn/shaders/awa_scatter.comp)、[text mean](src/engine/ncnn/shaders/awa_text_mean.comp) 着色器配合 [FP32 SDPA 适配](src/engine/ncnn/softmax.cpp)；CPU 实现用于同输入对照。请求 Vulkan 时检查每层能力和 AWA 实际调用计数，不自动切换到 CPU。媒体编解码、布局、噪声和 Euler 仍在主机执行，图间边界张量会下载并在下一图上传。
 
 ### 内存与模型包：控制生命周期，保留选择依据
 
@@ -108,9 +108,9 @@ Vulkan 实现使用 [gather](src/engine/ncnn/shaders/awa_gather.comp)、[scatter
 
 ## 实测结果与对照图
 
-记录日期 **2026-09-10**。使用冻结的 **0.7.0 原生 CLI/SDK**、SeedVR2 **3B / 单步 FP32-B**，设备为 **Linux x86_64 / RTX 4060 Laptop 8 GiB**，主机内存 32 GiB。输入为 **64×40、8 fps**，输出均为 **128×80**。三个案例来自同一自然素材，退化方式固定，镜头切换为人工拼接；这是开发样例，尚不构成代表性视频质量基准。
+记录日期 **2026-09-10**。使用冻结的 **0.7.0 数值修复版 CLI/SDK**、SeedVR2 **3B / 单步 FP32-B**，设备为 **Linux x86_64 / RTX 4060 Laptop 8 GiB**，主机内存 32 GiB。输入为 **64×40、8 fps**，输出均为 **128×80**。三个案例来自同一自然素材，退化方式固定，镜头切换为人工拼接；这是开发样例，尚不构成代表性视频质量基准。
 
-**三个短片都能完整执行；其中两个完整数值对照仍失败，三个案例的固定目标画质指标均低于 bicubic。** 以下直接展示这些结果。
+**三段原始短片均完整执行并通过 73/73 数值对照。** 固定目标画质指标仍低于 bicubic，原生和官方 FP32-B 都有这一结果；下面同时保留修复后的输出和画质数据。
 
 每张图从左到右依次为 **bicubic 输入基线 → 原生 ncnn/Vulkan → 官方 FP32-B → 固定目标**。直接引用已归档的编码前 RGB8 对照图，没有再次增强；`f0` 表示第 0 帧。固定目标来自已压缩的源视频，不是相机原始真值。
 
@@ -118,36 +118,37 @@ Vulkan 实现使用 [gather](src/engine/ncnn/shaders/awa_gather.comp)、[scatter
 
 展示第 0、4、8 帧，无需时序补齐。
 
-![motion-9：相同帧的 bicubic、原生、官方 FP32-B 与目标对照](artifacts/2026-09-10/bounded-video-v1/quality/motion-9/comparison.png)
+![motion-9：相同帧的 bicubic、原生、官方 FP32-B 与目标对照](artifacts/2026-09-10/video-numerics-v2/quality/motion-9/comparison.png)
 
-[输入短片](tests/fixtures/video-bounded/motion-9/input.mp4) · [原生实际输出 MP4](artifacts/2026-09-10/bounded-video-v1/motion-9-output.mp4) · [官方预览 MP4](artifacts/2026-09-10/bounded-video-v1/quality/motion-9/official.mp4) · [逐帧数据](artifacts/2026-09-10/bounded-video-v1/quality/motion-9/report.json)
+[输入短片](tests/fixtures/video-bounded/motion-9/input.mp4) · [原生实际输出 MP4](artifacts/2026-09-10/video-numerics-v2/motion-9-output.mp4) · [官方预览 MP4](artifacts/2026-09-10/video-numerics-v2/quality/motion-9/official.mp4) · [逐帧数据](artifacts/2026-09-10/video-numerics-v2/quality/motion-9/report.json)
 
 ### 尾帧补齐 · 8 帧 → 9 帧 → 8 帧
 
 展示第 0、4、7 帧。模型输入重复尾帧补至 9 帧，实际输出再裁回 8 帧。
 
-![padding-8：相同帧的 bicubic、原生、官方 FP32-B 与目标对照](artifacts/2026-09-10/bounded-video-v1/quality/padding-8/comparison.png)
+![padding-8：相同帧的 bicubic、原生、官方 FP32-B 与目标对照](artifacts/2026-09-10/video-numerics-v2/quality/padding-8/comparison.png)
 
-[输入短片](tests/fixtures/video-bounded/padding-8/input.mp4) · [原生实际输出 MP4](artifacts/2026-09-10/bounded-video-v1/padding-8-output.mp4) · [官方预览 MP4](artifacts/2026-09-10/bounded-video-v1/quality/padding-8/official.mp4) · [逐帧数据](artifacts/2026-09-10/bounded-video-v1/quality/padding-8/report.json)
+[输入短片](tests/fixtures/video-bounded/padding-8/input.mp4) · [原生实际输出 MP4](artifacts/2026-09-10/video-numerics-v2/padding-8-output.mp4) · [官方预览 MP4](artifacts/2026-09-10/video-numerics-v2/quality/padding-8/official.mp4) · [逐帧数据](artifacts/2026-09-10/video-numerics-v2/quality/padding-8/report.json)
 
 ### 人工镜头切换 · 17 帧
 
 展示第 0、7、8、16 帧。切换发生在第 8 帧之前，图中保留切换前后两帧。
 
-![cut-17：相同帧的 bicubic、原生、官方 FP32-B 与目标对照](artifacts/2026-09-10/bounded-video-v1/quality/cut-17/comparison.png)
+![cut-17：相同帧的 bicubic、原生、官方 FP32-B 与目标对照](artifacts/2026-09-10/video-numerics-v2/quality/cut-17/comparison.png)
 
-[输入短片](tests/fixtures/video-bounded/cut-17/input.mp4) · [原生实际输出 MP4](artifacts/2026-09-10/bounded-video-v1/cut-17-output.mp4) · [官方预览 MP4](artifacts/2026-09-10/bounded-video-v1/quality/cut-17/official.mp4) · [逐帧数据](artifacts/2026-09-10/bounded-video-v1/quality/cut-17/report.json)
+[输入短片](tests/fixtures/video-bounded/cut-17/input.mp4) · [原生实际输出 MP4](artifacts/2026-09-10/video-numerics-v2/cut-17-output.mp4) · [官方预览 MP4](artifacts/2026-09-10/video-numerics-v2/quality/cut-17/official.mp4) · [逐帧数据](artifacts/2026-09-10/video-numerics-v2/quality/cut-17/report.json)
 
 ### 数值与输出检查
 
-| 案例 | 完整张量边界 | RGB8 最大差¹ | 原生图执行 | 原始参考报告 |
+| 案例 | 原数值结果 → 修复后 | RGB8 最大差¹ | 原生图执行 | 修复报告 |
 | --- | --- | --- | --- | --- |
-| motion-9 | **63/73 · 未通过** | 1 | 36/36 Vulkan | [JSON](artifacts/2026-09-10/bounded-video-v1/motion-9-reference.json) |
-| padding-8 | **71/73 · 未通过** | 1 | 36/36 Vulkan | [JSON](artifacts/2026-09-10/bounded-video-v1/padding-8-reference.json) |
-| cut-17 | **73/73 · 此例通过** | 1 | 36/36 Vulkan | [JSON](artifacts/2026-09-10/bounded-video-v1/cut-17-reference.json) |
+| motion-9 | 63/73 → **73/73** | 1 | 36/36 Vulkan | [JSON](artifacts/2026-09-10/video-numerics-v2/motion-9.replay.json) |
+| padding-8 | 71/73 → **73/73** | 1 | 36/36 Vulkan | [JSON](artifacts/2026-09-10/video-numerics-v2/padding-8.replay.json) |
+| cut-17 | 73/73 → **73/73** | 1 | 36/36 Vulkan | [JSON](artifacts/2026-09-10/video-numerics-v2/cut-17.replay.json) |
 
+¹ 原生与官方在编码前的 0–255 通道值差异。输出帧数、尺寸、时间戳和无音轨检查均通过；图层由 Vulkan 执行，无 CPU 回退，保留日志无 Vulkan 校验错误。全部 73 个边界沿用 `abs(error) <= 0.001 + 0.001 * abs(reference)` 的诊断门槛，包括中间张量。
 
-¹ 原生与官方在编码前的 0–255 通道值差异。三个最终 `decoded` FP32 边界均通过，但不能豁免此前中间张量的失败。输出帧数、尺寸、时间戳和无音轨检查均通过；图层均由 Vulkan 执行，无 CPU 回退，保留日志无 Vulkan 校验错误。73 个边界沿用 `atol=rtol=0.001` 的诊断容差。
+留出的 **17 帧、128×128 合成视频**在 CPU/Vulkan 上均通过 73/73；**256×256 自然 JPEG**也通过 73/73、RGB8 最大差 1。[六条轨迹及实现身份](artifacts/2026-09-10/video-numerics-v2/summary.json)。
 
 ### 修复质量数据
 
@@ -166,27 +167,28 @@ Vulkan 实现使用 [gather](src/engine/ncnn/shaders/awa_gather.comp)、[scatter
 
 | 案例 | 原生总耗时（秒） | 进程 RSS 采样峰值（GiB） | 整卡显存采样峰值（MiB） |
 | --- | --- | --- | --- |
-| motion-9 | 28.09 | 1.184 | 3633 |
-| padding-8 | 27.62 | 1.126 | 4202 |
-| cut-17 | 31.31 | 0.893 | 5521 |
+| motion-9 | 28.11 | 0.918 | 2884 |
+| padding-8 | 32.20 | 0.888 | 2871 |
+| cut-17 | 32.25 | 0.927 | 3357 |
 
 
-每例只做一次串行实测，总耗时包含模型包哈希、权重载入和计算，不据此宣称加速。整卡显存包含桌面等其他进程，不能视为模型独占显存；RSS 也不是权重、激活和工作区的独立分项峰值。完整采样见[原始汇总](artifacts/2026-09-10/bounded-video-v1/summary.json)。
+每例只做一次串行实测，总耗时包含模型包哈希、权重载入、计算和诊断张量保存，不据此宣称正常运行速度或加速。整卡显存包含桌面等其他进程，不能视为模型独占显存；RSS 也不是权重、激活和工作区的独立分项峰值。完整采样见[原始汇总](artifacts/2026-09-10/video-numerics-v2/summary.json)。
 
-### 算子验证与失败定位
+### 数值修复与算子验证
 
-| 检查 | 结果 | 验证范围 |
-| --- | --- | --- |
-| AWA CPU / Vulkan | 8/8 | 4 个 pnnx 导出案例、16 组输出；最大绝对差 1.61e-6 |
-| motion-9 · blocks 19–31 | 26/26 | 每块使用相同官方输入 |
-| padding-8 · blocks 15–17 | 6/6 | 每块使用相同官方输入 |
-| motion-9 · all 32 DiT blocks | 64/64 | 仅替换官方起点，后续仍消费原生输出 |
-| motion-9 · block 19 replay | **失败复现** | 两个输出与原失败轨迹逐字节一致 |
+误差来自 FP32 运算顺序在完整模型中的累积与放大。修复保留实际模型结构，分别处理预处理插值、VAE 分块卷积与 shortcut bias、RMSNorm/FrameNorm、Q/K 预缩放、RoPE、窗口文本平均、SiLU/softmax 和 DiT 长点积补偿。
 
+| 检查 | 本轮结果 / 范围 |
+| --- | --- |
+| CPU/Vulkan DiT RMSNorm | 各 94,720 个独立夹具数值逐字节一致；CPU 的 31 项超限已修复 |
+| VAE 投影 / shortcut | 431,328 个 oneDNN FP32 夹具输出逐字节一致，device/host 两种权重放置 |
+| 真实 encoder 定位 | 同输入后验投影 15,360 个输出逐字节一致；完整 encoder 保留误差传播记录 |
+| 原生构建、算子和接口 | 本机 **36/36**；外部安装 SDK 与 CLI 加载同一库 |
+| 软件 Vulkan CI | **10 项通过，12 项能力跳过**；llvmpipe 不满足 FMA 残差要求，完整 FP32-B 运行在预检时拒绝 |
 
-AWA 使用 `(3,5,8)`、`(5,5,8)` 两种网格，各含 regular/shifted、20 heads、58 个文本位置，QKV 为合成输入；DiT 隔离检查使用真实 checkpoint 权重。实验支持进入 DiT 前的差异在后续计算中被放大，尚未唯一定位到一个上游算子，也未修复原始 63/73 和 71/73 轨迹。
+`engine devices` 现在包含独立的 FP32 算术探测；设备探测通过不等于模型认证。CI 的跳过项不计作数值通过，初次 Mesa 失败日志继续保留。CPU 与 NVIDIA 的完整模型记录分别归档。
 
-[协议与复现命令](docs/BOUNDED-VIDEO-RESULTS.md) · [报告及失败日志](artifacts/2026-09-10/bounded-video-v1/README.md) · [素材来源](tests/fixtures/video-bounded/SOURCE.md) · [机器可读结果](artifacts/2026-09-10/bounded-video-v1/summary.json)
+[修复原理与复现](docs/NUMERICS-REPAIR.md) · [本轮报告、失败候选与测量](artifacts/2026-09-10/video-numerics-v2/README.md) · [原始失败记录](artifacts/2026-09-10/bounded-video-v1/README.md) · [素材来源](tests/fixtures/video-bounded/SOURCE.md) · [当前缺口](docs/CURRENT-GAPS.md)
 
 ## 第一次克隆：先做不需要大模型的实验
 
@@ -214,17 +216,18 @@ python3 tools/prepare_models.py
 
 Ubuntu GCC CLI、Clang CLI、GCC Web 三项远端 CI 已通过；对应提交、原始报告与日志收集修复见[远端验证归档](artifacts/2026-09-10/github-ci-v1/README.md)。
 
-## 已有本机安装时使用
+## 本地 Web
 
 已有本地构建和完整模型包时，从项目目录启动：
 
 ```sh
-dist/seedvr2-0.7.0/bin/seedvr2-studio
+dist/tutorial/bin/seedvr2-web --model .cache/tutorial/image-package \
+  --video-model .cache/tutorial/video-package
 ```
 
 打开打印的地址，默认 `http://127.0.0.1:8877/`。导入 PNG/JPEG 或 MP4/MOV/WebM/MKV，选择输出长边、设备和片段帧数，开始处理。刷新或关闭浏览器后，服务进程会继续处理。任务页保留历史；服务退出会中断未完成任务，重开设置会创建一次新运行。
 
-本机安装已有转换好的 `models/image` 和 `models/video`，启动脚本会按安装位置自动找到它们。模型文件独立保存，不内嵌在脚本中；缺失时不会自动下载或转换。Git 克隆与 `cmake --install` 不附带大模型。已提供的下载、导出、测试脚本及其边界见 [首次使用的自动化说明](docs/FIRST-RUN.md#已转换模型与自动化范围)。
+完成教程中的导出后，用 `--model` 和 `--video-model` 指定 `.cache/tutorial/image-package` 与 `.cache/tutorial/video-package`。模型文件独立保存；启动脚本默认查找安装目录的 `models/image` 和 `models/video`，缺失时不会自动下载或转换。Git 克隆与 `cmake --install` 不附带大模型。已提供的下载、导出、测试脚本及其边界见 [首次使用的自动化说明](docs/FIRST-RUN.md#已转换模型与自动化范围)。
 
 - 每张输入最多 32 MiB、32 M 像素；输出长边 64–512、16 的倍数，裁剪后短边至少 64。Web 提供 128/256/384/512 四档。
 - 视频最多 256 MiB、8 位 SDR、方形像素且方向已转正；短片长边 64–128、最多 17 帧，输出无音轨 MP4。当前不支持 HDR、长视频分块或流式缓存，详见[短视频范围](docs/video-runtime.md)。
@@ -238,7 +241,7 @@ dist/seedvr2-0.7.0/bin/seedvr2-studio
 ## 独立 CLI
 
 ```sh
-dist/seedvr2-0.7.0/bin/seedvr2 run-video --model dist/seedvr2-0.7.0/models/video \
+dist/tutorial/bin/seedvr2 run-video --model .cache/tutorial/video-package \
   --input /path/to/input.mp4 --output /path/to/new-video-result \
   --frames 17 --size 128 --backend vulkan --gpu 0 --seed 666
 ```
@@ -246,12 +249,12 @@ dist/seedvr2-0.7.0/bin/seedvr2 run-video --model dist/seedvr2-0.7.0/models/video
 视频完整时序链路、包准备和复现命令见 [video-runtime.md](docs/video-runtime.md)。
 
 ```sh
-dist/seedvr2-0.7.0/bin/seedvr2 run --model dist/seedvr2-0.7.0/models/image \
+dist/tutorial/bin/seedvr2 run --model .cache/tutorial/image-package \
   --input /path/to/input.png --output /path/to/new-result \
   --size 512 --backend vulkan --gpu 0 --seed 666
 
 # 无需启动 Web，CPU 使用同一条完整处理链
-dist/seedvr2-0.7.0/bin/seedvr2 run --model dist/seedvr2-0.7.0/models/image \
+dist/tutorial/bin/seedvr2 run --model .cache/tutorial/image-package \
   --input /path/to/input.jpg --output /path/to/another-result \
   --size 256 --backend cpu --threads 4
 ```
@@ -259,14 +262,14 @@ dist/seedvr2-0.7.0/bin/seedvr2 run --model dist/seedvr2-0.7.0/models/image \
 图片输出目录须不存在或为空，包含 `output.png`、与结果对齐的 `comparison-input.png` 和 `run.json`。标准输出为结果 JSON，标准错误输出进度与诊断。`--diagnostic-tensors` 额外保存中间张量供开发数值验证。CLI 运行结果保存在指定目录，不会自动加入 Web 队列。
 
 ```sh
-dist/seedvr2-0.7.0/bin/seedvr2 engine status
-dist/seedvr2-0.7.0/bin/seedvr2 engine devices
-dist/seedvr2-0.7.0/bin/seedvr2 engine self-test --backend cpu --save
-dist/seedvr2-0.7.0/bin/seedvr2 engine self-test --backend vulkan --gpu 0 --save
-dist/seedvr2-0.7.0/bin/seedvr2 plan --request examples/plan-720p.json --save
-dist/seedvr2-0.7.0/bin/seedvr2 models status
-dist/seedvr2-0.7.0/bin/seedvr2 models audit --bundle examples/model-evidence-empty
-dist/seedvr2-0.7.0/bin/seedvr2 history list --kind operator-test
+dist/tutorial/bin/seedvr2 engine status
+dist/tutorial/bin/seedvr2 engine devices
+dist/tutorial/bin/seedvr2 engine self-test --backend cpu --save
+dist/tutorial/bin/seedvr2 engine self-test --backend vulkan --gpu 0 --save
+dist/tutorial/bin/seedvr2 plan --request examples/plan-720p.json --save
+dist/tutorial/bin/seedvr2 models status
+dist/tutorial/bin/seedvr2 models audit --bundle examples/model-evidence-empty
+dist/tutorial/bin/seedvr2 history list --kind operator-test
 ```
 
 空证据包审计退出 **6** 是预期结果，表示没有模型证书。`models status` 查询退出 0 只表示查询成功。规划记录为 `PLANNED`，与真实图像任务分开保存。CLI 的全局 `--database PATH` 置于子命令前，可与 Web 共用工作区。
@@ -283,7 +286,7 @@ npm run build --prefix apps/studio
 cmake --preset release
 cmake --build --preset release --parallel 4
 ctest --preset release
-cmake --install build/release --prefix dist/seedvr2-0.7.0
+cmake --install build/release --prefix dist/tutorial
 ```
 
 依赖准备显式联网，版本和归档 SHA-256 已锁定；缓存齐全后使用 `--offline`。CMake 不下载依赖。运行库锁定为 2026-09-08 查询时的官方 HEAD `3b7bdba7fc8aea8fd46779533eee027df77c639d`，转换器独立固定 `6a1bf000f363714839a36793addc8c879d3d899e`，没有使用相邻本地工作树。0.7.0 应用编译了经过哈希校验的 `host-buffer-v1` 分配器修正副本，原始 ncnn 源目录与归档不变；运行报告明确记录该修正和实际加载 SDK 的身份。旧导出及实验仍绑定原版本，不重新标注为新运行库；构建不会自动追随远端 HEAD。
@@ -301,14 +304,14 @@ cmake --build --preset cli --parallel 4
 
 ## 历史验证与技术文档
 
-本轮 SDK、JPEG 修正、离线验证、组件复核、ABBA 内存/时间测量与 CI 的当前结论见 [DELIVERY-RESULTS.md](docs/DELIVERY-RESULTS.md)。以下旧图像/视频报告保留各自执行版本，不能代替当前构建的实测。公共 SDK 源码导航见 [ARCHITECTURE.md](docs/ARCHITECTURE.md)。
+较早的 SDK、JPEG 修正、离线验证、组件复核、ABBA 内存/时间测量与 CI 记录见 [DELIVERY-RESULTS.md](docs/DELIVERY-RESULTS.md)。以下旧图像/视频报告保留各自执行版本，不能代替当前构建的实测。公共 SDK 源码导航见 [ARCHITECTURE.md](docs/ARCHITECTURE.md)。
 
 已完成两种尺寸的官方 FP32-B 全链路对比：每条轨迹 73 个中间结果逐元素通过，8 位输出最大相差 1。CPU 与最终优化后的 Vulkan 构建也对保留参考进行了复核。**这些是有明确范围的开发数值证据，不是图像质量验收或完整模型认证。** 视频早期的时序 VAE 16/16 个 CPU/Vulkan 子模型检查、6 帧 64×64 完整轨迹 73/73 通过记录继续保留。17 帧 128×128 的历史结果曾为 Vulkan 60/73、CPU 70/73，严格判失败；后续数值修复后同一保留轨迹在 CPU/Vulkan 均达到 73/73，见 [视频数值修复](docs/VIDEO-NUMERICS.md)。历史失败未删除，当前 0.7.0 两种内存策略的复核见 [内存验证](docs/MEMORY-VALIDATION.md)。官方 BF16/FlashAttention、长视频和正式验收阈值尚未完成。
 
 - [短视频运行时](docs/video-runtime.md) / [包含负结果的视频验证](docs/video-validation.md)
 - [最新 ncnn 的 FP16/BF16 实测与真实组件误差](docs/PRECISION-VALIDATION.md)
 - [完整单图链路、模型包与复现命令](docs/image-runtime.md)
-- [当前验证报告与限制](docs/image-validation.md) / [机器可读状态](docs/status.json)
+- [当前数值验证](docs/NUMERICS-REPAIR.md) / [剩余范围](docs/CURRENT-GAPS.md) / [机器可读状态](docs/status.json)
 - [应用框架和模块职责](docs/full-stack-framework.md) / [任务架构决定](docs/adr/0007-image-runtime-and-jobs.md)
 - [严格模型验收](docs/model-validation.md) / [模型内部结构](docs/architecture.md)
 - [本地 Web API](docs/local-web.md) / [OpenAPI](schemas/local-api.v1.openapi.json)

@@ -1,0 +1,60 @@
+#version 450
+// Locked FP32-B VAE boundaries. RGB uses channel/time/height/width order.
+// Blocked spatial convolutions follow oneDNN 3.7.1's partial sums and bias order.
+layout(local_size_x=128,local_size_y=1,local_size_z=1) in;
+layout(binding=0) readonly buffer Input { float input_data[]; };
+layout(binding=1) readonly buffer Weights { vec4 weights[]; };
+layout(binding=2) readonly buffer Bias { vec4 bias[]; };
+layout(binding=3) writeonly buffer Output { float output_data[]; };
+layout(push_constant) uniform parameter {
+    int w,h,t,cstep,ow,oh,ot,ocstep,channels,st,s,pad,inputs,blocked,kt;
+} p;
+void main() {
+    int pos=int(gl_GlobalInvocationID.x)+int(gl_GlobalInvocationID.y)*65536;
+    int group=int(gl_GlobalInvocationID.z);
+    int count=p.ow*p.oh*p.ot;
+    if (pos>=count || group>=p.channels/4) return;
+    int x=pos%p.ow,y=(pos/p.ow)%p.oh,t=pos/(p.ow*p.oh);
+    precise vec4 sum=vec4(0.);
+    if (p.blocked==2) {
+        // Channel-changing residual shortcut, unlike the attention linears.
+        sum=bias[group];
+        for (int c=0;c<p.inputs;++c)
+            sum=fma(vec4(input_data[c*p.cstep+pos]),weights[group*p.inputs+c],sum);
+    } else if (p.blocked==1) {
+        sum=bias[group];
+        for (int base=0;base<p.inputs;base+=16) {
+            precise vec4 partial=vec4(0.);
+            for (int kt=0;kt<p.kt;++kt) {
+                int it=max(t*p.st-(p.kt-1)+kt,0);
+                for (int ky=0;ky<3;++ky) for (int kx=0;kx<3;++kx) {
+                    int iy=y*p.s-p.pad+ky,ix=x*p.s-p.pad+kx;
+                    for (int lane=0;lane<16;++lane) {
+                        int c=base+lane;
+                        float value=0.;
+                        if (iy>=0 && iy<p.h && ix>=0 && ix<p.w)
+                            value=input_data[c*p.cstep+(it*p.h+iy)*p.w+ix];
+                        int index=((c*p.kt+kt)*3+ky)*3+kx;
+                        partial=fma(vec4(value),weights[group*(p.inputs*p.kt*9)+index],partial);
+                    }
+                }
+            }
+            sum=partial+sum;
+        }
+    } else {
+        for (int c=0;c<p.inputs;++c) for (int kt=0;kt<p.kt;++kt) {
+            int it=max(t*p.st-(p.kt-1)+kt,0);
+            for (int ky=0;ky<3;++ky) for (int kx=0;kx<3;++kx) {
+                int iy=y*p.s-p.pad+ky,ix=x*p.s-p.pad+kx;
+                float value=0.;
+                if (iy>=0 && iy<p.h && ix>=0 && ix<p.w)
+                    value=input_data[c*p.cstep+(it*p.h+iy)*p.w+ix];
+                int index=((c*p.kt+kt)*3+ky)*3+kx;
+                sum=fma(vec4(value),weights[group*(p.inputs*p.kt*9)+index],sum);
+            }
+        }
+        sum=sum+bias[group];
+    }
+    for (int lane=0;lane<4;++lane)
+        output_data[(group*4+lane)*p.ocstep+pos]=sum[lane];
+}

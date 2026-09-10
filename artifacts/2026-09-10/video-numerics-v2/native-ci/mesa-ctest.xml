@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-c++"
+	tests="22"
+	failures="0"
+	disabled="0"
+	skipped="12"
+	hostname="mios-pc"
+	time="2"
+	timestamp="2026-09-10T16:07:08"
+	>
+	<testcase name="engine.memory-vulkan" classname="engine.memory-vulkan" time="0.132574" status="run">
+		<properties>
+			<property name="cmake_labels" value="vulkan"/>
+		</properties>
+		<system-out>[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+{
+  "device": {
+    "api_version": 4211042,
+    "device_id": 0,
+    "driver_version": 109056008,
+    "index": 0,
+    "name": "llvmpipe (LLVM 22.1.8, 256 bits)",
+    "subgroup_size": 8,
+    "vendor_id": 65541
+  },
+  "live_driver_budget": {
+    "budget_bytes": 33308995584,
+    "heap_index": 0,
+    "source": "VK_EXT_memory_budget_estimate",
+    "usage_bytes": 17792172032
+  },
+  "passed": true,
+  "scope": "Four real Vulkan GEMMs; controlled budgets are not physical VRAM exhaustion",
+  "steps": [
+    {
+      "activation_offload": false,
+      "actual_weight_memory": "not_instrumented",
+      "available_bytes": 200,
+      "before_load": {
+        "budget_b...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="engine.awa-rope-vulkan" classname="engine.awa-rope-vulkan" time="0.141321" status="run">
+		<properties>
+			<property name="cmake_labels" value="vulkan"/>
+		</properties>
+		<system-out>[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+checked=3792 finite_max_abs=1.35118e-07 nonfinite=0 violations=0
+</system-out>
+	</testcase>
+	<testcase name="engine.awa-sdpa-fp32-vulkan" classname="engine.awa-sdpa-fp32-vulkan" time="0.142619" status="run">
+		<properties>
+			<property name="cmake_labels" value="vulkan"/>
+		</properties>
+		<system-out>[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+checked=40448 finite_max_abs=0 nonfinite=0 violations=0
+</system-out>
+	</testcase>
+	<testcase name="engine.awa-rope-vulkan-host" classname="engine.awa-rope-vulkan-host" time="0.144636" status="run">
+		<properties>
+			<property name="cmake_labels" value="vulkan"/>
+		</properties>
+		<system-out>[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+checked=3792 finite_max_abs=1.35118e-07 nonfinite=0 violations=0
+</system-out>
+	</testcase>
+	<testcase name="engine.awa-sdpa-fp32-vulkan-host" classname="engine.awa-sdpa-fp32-vulkan-host" time="0.141961" status="run">
+		<properties>
+			<property name="cmake_labels" value="vulkan"/>
+		</properties>
+		<system-out>[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+checked=40448 finite_max_abs=0 nonfinite=0 violations=0
+</system-out>
+	</testcase>
+	<testcase name="engine.temporal-conv-bias-vulkan" classname="engine.temporal-conv-bias-vulkan" time="0.153827" status="run">
+		<properties>
+			<property name="cmake_labels" value="vulkan"/>
+		</properties>
+		<system-out>[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+PASS: pointwise temporal convolution retains bias after cancellation; checked=288 failed=0 max_abs=0
+</system-out>
+	</testcase>
+	<testcase name="engine.awa-rounding-vulkan" classname="engine.awa-rounding-vulkan" time="0.145462" status="run">
+		<properties>
+			<property name="cmake_labels" value="vulkan"/>
+		</properties>
+		<system-out>[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+checked=3792 finite_max_abs=0 nonfinite=0 violations=0
+</system-out>
+	</testcase>
+	<testcase name="engine.fp32-device-contract" classname="engine.fp32-device-contract" time="0.341466" status="run">
+		<properties>
+			<property name="cmake_labels" value="vulkan"/>
+		</properties>
+		<system-out>{
+  "passed": true,
+  "device": "llvmpipe (LLVM 22.1.8, 256 bits)",
+  "arithmetic": {
+    "checked": 8,
+    "failed": 8,
+    "model_verified": false,
+    "protocol": "fp32-fma-residual-v1",
+    "scope": "Required arithmetic prerequisite; not a full numerical or model validation",
+    "supported": false,
+    "values": [
+      {
+        "actual": 0.0,
+        "expected": -1.4901161193847656e-08,
+        "matched": false
+      },
+      {
+        "actual": 0.0,
+        "expected": 3.725290298461914e-09,
+        "matched": false
+      },
+      {
+        "actual": 0.0,
+        "expected": -9.313225746154785e-10,
+        "matched": false
+      },
+      {
+        "actual": 0.0,
+        "expected": 2.3283064365386963e-10,
+        "matched": false
+      },
+      {
+        "actual": 0.0,
+        "expected": -5.820766091346741e-11,
+        "matched": false
+      },
+      {
+        "actual": 0.0,
+        "expected": 1.4551915228366852e-11,
+        "matched": false
+      },
+      {
+        "actual": 0.0,
+        "expected"...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="engine.rms-norm-fp32" classname="engine.rms-norm-fp32" time="0.105616" status="notrun">
+		<skipped message="SKIP_RETURN_CODE=77"/>
+		<properties>
+			<property name="cmake_labels" value="vulkan"/>
+		</properties>
+		<system-out>[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+SKIP: device lacks the FP32 FMA residual prerequisite; full FP32-B inference is rejected by preflight
+</system-out>
+	</testcase>
+	<testcase name="engine.linear-fp32" classname="engine.linear-fp32" time="0.105951" status="notrun">
+		<skipped message="SKIP_RETURN_CODE=77"/>
+		<properties>
+			<property name="cmake_labels" value="vulkan"/>
+		</properties>
+		<system-out>[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+SKIP: device lacks the FP32 FMA residual prerequisite; full FP32-B inference is rejected by preflight
+</system-out>
+	</testcase>
+	<testcase name="engine.linear-host-fp32" classname="engine.linear-host-fp32" time="0.113063" status="notrun">
+		<skipped message="SKIP_RETURN_CODE=77"/>
+		<properties>
+			<property name="cmake_labels" value="vulkan"/>
+		</properties>
+		<system-out>[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+SKIP: device lacks the FP32 FMA residual prerequisite; full FP32-B inference is rejected by preflight
+</system-out>
+	</testcase>
+	<testcase name="engine.silu-fp32" classname="engine.silu-fp32" time="0.10624" status="notrun">
+		<skipped message="SKIP_RETURN_CODE=77"/>
+		<properties>
+			<property name="cmake_labels" value="vulkan"/>
+		</properties>
+		<system-out>[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+SKIP: device lacks the FP32 FMA residual prerequisite; full FP32-B inference is rejected by preflight
+</system-out>
+	</testcase>
+	<testcase name="engine.softmax-fp32" classname="engine.softmax-fp32" time="0.107599" status="notrun">
+		<skipped message="SKIP_RETURN_CODE=77"/>
+		<properties>
+			<property name="cmake_labels" value="vulkan"/>
+		</properties>
+		<system-out>[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+SKIP: device lacks the FP32 FMA residual prerequisite; full FP32-B inference is rejected by preflight
+</system-out>
+	</testcase>
+	<testcase name="engine.awa-rms-fp32" classname="engine.awa-rms-fp32" time="0.105109" status="notrun">
+		<skipped message="SKIP_RETURN_CODE=77"/>
+		<properties>
+			<property name="cmake_labels" value="vulkan"/>
+		</properties>
+		<system-out>[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+SKIP: device lacks the FP32 FMA residual prerequisite; full FP32-B inference is rejected by preflight
+</system-out>
+	</testcase>
+	<testcase name="engine.frame-norm-fp32" classname="engine.frame-norm-fp32" time="0.105572" status="notrun">
+		<skipped message="SKIP_RETURN_CODE=77"/>
+		<properties>
+			<property name="cmake_labels" value="vulkan"/>
+		</properties>
+		<system-out>[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+SKIP: device lacks the FP32 FMA residual prerequisite; full FP32-B inference is rejected by preflight
+</system-out>
+	</testcase>
+	<testcase name="engine.frame-norm-cascade-fp32" classname="engine.frame-norm-cascade-fp32" time="0.108782" status="notrun">
+		<skipped message="SKIP_RETURN_CODE=77"/>
+		<properties>
+			<property name="cmake_labels" value="vulkan"/>
+		</properties>
+		<system-out>[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+SKIP: device lacks the FP32 FMA residual prerequisite; full FP32-B inference is rejected by preflight
+</system-out>
+	</testcase>
+	<testcase name="engine.frame-sdpa-fp32-vulkan" classname="engine.frame-sdpa-fp32-vulkan" time="0.118892" status="run">
+		<properties>
+			<property name="cmake_labels" value="vulkan"/>
+		</properties>
+		<system-out>[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+checked=6144 max_abs=2.08616e-07 violations=0
+</system-out>
+	</testcase>
+	<testcase name="engine.rgb-conv-fp32" classname="engine.rgb-conv-fp32" time="0.104779" status="notrun">
+		<skipped message="SKIP_RETURN_CODE=77"/>
+		<properties>
+			<property name="cmake_labels" value="vulkan"/>
+		</properties>
+		<system-out>[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+SKIP: device lacks the FP32 FMA residual prerequisite; full FP32-B inference is rejected by preflight
+</system-out>
+	</testcase>
+	<testcase name="engine.rgb-conv-host-fp32" classname="engine.rgb-conv-host-fp32" time="0.105113" status="notrun">
+		<skipped message="SKIP_RETURN_CODE=77"/>
+		<properties>
+			<property name="cmake_labels" value="vulkan"/>
+		</properties>
+		<system-out>[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+SKIP: device lacks the FP32 FMA residual prerequisite; full FP32-B inference is rejected by preflight
+</system-out>
+	</testcase>
+	<testcase name="engine.posterior-projection-fp32" classname="engine.posterior-projection-fp32" time="0.103128" status="notrun">
+		<skipped message="SKIP_RETURN_CODE=77"/>
+		<properties>
+			<property name="cmake_labels" value="vulkan"/>
+		</properties>
+		<system-out>[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+SKIP: device lacks the FP32 FMA residual prerequisite; full FP32-B inference is rejected by preflight
+</system-out>
+	</testcase>
+	<testcase name="engine.posterior-projection-host-fp32" classname="engine.posterior-projection-host-fp32" time="0.101421" status="notrun">
+		<skipped message="SKIP_RETURN_CODE=77"/>
+		<properties>
+			<property name="cmake_labels" value="vulkan"/>
+		</properties>
+		<system-out>[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+SKIP: device lacks the FP32 FMA residual prerequisite; full FP32-B inference is rejected by preflight
+</system-out>
+	</testcase>
+	<testcase name="engine.text-pool-fp32" classname="engine.text-pool-fp32" time="0.10885" status="run">
+		<properties>
+			<property name="cmake_labels" value="vulkan"/>
+		</properties>
+		<system-out>[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+windows=1 violations=0
+windows=3 violations=0
+windows=5 violations=0
+windows=4 violations=0
+windows=8 violations=0
+windows=17 violations=0
+windows=32 violations=0
+checked=51968 changed=0 max_abs=0 violations=0
+</system-out>
+	</testcase>
+</testsuite>

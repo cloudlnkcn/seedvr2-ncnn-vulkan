@@ -109,9 +109,9 @@ struct Filter { int first; std::vector<float> weights; };
 float cubic(float x) {
     x = std::abs(x);
     if (x < 1.f)
-        return ((1.5f*x-2.5f)*x)*x+1.f;
+        return std::fma(std::fma(1.5f,x,-2.5f)*x,x,1.f);
     if (x < 2.f)
-        return ((-.5f*x+2.5f)*x-4.f)*x+2.f;
+        return std::fma(std::fma(std::fma(-.5f,x,2.5f),x,-4.f),x,2.f);
     return 0.f;
 }
 std::vector<Filter> filters(int source, int destination) {
@@ -136,6 +136,23 @@ std::vector<Filter> filters(int source, int destination) {
     }
     return out;
 }
+float rounded_product(float a,float b) {
+    // Keep the SIMD-batch products rounded separately, including on compilers
+    // that contract a multiplication with its subsequent addition by default.
+    volatile float product=a*b;
+    return product;
+}
+template<class Read> float resample(const Filter &filter,Read read) {
+    // Locked FP32-B antialias evaluation: first term, four-term batches with
+    // separately rounded products, then fused scalar tail. Coefficients use
+    // the same fused cubic polynomial. Applying FMA to every term is different.
+    const auto size=filter.weights.size();
+    float value=rounded_product(read(0),filter.weights[0]);
+    const auto end=1+(size-1)/4*4;
+    for (std::size_t j=1;j<end;++j) value+=rounded_product(read(j),filter.weights[j]);
+    for (std::size_t j=end;j<size;++j) value=std::fma(read(j),filter.weights[j],value);
+    return value;
+}
 }
 ncnn::Mat prepare_image(const ImagePixels &input, int long_side) {
     if (long_side < 64 || long_side > 512 || long_side % 16)
@@ -156,18 +173,15 @@ ncnn::Mat prepare_image(const ImagePixels &input, int long_side) {
         auto temp = intermediate.channel(c);
         for (int y = 0; y < input.height; ++y)
             for (int x = 0; x < rw; ++x) {
-                float value = 0;
-                for (std::size_t j = 0; j < fx[x].weights.size(); ++j)
-                    value += (input.rgb[(std::size_t(y)*input.width+fx[x].first+j)*3+c]/255.f)*fx[x].weights[j];
-                temp.row(y)[x] = value;
+                temp.row(y)[x] = resample(fx[x],[&](std::size_t j) {
+                    return input.rgb[(std::size_t(y)*input.width+fx[x].first+j)*3+c]/255.f;
+                });
             }
         auto dest = output.channel(c);
         for (int y = 0; y < height; ++y)
             for (int x = 0; x < width; ++x) {
-                float value = 0;
                 const auto &filter = fy[y+oy];
-                for (std::size_t j = 0; j < filter.weights.size(); ++j)
-                    value += temp.row(filter.first+int(j))[x+ox]*filter.weights[j];
+                const float value = resample(filter,[&](std::size_t j) {return temp.row(filter.first+int(j))[x+ox];});
                 dest.row(y)[x] = (std::clamp(value, 0.f, 1.f)-.5f)/.5f;
             }
     }

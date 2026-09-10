@@ -1,0 +1,449 @@
+{
+  "schema_version": "seedvr2-posterior-projection-fixture-v2",
+  "torch_version": "2.9.0+cpu",
+  "generator_sha256": "bc788f42c8e01acad8833553a17ab3c8fc0244149c3dec77bb9bc9a7a008b562",
+  "oracle": "Explicit oneDNN FP32 conv3d via torch mkldnn tensor; original FP64-rounded reference retained as an accuracy diagnostic",
+  "default_dense_backend": "_ConvBackend.Slow3d",
+  "oracle_backend": "Mkldnn (explicit)",
+  "torch_build": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 201703\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.7.1 (Git Hash 8d263e693366ef8db40acc569cc7d8edf644556d)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX512\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=0fabc3ba44823f257e70ce397d989c8de5e362c1, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DLIBKINETO_NOCUPTI -DLIBKINETO_NOROCTRACER -DLIBKINETO_NOXPUPTI=ON -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.9.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+  "tolerance": "Exact oneDNN FP32 reference; FP64 differences reported separately; not a full-model gate",
+  "cases": [
+    {
+      "stride": 1,
+      "input": {
+        "path": "input.f32",
+        "dtype": "f32le",
+        "shape": [
+          512,
+          3,
+          3,
+          4
+        ],
+        "sha256": "3a5b9c876c39d9878d2a9bcf7b3063dcbe35c031384a833f249cc9beba2b1369"
+      },
+      "weights": {
+        "path": "weights.f32",
+        "dtype": "f32le",
+        "shape": [
+          442400
+        ],
+        "sha256": "c7593daf7f8611e3bb537f23a3e2aa71832673e66e6a979ddd39474101d77245"
+      },
+      "reference": {
+        "path": "reference.f32",
+        "dtype": "f32le",
+        "shape": [
+          32,
+          3,
+          3,
+          4
+        ],
+        "sha256": "c5dd764a1daacb042b97d417df08b3071d8b916b06a447e62460b43d1a154bcf"
+      },
+      "onednn_fp32": {
+        "path": "onednn-fp32.f32",
+        "dtype": "f32le",
+        "shape": [
+          32,
+          3,
+          3,
+          4
+        ],
+        "sha256": "897f44f4f5f03491f4096566b3b3f3cadeb89c74c8619de909642ca398bba902"
+      }
+    },
+    {
+      "stride": 1,
+      "temporal_stride": 1,
+      "temporal_kernel": 3,
+      "kernel": 3,
+      "padding": 1,
+      "end_padding": 1,
+      "input": {
+        "path": "blocked-0-input.f32",
+        "dtype": "f32le",
+        "shape": [
+          16,
+          5,
+          7,
+          9
+        ],
+        "sha256": "2490a78acd99a26a5d0b81050c90a105197b7d3a32eea987603c3989819e7782"
+      },
+      "weights": {
+        "path": "blocked-0-weights.f32",
+        "dtype": "f32le",
+        "shape": [
+          13856
+        ],
+        "sha256": "374c95ee38f69abc54765ef89dce2cddfc7590f4fb3c015207b09671a2cc621f"
+      },
+      "reference": {
+        "path": "blocked-0-fp64.f32",
+        "dtype": "f32le",
+        "shape": [
+          32,
+          5,
+          7,
+          9
+        ],
+        "sha256": "b4f0a4a0b3d4b4f35e1bb669802aae86fc21dc244d3e711a7ee71004542b385f"
+      },
+      "onednn_fp32": {
+        "path": "blocked-0-onednn.f32",
+        "dtype": "f32le",
+        "shape": [
+          32,
+          5,
+          7,
+          9
+        ],
+        "sha256": "25de221d6c0240b20af089dd6ade75323913d249495bbeb322fde14e05791a5d"
+      }
+    },
+    {
+      "stride": 1,
+      "temporal_stride": 1,
+      "temporal_kernel": 3,
+      "kernel": 3,
+      "padding": 1,
+      "end_padding": 1,
+      "input": {
+        "path": "blocked-1-input.f32",
+        "dtype": "f32le",
+        "shape": [
+          128,
+          5,
+          7,
+          9
+        ],
+        "sha256": "3472cb9988c823b2f739f7276c2aa3a3b912e21b2c87d39c29f1d6c75593ece0"
+      },
+      "weights": {
+        "path": "blocked-1-weights.f32",
+        "dtype": "f32le",
+        "shape": [
+          442496
+        ],
+        "sha256": "46c8b73d0798ae62f2c3f3e85ab01332d39c43b1f1d52803131adcf0e11f7b99"
+      },
+      "reference": {
+        "path": "blocked-1-fp64.f32",
+        "dtype": "f32le",
+        "shape": [
+          128,
+          5,
+          7,
+          9
+        ],
+        "sha256": "cf95fe895ca33be719f552607bb353e38225add3c0333716700cd26b360921aa"
+      },
+      "onednn_fp32": {
+        "path": "blocked-1-onednn.f32",
+        "dtype": "f32le",
+        "shape": [
+          128,
+          5,
+          7,
+          9
+        ],
+        "sha256": "adce2e484cf35f0148ad0cf74c02c4297c4307f966abe30d557b30219eaa7687"
+      }
+    },
+    {
+      "stride": 2,
+      "temporal_stride": 2,
+      "temporal_kernel": 3,
+      "kernel": 3,
+      "padding": 0,
+      "end_padding": 1,
+      "input": {
+        "path": "blocked-2-input.f32",
+        "dtype": "f32le",
+        "shape": [
+          256,
+          5,
+          7,
+          9
+        ],
+        "sha256": "f44e89f8fb0bb5651e0115bde934fe2d4bd4148d84bca4a500bb0ed611d68424"
+      },
+      "weights": {
+        "path": "blocked-2-weights.f32",
+        "dtype": "f32le",
+        "shape": [
+          1769728
+        ],
+        "sha256": "319dd3741937863dc9136ed4b7b334bec898b66d73df0d992460e1963649d7f2"
+      },
+      "reference": {
+        "path": "blocked-2-fp64.f32",
+        "dtype": "f32le",
+        "shape": [
+          256,
+          3,
+          3,
+          4
+        ],
+        "sha256": "40c01b3a4befcc49b389330f75b497258b5bf6fd7529e3db8ac6fb5cab54791b"
+      },
+      "onednn_fp32": {
+        "path": "blocked-2-onednn.f32",
+        "dtype": "f32le",
+        "shape": [
+          256,
+          3,
+          3,
+          4
+        ],
+        "sha256": "5f0dd806df7993dc954ac239cad41ae452b3e8adfcf54d1b4e741db9d1de2c36"
+      }
+    },
+    {
+      "stride": 2,
+      "temporal_stride": 1,
+      "temporal_kernel": 1,
+      "kernel": 3,
+      "padding": 0,
+      "end_padding": 1,
+      "input": {
+        "path": "blocked-3-input.f32",
+        "dtype": "f32le",
+        "shape": [
+          128,
+          5,
+          7,
+          9
+        ],
+        "sha256": "555e98fea2fccda7d665e24164f029dde564015bad6cb7151033d1f100a8df30"
+      },
+      "weights": {
+        "path": "blocked-3-weights.f32",
+        "dtype": "f32le",
+        "shape": [
+          147584
+        ],
+        "sha256": "7e66ded8d46bae477514abc7cd6759a284091fb27ce84f4ebf2e834b17c345cb"
+      },
+      "reference": {
+        "path": "blocked-3-fp64.f32",
+        "dtype": "f32le",
+        "shape": [
+          128,
+          5,
+          3,
+          4
+        ],
+        "sha256": "ffd785fc36b1f8c5c42114748daafff33b4c161a9c838345becd049a91fb587a"
+      },
+      "onednn_fp32": {
+        "path": "blocked-3-onednn.f32",
+        "dtype": "f32le",
+        "shape": [
+          128,
+          5,
+          3,
+          4
+        ],
+        "sha256": "22cce858064539d766cb0fba64ef2d828bd1490efbc9b427811208c55880f263"
+      }
+    },
+    {
+      "stride": 1,
+      "temporal_stride": 1,
+      "temporal_kernel": 1,
+      "kernel": 1,
+      "padding": 0,
+      "end_padding": 0,
+      "input": {
+        "path": "blocked-4-input.f32",
+        "dtype": "f32le",
+        "shape": [
+          128,
+          5,
+          7,
+          9
+        ],
+        "sha256": "42f5f1e674641be2bb7bec6a85cef66963261f83f1fa1a2c81e3c8e5db4fcad6"
+      },
+      "weights": {
+        "path": "blocked-4-weights.f32",
+        "dtype": "f32le",
+        "shape": [
+          33024
+        ],
+        "sha256": "050526e82f31ea55b249dd8bb84c026450ba66300c741b302287ed06a860edc3"
+      },
+      "reference": {
+        "path": "blocked-4-fp64.f32",
+        "dtype": "f32le",
+        "shape": [
+          256,
+          5,
+          7,
+          9
+        ],
+        "sha256": "63d8c8f999f4412d092f6a2794a6c03b363a6fc65025405a5255807848d75b45"
+      },
+      "onednn_fp32": {
+        "path": "blocked-4-onednn.f32",
+        "dtype": "f32le",
+        "shape": [
+          256,
+          5,
+          7,
+          9
+        ],
+        "sha256": "ee6c0ffc22922774ec40b2cf13fb4ca061442296f7e3a843fa3097be59832af6"
+      }
+    },
+    {
+      "stride": 1,
+      "temporal_stride": 1,
+      "temporal_kernel": 1,
+      "kernel": 1,
+      "padding": 0,
+      "end_padding": 0,
+      "input": {
+        "path": "blocked-5-input.f32",
+        "dtype": "f32le",
+        "shape": [
+          256,
+          5,
+          7,
+          9
+        ],
+        "sha256": "24bed810e8c2c8da24b9a6bb323522904da22213aa7d18e9ab85785d606ba5c5"
+      },
+      "weights": {
+        "path": "blocked-5-weights.f32",
+        "dtype": "f32le",
+        "shape": [
+          131584
+        ],
+        "sha256": "e01e2bfa792b0e7c54a04d363da4886517d94f603c3c9eb63a9a53fb52ef58f9"
+      },
+      "reference": {
+        "path": "blocked-5-fp64.f32",
+        "dtype": "f32le",
+        "shape": [
+          512,
+          5,
+          7,
+          9
+        ],
+        "sha256": "9a91876bbe860e18afc23f68cd440d0ac1b7c5bb7eab7889bbf3e314e6860c51"
+      },
+      "onednn_fp32": {
+        "path": "blocked-5-onednn.f32",
+        "dtype": "f32le",
+        "shape": [
+          512,
+          5,
+          7,
+          9
+        ],
+        "sha256": "9b0591bce86cebdf50455097f2d86fd1e2afb16a7755035b1e8b1ff418865860"
+      }
+    },
+    {
+      "stride": 1,
+      "temporal_stride": 1,
+      "temporal_kernel": 1,
+      "kernel": 1,
+      "padding": 0,
+      "end_padding": 0,
+      "input": {
+        "path": "blocked-6-input.f32",
+        "dtype": "f32le",
+        "shape": [
+          512,
+          5,
+          7,
+          9
+        ],
+        "sha256": "491b5c61dd9af9bc5056276f719357bc4472b8990e648bbffe0ef91d691fe56e"
+      },
+      "weights": {
+        "path": "blocked-6-weights.f32",
+        "dtype": "f32le",
+        "shape": [
+          131328
+        ],
+        "sha256": "45dba1f41be1f7e345b4f9fa22b15023379e4f55c2a4901f7ee01f2ebf345020"
+      },
+      "reference": {
+        "path": "blocked-6-fp64.f32",
+        "dtype": "f32le",
+        "shape": [
+          256,
+          5,
+          7,
+          9
+        ],
+        "sha256": "2e00fc4c01310ded80c4df9fe96b5c6ad3ee74c21fc26a26118cff2f36cf0e7f"
+      },
+      "onednn_fp32": {
+        "path": "blocked-6-onednn.f32",
+        "dtype": "f32le",
+        "shape": [
+          256,
+          5,
+          7,
+          9
+        ],
+        "sha256": "7b7a0c9239d6eaf1172fa66b03dc97add418f2c657cfefc2f02a5ad74722427b"
+      }
+    },
+    {
+      "stride": 1,
+      "temporal_stride": 1,
+      "temporal_kernel": 1,
+      "kernel": 1,
+      "padding": 0,
+      "end_padding": 0,
+      "input": {
+        "path": "blocked-7-input.f32",
+        "dtype": "f32le",
+        "shape": [
+          256,
+          5,
+          7,
+          9
+        ],
+        "sha256": "5da3c0ac779787767f695e40d080294ad8d1b84743d869e79ce9bc068ea64cde"
+      },
+      "weights": {
+        "path": "blocked-7-weights.f32",
+        "dtype": "f32le",
+        "shape": [
+          32896
+        ],
+        "sha256": "a0e0215bdae5c06f4939deecc25462c3ac936c258f7f2ed20babe38ac41853a4"
+      },
+      "reference": {
+        "path": "blocked-7-fp64.f32",
+        "dtype": "f32le",
+        "shape": [
+          128,
+          5,
+          7,
+          9
+        ],
+        "sha256": "812c0b3b2945cd5145228cc7318f5d64e8fb6a82b4102d1ebc7f98ef763ab48b"
+      },
+      "onednn_fp32": {
+        "path": "blocked-7-onednn.f32",
+        "dtype": "f32le",
+        "shape": [
+          128,
+          5,
+          7,
+          9
+        ],
+        "sha256": "c10bf1ff467c44079f2b8a3f0ed3f5c802f511680d0c873e7a017925e88c0e06"
+      }
+    }
+  ],
+  "model_verified": false
+}

@@ -2,6 +2,9 @@
 #include "graph.hpp"
 #include "awa.hpp"
 #include "constant.hpp"
+#include "rms_norm.hpp"
+#include "linear.hpp"
+#include "silu.hpp"
 #include "engine_build.hpp"
 #include <iostream>
 
@@ -32,12 +35,15 @@ int main(int argc, char **argv) {
         e::ExecutionTrace awa;
         const auto param=d::artifact(root,doc.at("model_param"));
         const auto weights=d::artifact(root,doc.at("model_bin"),1024ULL*1024*1024);
-        if (e::register_awa(net,awa) || e::register_constant(net) || net.load_param(param.c_str()) ||
+        if (e::register_awa(net,awa) || e::register_constant(net) || e::register_dit_rms_norm(net) || e::register_dit_linear(net) || e::register_dit_silu(net) || net.load_param(param.c_str()) ||
             net.layers().size()>512 || net.input_indexes().size()!=3 || net.output_indexes().size()!=2 ||
             awa.heads!=20 || awa.shifted!=index%2 || net.load_model(weights.c_str()))
             throw std::runtime_error("Cannot load expected DiT graph");
         std::vector<ncnn::Mat> inputs;
-        const std::vector<std::vector<int>> shapes{{5,8,8,2560},{58,2560},{2560,6}};
+        const auto grid=doc.at("inputs").at(0).at("shape").get<std::vector<int>>();
+        if (grid.size()!=4 || grid[0]<1 || grid[0]>5 || grid[1]<1 || grid[1]>8 ||
+            grid[2]<1 || grid[2]>8 || grid[3]!=2560) throw std::runtime_error("Unexpected video grid");
+        const std::vector<std::vector<int>> shapes{grid,{58,2560},{2560,6}};
         for (std::size_t i=0;i<3;++i) {
             const auto &row=doc.at("inputs").at(i);
             if (row.at("shape")!=shapes[i] || row.at("dtype")!="f32le") throw std::runtime_error("Unexpected input contract");

@@ -4,6 +4,7 @@
 #include "package.hpp"
 #include "video_io.hpp"
 #include "memory.hpp"
+#include "fp32_device.hpp"
 #include <bit>
 #if defined(__unix__)
 #include <unistd.h>
@@ -74,6 +75,7 @@ Result<Preflight> preflight(const RestoreRequest &r) {
             const int index=r.gpu_index<0?ncnn::get_default_gpu_index():r.gpu_index;
             if (index<0 || index>=ncnn::get_gpu_count()) throw std::runtime_error("Requested Vulkan device is unavailable; select an available device or explicitly choose CPU");
             device=device_info(index);
+            device["fp32_b_arithmetic"]=require_fp32_device(index);
         }
         field="model";
         const auto p=inspect_manifest(r.model_directory,video);

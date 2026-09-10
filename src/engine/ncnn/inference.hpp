@@ -1,6 +1,9 @@
 #pragma once
 #include "awa.hpp"
 #include "constant.hpp"
+#include "rms_norm.hpp"
+#include "linear.hpp"
+#include "silu.hpp"
 #include "video_layers.hpp"
 #include "engine_build.hpp"
 #include "graph.hpp"
@@ -60,7 +63,8 @@ inline std::vector<ncnn::Mat> execute_graph(const GraphFiles &files, const std::
     net.opt.num_threads = request.threads;
     net.opt.pipeline_cache = pipelines;
     if (request.vulkan) net.set_vulkan_device(gpu);
-    if (register_awa(net, awa) != 0 || register_constant(net) != 0 || register_video_layers(net) != 0 ||
+    if (register_awa(net, awa) != 0 || register_constant(net) != 0 || register_dit_silu(net) != 0 ||
+        (id.starts_with("block-") && (register_dit_rms_norm(net) != 0 || register_dit_linear(net) != 0)) || register_video_layers(net) != 0 ||
         net.load_param(files.param.string().c_str()) != 0 || net.layers().size() > 512 ||
         net.input_indexes().size() != inputs.size())
         throw std::runtime_error("Cannot load graph structure: "+id);

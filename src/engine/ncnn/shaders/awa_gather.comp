@@ -17,6 +17,12 @@ shared float q[128];
 shared float k[128];
 shared float qsum[128];
 shared float ksum[128];
+float reference_rsqrt(float z) {
+    precise float root=sqrt(z);
+    root=fma(fma(-root,root,z),.5/root,root);
+    precise float q=1./root;
+    return fma(fma(-q,root,1.),1./root,q);
+}
 void main() {
     int token=int(gl_WorkGroupID.x), head=int(gl_WorkGroupID.y), d=int(gl_LocalInvocationID.x);
     if (token>=p.sequence || head>=p.heads) return;
@@ -31,14 +37,34 @@ void main() {
     else {q[d]=text[index];k[d]=text[index+hd];v=text[index+2*hd];}
     qsum[d]=q[d]*q[d]; ksum[d]=k[d]*k[d];
     barrier();
-    for (int step=64;step>0;step/=2) {
-        if (d<step) {qsum[d]+=qsum[d+step];ksum[d]+=ksum[d+step];}
-        barrier();
+    // Materialized squares and four interleaved eight-wide accumulators
+    // reproduce the locked CPU RMSNorm reduction without cross-head mixing.
+    if (d<8) {
+        precise float aq[4],ak[4];
+        for(int j=0;j<4;++j) {
+            aq[j]=0.;ak[j]=0.;
+            for(int i=0;i<4;++i) {
+                aq[j]=aq[j]+qsum[i*32+j*8+d];
+                ak[j]=ak[j]+ksum[i*32+j*8+d];
+            }
+        }
+        qsum[d]=((aq[0]+aq[1])+aq[2])+aq[3];
+        ksum[d]=((ak[0]+ak[1])+ak[2])+ak[3];
     }
+    barrier();
+    if(d==0) {
+        precise float sq=0.,sk=0.;
+        for(int i=0;i<8;++i) {sq=sq+qsum[i];sk=sk+ksum[i];}
+        precise float zq=sq/128.+p.epsilon,zk=sk/128.+p.epsilon;
+        qsum[0]=reference_rsqrt(zq);ksum[0]=reference_rsqrt(zk);
+    }
+    barrier();
     int offset=is_video?0:256;
-    float qs=inversesqrt(qsum[0]/128.+p.epsilon);
-    float ks=inversesqrt(ksum[0]/128.+p.epsilon);
-    float qn=q[d]*qs*norm[offset+d], kn=k[d]*ks*norm[offset+128+d];
+    float qs=qsum[0];
+    float ks=ksum[0];
+    // Eager FP32 normalization and rotary products have separate rounding
+    // boundaries. Prevent driver contraction/reassociation across those ops.
+    precise float qn=q[d]*qs*norm[offset+d], kn=k[d]*ks*norm[offset+128+d];
     if (d<126) {
         int axis=d/42, pair=(d%42)/2, partner=d^1;
         int pos=is_video ? (axis==0 ? p.text_length+local.x : (axis==1?local.y:local.z))

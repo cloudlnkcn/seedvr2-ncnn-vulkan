@@ -1,0 +1,150 @@
+Test project /home/mingshi/Project/AI/pnnx_torchdynamo/seedvr2-ncnn-vulkan/build/release
+      Start  2: engine.memory-vulkan
+ 1/21 Test  #2: engine.memory-vulkan ....................   Passed    0.13 sec
+      Start  4: engine.awa-rope-vulkan
+ 2/21 Test  #4: engine.awa-rope-vulkan ..................   Passed    0.15 sec
+      Start  6: engine.awa-sdpa-fp32-vulkan
+ 3/21 Test  #6: engine.awa-sdpa-fp32-vulkan .............   Passed    0.15 sec
+      Start  7: engine.awa-rope-vulkan-host
+ 4/21 Test  #7: engine.awa-rope-vulkan-host .............   Passed    0.15 sec
+      Start  8: engine.awa-sdpa-fp32-vulkan-host
+ 5/21 Test  #8: engine.awa-sdpa-fp32-vulkan-host ........   Passed    0.15 sec
+      Start 10: engine.temporal-conv-bias-vulkan
+ 6/21 Test #10: engine.temporal-conv-bias-vulkan ........   Passed    0.23 sec
+      Start 11: engine.awa-rounding-vulkan
+ 7/21 Test #11: engine.awa-rounding-vulkan ..............   Passed    0.15 sec
+      Start 14: engine.rms-norm-fp32
+ 8/21 Test #14: engine.rms-norm-fp32 ....................***Failed    0.14 sec
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+overwrite built-in layer type RMSNorm
+checked=94720 max_abs=7.62939e-06 nonzero=22726 violations=8
+
+      Start 15: engine.linear-fp32
+ 9/21 Test #15: engine.linear-fp32 ......................***Failed    0.12 sec
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+overwrite built-in layer type InnerProduct
+checked=32 violations=8 max_abs=1.49012e-08
+
+      Start 16: engine.linear-host-fp32
+10/21 Test #16: engine.linear-host-fp32 .................***Failed    0.11 sec
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+overwrite built-in layer type InnerProduct
+checked=32 violations=8 max_abs=1.49012e-08
+
+      Start 17: engine.silu-fp32
+11/21 Test #17: engine.silu-fp32 ........................   Passed    0.12 sec
+      Start 18: engine.softmax-fp32
+12/21 Test #18: engine.softmax-fp32 .....................***Failed    0.11 sec
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+overwrite built-in layer type Softmax
+width=7 changed=0 violations=0
+width=8 changed=0 violations=0
+width=9 changed=0 violations=0
+width=15 changed=0 violations=0
+width=16 changed=2 violations=0
+width=17 changed=33 violations=0
+width=58 changed=114 violations=1
+width=64 changed=233 violations=2
+width=160 changed=429 violations=0
+width=178 changed=822 violations=2
+width=378 changed=1574 violations=1
+width=1024 changed=137 violations=0
+checked=29010 changed=3344 max_abs=5.96046e-08 max_ulps=3 violations=6
+
+      Start 19: engine.awa-rms-fp32
+13/21 Test #19: engine.awa-rms-fp32 .....................***Failed    0.13 sec
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+checked=236 max_abs=9.53674e-07 violations=24
+
+      Start 20: engine.frame-norm-fp32
+14/21 Test #20: engine.frame-norm-fp32 ..................***Failed    0.20 sec
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+checked=8192 max_abs=0.000712276 violations=4160
+
+      Start 21: engine.frame-norm-cascade-fp32
+15/21 Test #21: engine.frame-norm-cascade-fp32 ..........***Failed    0.12 sec
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+checked=245760 max_abs=0.000177383 violations=46803
+
+      Start 23: engine.frame-sdpa-fp32-vulkan
+16/21 Test #23: engine.frame-sdpa-fp32-vulkan ...........   Passed    0.12 sec
+      Start 24: engine.rgb-conv-fp32
+17/21 Test #24: engine.rgb-conv-fp32 ....................***Failed    0.23 sec
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+OUT_OF_SCOPE: strided RGB reference; legacy convolution retained
+checked=74880 changed=53573 max_abs=1.43051e-06
+
+      Start 25: engine.rgb-conv-host-fp32
+18/21 Test #25: engine.rgb-conv-host-fp32 ...............***Failed    0.11 sec
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+OUT_OF_SCOPE: strided RGB reference; legacy convolution retained
+checked=74880 changed=53573 max_abs=1.43051e-06
+
+      Start 26: engine.posterior-projection-fp32
+19/21 Test #26: engine.posterior-projection-fp32 ........***Failed    0.15 sec
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+checked=431328 changed=350775 max_abs=9.53674e-07
+DIAGNOSTIC FP64: above_2ulp=242381 max_abs=1.90735e-06
+
+      Start 27: engine.posterior-projection-host-fp32
+20/21 Test #27: engine.posterior-projection-host-fp32 ...***Failed    0.15 sec
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  queueC=0[1]  queueT=0[1]  rebar=1  r-score=14
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-p/s/u/a=1/1/1/1  int8-p/s/u/a=1/1/1/1  bf16-p/s=1/0
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  subgroup=8(8~8)  ops=1/1/1/1/1/1/1/1/1/1
+[0 llvmpipe (LLVM 22.1.8, 256 bits)]  fp16-cm=8x8x8  int8-cm=8x8x8  bf16-cm=0  fp8-cm=0  fp6-cm=0  fp4-cm=0
+checked=431328 changed=350775 max_abs=9.53674e-07
+DIAGNOSTIC FP64: above_2ulp=242381 max_abs=1.90735e-06
+
+      Start 28: engine.text-pool-fp32
+21/21 Test #28: engine.text-pool-fp32 ...................   Passed    0.11 sec
+
+48% tests passed, 11 tests failed out of 21
+
+Label Time Summary:
+vulkan    =   3.04 sec*proc (21 tests)
+
+Total Test time (real) =   3.05 sec
+
+The following tests FAILED:
+	 14 - engine.rms-norm-fp32 (Failed)                     vulkan
+	 15 - engine.linear-fp32 (Failed)                       vulkan
+	 16 - engine.linear-host-fp32 (Failed)                  vulkan
+	 18 - engine.softmax-fp32 (Failed)                      vulkan
+	 19 - engine.awa-rms-fp32 (Failed)                      vulkan
+	 20 - engine.frame-norm-fp32 (Failed)                   vulkan
+	 21 - engine.frame-norm-cascade-fp32 (Failed)           vulkan
+	 24 - engine.rgb-conv-fp32 (Failed)                     vulkan
+	 25 - engine.rgb-conv-host-fp32 (Failed)                vulkan
+	 26 - engine.posterior-projection-fp32 (Failed)         vulkan
+	 27 - engine.posterior-projection-host-fp32 (Failed)    vulkan
+Errors while running CTest

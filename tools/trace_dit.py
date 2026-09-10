@@ -23,7 +23,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('binary', 'sdk', 'reference', 'baseline', 'package', 'output'):
         parser.add_argument('--'+name, type=Path, required=True)
-    parser.add_argument('--mode', choices=('official-start', 'native-start', 'teacher-forced'), required=True)
+    parser.add_argument('--mode', choices=('official-start', 'native-start', 'teacher-forced', 'prefix-start'), required=True)
+    parser.add_argument('--prefix', type=Path, help='Explicit native prefix intervention report directory; diagnostic only')
     parser.add_argument('--native-run', type=Path)
     parser.add_argument('--backend', choices=('cpu', 'vulkan'), default='vulkan')
     parser.add_argument('--gpu', type=int, default=0)
@@ -34,6 +35,8 @@ def main():
         parser.error('Choose ordered block indices 0..31 and a nonnegative GPU')
     if args.mode == 'native-start' and args.native_run is None:
         parser.error('native-start requires --native-run')
+    if (args.mode=='prefix-start') != (args.prefix is not None) or (args.prefix and args.first!=0):
+        parser.error('prefix-start requires --prefix and starts at block zero')
     ref, baseline, shapes, reference_sha, known = bind_reference(args.reference, args.baseline, 'video')
     if sha(args.package/'manifest.json') != known['model_manifest_sha256']:
         raise ValueError('Model package differs from reviewed trajectory')
@@ -42,6 +45,15 @@ def main():
     if max(height, width) > 128 or shapes['patch-in'] != [grid[0]*grid[1]*grid[2], 2560]:
         raise ValueError('Expected the reviewed short-video grid within the existing 128-pixel limit')
     official = {row['stage']: row['reference'] for row in ref['stages']}
+    prefix=None
+    if args.prefix:
+        prefix=load_json(args.prefix/'report.json')
+        if (prefix.get('schema_version')!='seedvr2-video-prefix-trace-v1' or prefix.get('status')!='EXECUTED' or
+                prefix.get('diagnostic_only') is not True or prefix['case']['reference_report_sha256']!=reference_sha or
+                prefix['case']['model_manifest_sha256']!=known['model_manifest_sha256'] or
+                prefix['outputs']['patch-in']['shape']!=shapes['patch-in']):
+            raise ValueError('Prefix intervention identity/shape differs')
+        tensor_path(args.prefix,prefix['outputs']['patch-in'])
     package = load_json(args.package/'manifest.json')
     graphs = {row['id']: row for row in package['graphs']}
     native = None
@@ -72,6 +84,9 @@ def main():
                   video_grid=grid,
                   expected_blocks=list(range(args.first, args.last+1)), blocks=[],
                   completed=False, model_verified=False, tolerance=ref['tolerance'])
+    if prefix:
+        report['prefix_report_sha256']=sha(args.prefix/'report.json')
+        report['prefix_case']=prefix['case']
     previous = None
     for index in range(args.first, args.last+1):
         folder = args.output/f'block-{index:02d}'
@@ -81,7 +96,10 @@ def main():
             shutil.copyfile(source, folder/name)
             return dict(path=name, dtype='f32le', shape=shape, sha256=sha(folder/name))
         names = ['patch-in', 'text-in'] if index == 0 else [f'block-{index-1:02d}-video', f'block-{index-1:02d}-text']
-        if args.mode == 'teacher-forced' or (previous is None and args.mode == 'official-start'):
+        if previous is None and prefix:
+            sources=[(args.prefix,prefix['outputs']['patch-in']),(args.reference,official['text-in'])]
+            input_kind='NATIVE_PREFIX_INTERVENTION_WITH_OFFICIAL_TEXT'
+        elif args.mode == 'teacher-forced' or (previous is None and args.mode == 'official-start'):
             sources = [(args.reference, official[name]) for name in names]
             input_kind = 'OFFICIAL'
         elif previous is None:

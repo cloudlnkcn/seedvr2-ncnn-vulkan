@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare retained CPU encoder boundaries on identical inputs; no certification."""
+"""Compare retained CPU/Vulkan encoder boundaries on identical inputs; no certification."""
 import argparse
 import json
 from pathlib import Path
@@ -16,7 +16,10 @@ def main():
     if args.output.exists(): raise ValueError('Output already exists')
     doc=load_json(args.trace/'report.json');case=load_json(args.case)
     if doc['status']!='EXECUTED' or doc['case_sha256']!=sha(args.case): raise ValueError('Trace/case identity mismatch')
-    if case['input']['shape']!=[3,17,128,128] or case['component']!='vae-video-encoder': raise ValueError('Unexpected fixture')
+    shape=case['input']['shape']
+    if (case['component']!='vae-video-encoder' or len(shape)!=4 or shape[0]!=3 or
+            not 1<=shape[1]<=17 or (shape[1]-1)%4 or
+            any(not 8<=n<=128 or n%8 for n in shape[2:])): raise ValueError('Unexpected fixture')
     rows={r['name']:r for r in doc['layers']}
     names={'conv_in','norm1','add_10','pnnx_unique_45','pnnx_unique_46'}
     if len(doc['layers'])!=5 or set(rows)!=names: raise ValueError('Incomplete trace')
@@ -31,13 +34,17 @@ def main():
     encoder,memory=make_reference(state,'encoder')
     report=dict(schema_version='seedvr2-vae-isolation-v1',diagnostic_only=True,model_verified=False,
                 case_sha256=sha(args.case),native_trace_sha256=sha(args.trace/'report.json'),
-                script_sha256=sha(Path(__file__)),torch_version=torch.__version__,
+                script_sha256=sha(Path(__file__)),torch_version=torch.__version__,backend=doc['backend'],input_shape=shape,
                 official_sources=verify_sources(),checkpoint_sha256=next(r['lfs']['sha256'] for r in lock['files'] if r['rfilename']=='ema_vae.pth'),boundaries={})
     with torch.inference_mode():
         source=read(args.case.parent,case['input'])
         first=read(args.trace,rows['conv_in'])
         reference=encoder.conv_in(source[None],memory_state=memory)[0]
         report['boundaries']['first_conv_same_prepared']=compare(first,reference)
+        double=encoder.conv_in.to(dtype=torch.float64)(source[None].double(),memory_state=memory)[0]
+        report['boundaries']['first_conv_native_vs_fp64']=compare(first,double)
+        report['boundaries']['first_conv_official_vs_fp64']=compare(reference,double)
+        del double
         del source,reference
         for input_name,output_name,norm in [('conv_in','norm1',encoder.down_blocks[0].resnets[0].norm1),('add_10','pnnx_unique_45',encoder.conv_norm_out)]:
             x=first if input_name=='conv_in' else read(args.trace,rows[input_name])

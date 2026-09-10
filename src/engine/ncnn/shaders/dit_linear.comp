@@ -1,0 +1,25 @@
+#version 450
+// Compensate both product rounding and cancellation in long dot products.
+// FMA recovers the product residual; Neumaier's sum recovers the add residual.
+// Both accumulators remain FP32; no FP64 device feature is required.
+layout(local_size_x=64,local_size_y=1,local_size_z=1) in;
+layout(binding=0) readonly buffer Input { float input_data[]; };
+layout(binding=1) readonly buffer Weights { vec4 weights[]; };
+layout(binding=2) readonly buffer Bias { vec4 bias[]; };
+layout(binding=3) writeonly buffer Output { vec4 output_data[]; };
+layout(push_constant) uniform parameter { int inputs,outputs,rows; } p;
+void main() {
+    int group=int(gl_GlobalInvocationID.x),row=int(gl_GlobalInvocationID.y);
+    if (group>=p.outputs/4 || row>=p.rows) return;
+    precise vec4 sum=vec4(0.),correction=vec4(0.);
+    for (int j=0;j<p.inputs;++j) {
+        precise vec4 product=input_data[row*p.inputs+j]*weights[group*p.inputs+j];
+        precise vec4 product_error=fma(vec4(input_data[row*p.inputs+j]),weights[group*p.inputs+j],-product);
+        precise vec4 next=sum+product;
+        precise vec4 error=mix((product-next)+sum,(sum-next)+product,greaterThanEqual(abs(sum),abs(product)));
+        correction=correction+(error+product_error);
+        sum=next;
+    }
+    precise vec4 result=(sum+correction)+bias[group];
+    output_data[row*(p.outputs/4)+group]=result;
+}

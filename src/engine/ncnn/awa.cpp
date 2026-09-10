@@ -1,4 +1,7 @@
 #include "awa.hpp"
+#include "softmax.hpp"
+#include "text_pool.hpp"
+#include "data/rope_fp32_table.hpp"
 #include "awa_shaders.hpp"
 #include "seedvr2/planning.hpp"
 #include <algorithm>
@@ -75,20 +78,23 @@ class AdaptiveWindowAttention final : public ncnn::Layer {
             std::memcpy(values.data(), spec.data, sizeof(values));
             if (values != std::array<std::int32_t, 3>{1, heads_, shifted_})
                 return -1;
-            for (int i = 0; i < 21; ++i)
+            for (int i = 0; i < 21; ++i) {
                 if (!std::isfinite(frequencies[i]) ||
                     std::abs(frequencies[i]-norm_[norm_count+i]) > norm_[norm_count+i]*1e-6f)
                     return -1;
+                norm_[norm_count+i] = frequencies[i];
+            }
         }
-        // Vulkan's fast sin/cos range reduction loses phase accuracy for the
-        // text-offset temporal positions. Evaluate the small, input-independent
-        // FP32 angle table once on the host; all tensor arithmetic stays on GPU.
+        // Preserve the original CPU FP32 trigonometric rounding with a frozen,
+        // input-independent positional cache. Nonstandard serialized frequencies
+        // are still evaluated from their actual values. Tensor math stays on GPU.
         for (int position = 0; position < rope_positions; ++position) {
             for (int pair = 0; pair < rope_frequencies; ++pair) {
                 const float angle = static_cast<float>(position) * norm_[norm_count + pair];
                 const int offset = rope_table_offset + (position * rope_frequencies + pair) * 2;
-                norm_[offset] = std::cos(angle);
-                norm_[offset + 1] = std::sin(angle);
+                const bool locked_frequency = norm_[norm_count + pair] == rope_fp32::frequency(pair);
+                norm_[offset] = locked_frequency ? rope_fp32::phase(position, pair, 0) : std::cos(angle);
+                norm_[offset + 1] = locked_frequency ? rope_fp32::phase(position, pair, 1) : std::sin(angle);
             }
         }
         return 0;
@@ -115,7 +121,7 @@ class AdaptiveWindowAttention final : public ncnn::Layer {
             return 0;
         if (!vkdev)
             return -1;
-        sdpa_vk_.reset(ncnn::create_layer_vulkan("SDPA"));
+        sdpa_vk_.reset(create_fp32_sdpa());
         scale_vk_.reset(ncnn::create_layer_vulkan("BinaryOp"));
         if (!sdpa_vk_ || !sdpa_vk_->support_vulkan || !scale_vk_ || !scale_vk_->support_vulkan)
             return -1;
@@ -136,7 +142,7 @@ class AdaptiveWindowAttention final : public ncnn::Layer {
             return -1;
         if (gather_->shader_info().push_constant_count != 15 ||
             scatter_->shader_info().push_constant_count != 13 ||
-            mean_->shader_info().push_constant_count != 3)
+            mean_->shader_info().push_constant_count != 4)
             return -1;
         return 0;
     }
@@ -233,7 +239,13 @@ class AdaptiveWindowAttention final : public ncnn::Layer {
         out[1].create(hd, txt.h, size_t(4), 1, opt.blob_allocator);
         if (out[0].empty() || out[1].empty())
             return -100;
-        out[1].fill(0.f);
+        std::vector<int> lengths;
+        for (const auto &win : plan.windows) lengths.push_back(static_cast<int>(win.token_count));
+        const auto order = text_pool_order(lengths, txt.h);
+        if (order.empty()) return -1;
+        ncnn::Mat text_windows(hd, txt.h, static_cast<int>(plan.windows.size()), size_t(4), 1, opt.workspace_allocator);
+        if (text_windows.empty()) return -100;
+        int window_index = 0;
         for (const auto &win : plan.windows) {
             const int nv = static_cast<int>(win.token_count), n = nv + txt.h;
             std::vector<ncnn::Mat> qkv(3);
@@ -279,9 +291,9 @@ class AdaptiveWindowAttention final : public ncnn::Layer {
                 for (int i = 0; i < n; ++i) {
                     const float *src = channel.row(i);
                     if (i >= nv) {
-                        float *dst = out[1].row(i - nv) + head * dim;
+                        float *dst = text_windows.channel(window_index).row(i - nv) + head * dim;
                         for (int d = 0; d < dim; ++d)
-                            dst[d] += src[d];
+                            dst[d] = src[d];
                     } else {
                         const int t = i / (nh * nw), h = (i / nw) % nh, w = i % nw;
                         float *dst = out[0]
@@ -293,11 +305,12 @@ class AdaptiveWindowAttention final : public ncnn::Layer {
                     }
                 }
             }
+            ++window_index;
         }
-        const float count = static_cast<float>(plan.windows.size());
         for (int i = 0; i < txt.h; ++i)
             for (int d = 0; d < hd; ++d)
-                out[1].row(i)[d] /= count;
+                out[1].row(i)[d] = text_pool_mean(static_cast<const float *>(text_windows.data) + i * hd + d,
+                    text_windows.cstep, std::span<const int>(order.data() + size_t(i) * plan.windows.size(), plan.windows.size()));
         return 0;
     }
     int forward(const std::vector<ncnn::VkMat> &in, std::vector<ncnn::VkMat> &out,
@@ -383,15 +396,25 @@ class AdaptiveWindowAttention final : public ncnn::Layer {
             cmd.record_pipeline(scatter_.get(), {result[0], out[0], text_windows}, {}, s, dispatch);
             ++window_index;
         }
-        std::vector<ncnn::vk_constant_type> c(3);
+        std::vector<int> lengths;
+        for (const auto &win : plan.windows) lengths.push_back(static_cast<int>(win.token_count));
+        const auto order = text_pool_order(lengths, txt.h);
+        if (order.empty()) return -1;
+        ncnn::Mat order_cpu(static_cast<int>(order.size()), size_t(4), 1);
+        for (size_t i = 0; i < order.size(); ++i) order_cpu[static_cast<int>(i)] = static_cast<float>(order[i]);
+        ncnn::VkMat order_gpu;
+        cmd.record_upload(order_cpu, order_gpu, opt);
+        if (order_gpu.empty()) return -100;
+        std::vector<ncnn::vk_constant_type> c(4);
         c[0].i = txt.h * hd;
         c[1].i = window_index;
         c[2].i = static_cast<int>(text_windows.cstep);
+        c[3].i = hd;
         ncnn::Mat dispatch;
         dispatch.w = c[0].i;
         dispatch.h = 1;
         dispatch.c = 1;
-        cmd.record_pipeline(mean_.get(), {text_windows, out[1]}, {}, c, dispatch);
+        cmd.record_pipeline(mean_.get(), {text_windows, out[1], order_gpu}, {}, c, dispatch);
         return 0;
     }
 

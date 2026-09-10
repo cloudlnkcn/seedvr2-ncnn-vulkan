@@ -2,11 +2,23 @@
 layout(local_size_x=64, local_size_y=1, local_size_z=1) in;
 layout(binding=0) readonly buffer TextWindows { float text_windows[]; };
 layout(binding=1) writeonly buffer Text { float text[]; };
-layout(push_constant) uniform parameter { int size, windows, text_cstep; } p;
+layout(binding=2) readonly buffer Order { float order[]; };
+layout(push_constant) uniform parameter { int size, windows, text_cstep, channels; } p;
 void main() {
     int i=int(gl_GlobalInvocationID.x);
     if(i>=p.size) return;
-    float sum=0.;
-    for(int w=0;w<p.windows;++w) sum+=text_windows[w*p.text_cstep+i];
-    text[i]=sum/float(p.windows);
+    int base=(i/p.channels)*p.windows;
+    precise float sums[4]=float[4](0.,0.,0.,0.);
+    int w=0;
+    for (;w+16<=p.windows;) {
+        for(int j=0;j<16;++j,++w) sums[0]=sums[0]+text_windows[int(order[base+w])*p.text_cstep+i];
+        for(int level=1;level<4;++level) {
+            sums[level]=sums[level]+sums[level-1]; sums[level-1]=0.;
+            if((w&(15<<(level*4)))!=0) break;
+        }
+    }
+    for(;w<p.windows;++w) sums[0]=sums[0]+text_windows[int(order[base+w])*p.text_cstep+i];
+    for(int level=1;level<4;++level) sums[0]=sums[0]+sums[level];
+    precise float count=float(p.windows), q=sums[0]/count;
+    text[i]=fma(fma(-q,count,sums[0]),1./count,q);
 }

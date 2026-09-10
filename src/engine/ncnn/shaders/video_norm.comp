@@ -1,27 +1,85 @@
 #version 450
+// FP32-B frame GroupNorm. Eight moment lanes and a cascade of 16-vector
+// chunks follow the locked PyTorch 2.9 CPU evaluation order. Each frame and
+// group is independent; affine application retains the original FMA steps.
 layout(local_size_x=128, local_size_y=1, local_size_z=1) in;
 layout(binding=0) readonly buffer Source { float src[]; };
 layout(binding=1) readonly buffer Affine { float affine[]; };
 layout(binding=2) writeonly buffer Destination { float dst[]; };
 layout(push_constant) uniform parameter { int spatial, frames, channels, cstep, outstep, groups; float epsilon; } p;
-shared float reduction[128];
-shared float mean_value;
+shared float means[8], moments[8];
+shared float mean_value, variance_value;
+const float reciprocals[16]=float[16](1.,1./2.,1./3.,1./4.,1./5.,1./6.,1./7.,1./8.,
+    1./9.,1./10.,1./11.,1./12.,1./13.,1./14.,1./15.,1./16.);
+float divide(float a,float b) {
+    precise float q=a/b;
+    precise float remainder=fma(-q,b,a);
+    return fma(remainder,1./b,q);
+}
+void merge(int added,float am,float av,inout int n,inout float mean,inout float variance) {
+    int total=n+added;
+    precise float ratio=total==0?0.:divide(float(added),float(total));
+    precise float delta=am-mean;
+    mean=fma(ratio,delta,mean);
+    precise float adjustment=(delta*delta)*ratio;
+    precise float next=variance+fma(adjustment,float(n),av);
+    variance=next;n=total;
+}
+float load_value(int g,int t,int i) {
+    int cg=p.channels/p.groups;
+    return src[(g*cg+i/p.spatial)*p.cstep+t*p.spatial+i%p.spatial];
+}
 void main() {
-    int lane=int(gl_LocalInvocationID.x), g=int(gl_WorkGroupID.x), t=int(gl_WorkGroupID.y);
-    int cg=p.channels/p.groups, count=cg*p.spatial;
-    float sum=0.;
-    for(int i=lane;i<count;i+=128) sum+=src[(g*cg+i/p.spatial)*p.cstep+t*p.spatial+i%p.spatial];
-    reduction[lane]=sum; barrier();
-    for(int step=64;step>0;step/=2) { if(lane<step) reduction[lane]+=reduction[lane+step]; barrier(); }
-    if(lane==0) mean_value=reduction[0]/float(count);
+    int lane=int(gl_LocalInvocationID.x),g=int(gl_WorkGroupID.x),t=int(gl_WorkGroupID.y);
+    int count=(p.channels/p.groups)*p.spatial,vectors=count/8,chunks=(vectors+15)/16;
+    if (lane<8) {
+        int counts[16];float mm[16],vv[16];
+        for (int i=0;i<16;++i) {counts[i]=0;mm[i]=0.;vv[i]=0.;}
+        int depth=0;
+        for (int n=chunks-1;n>0;n>>=1) ++depth;
+        for (int chunk=0;chunk<chunks;++chunk) {
+            int take=min(16,vectors-chunk*16);
+            precise float m=0.,v=0.;
+            for (int j=0;j<take;++j) {
+                float x=load_value(g,t,(chunk*16+j)*8+lane);
+                precise float delta=x-m;
+                m=fma(delta,reciprocals[j],m);
+                v=fma(delta,x-m,v);
+            }
+            merge(take,m,v,counts[0],mm[0],vv[0]);
+            int mask=chunk+1;
+            for (int j=1;j<depth && (mask&1)==0;++j) {
+                merge(counts[j-1],mm[j-1],vv[j-1],counts[j],mm[j],vv[j]);
+                counts[j-1]=0;mm[j-1]=0.;vv[j-1]=0.;mask>>=1;
+            }
+        }
+        for (int j=1;j<depth;++j) merge(counts[j],mm[j],vv[j],counts[0],mm[0],vv[0]);
+        means[lane]=mm[0];moments[lane]=vv[0];
+    }
     barrier();
-    sum=0.;
-    for(int i=lane;i<count;i+=128) { float v=src[(g*cg+i/p.spatial)*p.cstep+t*p.spatial+i%p.spatial]-mean_value; sum+=v*v; }
-    reduction[lane]=sum; barrier();
-    for(int step=64;step>0;step/=2) { if(lane<step) reduction[lane]+=reduction[lane+step]; barrier(); }
-    float scale=inversesqrt(reduction[0]/float(count)+p.epsilon);
+    if (lane==0) {
+        int n=0;precise float m=0.,v=0.;
+        for (int i=vectors*8;i<count;++i) {
+            float x=load_value(g,t,i);precise float delta=x-m;++n;
+            m=m+divide(delta,float(n));v=fma(delta,x-m,v);
+        }
+        for (int j=0;j<8;++j) merge(vectors,means[j],moments[j],n,m,v);
+        mean_value=m;variance_value=divide(v,float(count));
+    }
+    barrier();
+    // Refine the device rsqrt, keeping the low part of variance + epsilon.
+    precise float variance=max(variance_value,0.);
+    precise float z=variance+p.epsilon;
+    precise float z_error=variance>=p.epsilon?(variance-z)+p.epsilon:(p.epsilon-z)+variance;
+    precise float scale=inversesqrt(z);
+    precise float square=scale*scale;
+    precise float square_error=fma(scale,scale,-square);
+    precise float residual=(fma(-z,square,1.)-z*square_error)-z_error*square;
+    scale=fma(.5*scale,residual,scale);
     for(int i=lane;i<count;i+=128) {
-        int c=g*cg+i/p.spatial, off=t*p.spatial+i%p.spatial;
-        dst[c*p.outstep+off]=(src[c*p.cstep+off]-mean_value)*scale*affine[c]+affine[p.channels+c];
+        int c=g*(p.channels/p.groups)+i/p.spatial,off=t*p.spatial+i%p.spatial;
+        precise float a=scale*affine[c];
+        precise float b=fma(-a,mean_value,affine[p.channels+c]);
+        dst[c*p.outstep+off]=fma(src[c*p.cstep+off],a,b);
     }
 }

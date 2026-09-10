@@ -1,6 +1,6 @@
 # 原生架构与源码导航
 
-0.7.0，2026-09-08。目标是一个易测试的单机应用：本地 Web、独立 CLI、可安装 SDK 共用计算实现，避免引入额外服务或未有需求的扩展框架。
+0.7.0，2026-09-10 数值修复。目标是一个易测试的单机应用：本地 Web、独立 CLI、可安装 SDK 共用计算实现，避免引入额外服务或未有需求的扩展框架。
 
 应用分层、36 图模型流程、张量关系及设计取舍的概览见 [README 架构设计](../README.md#架构设计)（[English](../README.en.md#architecture-and-design)）。本页按修改目的提供更细的源码导航。
 
@@ -38,6 +38,8 @@ flowchart LR
 | 权重生命周期 | `inference.hpp`、`weight_io.hpp` | 一次一图，先销毁 Net 再释放映射；默认 buffered，可选只读 mmap |
 | 权重放置预算 | `include/seedvr2/memory.hpp`、`src/runtime/memory_policy.*`、`src/engine/ncnn/memory.hpp` | 纯策略与设备查询分开；每图重读预算，不把放置请求冒充实际驻留 |
 | 自定义数学 | `awa.cpp`、`constant.cpp`、`video_layers.cpp`、`shaders` | AWA 窗口与 RoPE、文本平均、常量、时序 VAE 变换 |
+| FP32 数值对齐 | `rms_norm.cpp`、`linear.cpp`、`silu.cpp`、`softmax.cpp`、`text_pool.hpp`、`data/rope_fp32_table.hpp` | DiT 归约与补偿点积、SLEEF SiLU、SDPA 中间 softmax、窗口文本平均与已冻结频率的 RoPE 常量；均复用真实流水线入口 |
+| Vulkan 算术能力 | `fp32_device.hpp`、`shaders/fp32_probe.comp`、`tests/check_fp32_device.py` | 独立检测 FMA 残差；完整 FP32-B 的预检先于大权重加载，能力不足明确拒绝；设备探测不签发模型证书 |
 | 输入输出 | `image_io.cpp`、`video_io.cpp` | 有界解码、预处理、PNG/MP4、输入类型/色彩范围拒绝 |
 | 当前实现身份和资源 | `provenance.hpp` | 可执行文件与实际加载 SDK 的 SHA；RSS 不冒充激活或工作区 |
 | 官方参考与导出 | `tools/*_reference.py`、`tools/export_*.py` | 官方原文方法体的 FP32-B 适配和候选导出分开 |
@@ -54,7 +56,7 @@ flowchart LR
 
 固定正向文本为 `58 × 2560`，timestep=1000；单步 CFG=1，latent scale=0.9152，原始 Euler endpoint。DiT 末端保留官方输出 Ada 对 block 0 调制的复用语义。主机负责布局/噪声/采样及编解码，神经网络层走所选择的 ncnn 后端；“Vulkan 推理”不表示每一个主机操作都已搬到 GPU。
 
-AWA 的 pnnx 边界保留官方自适应窗口含义：窗口 gather、Q/K 归一化、多模态 3D RoPE、窗口内联合注意力、视频 scatter、文本跨窗口等权平均。常规注意力调用固定官方 ncnn 的 SDPA；自定义层负责标准层不能完整表达的窗口和时序关系。具体移植推导见 [native-backend.md](native-backend.md) 和 [video-runtime.md](video-runtime.md)。
+AWA 的 pnnx 边界保留官方自适应窗口含义：窗口 gather、Q/K 归一化、多模态 3D RoPE、窗口内联合注意力、视频 scatter、文本跨窗口等权平均。Vulkan 注意力复用锁定 ncnn 的 SDPA QK/PV 着色器，中间由私有适配层执行保留 FP32 顺序的 softmax；CPU 使用 ncnn SDPA。具体移植推导见 [native-backend.md](native-backend.md) 和 [video-runtime.md](video-runtime.md)，本次数值修正及其固定参考环境见 [NUMERICS-REPAIR.md](NUMERICS-REPAIR.md)。
 
 ## 生命周期、认证和可复现性
 
@@ -70,6 +72,6 @@ AWA 的 pnnx 边界保留官方自适应窗口含义：窗口 gather、Q/K 归�
 
 先按当前尺寸提供可用输入、结果和错误，再由明确需求和测量选择扩展。继续研究的事项包括更多输入与设备的误差传播、官方 BF16 路径、代表性自然视频质量、时间缓存/长片边界和更大分辨率。它们不妨碍交付有边界的当前预览，也不能被当前小型自测替代验收。没有预先加入插件系统、常驻全模型缓存或通用分布式调度器。
 
-17 帧数值修复及开发诊断工具导航见 [VIDEO-NUMERICS.md](VIDEO-NUMERICS.md)。共享执行层的内部 observer 默认关闭；启用后会下载并保存指定边界，改变执行时序，因此其性能不能代替正常流水线测量。CPU 时序编码器单独采用直接卷积，解码器保留原有路径；该策略同时用于完整执行与组件诊断。
+最早的 17 帧数值修复见 [VIDEO-NUMERICS.md](VIDEO-NUMERICS.md)；当前三段自然素材及 CPU 留出回归的修复、算子测试和设备边界见 [NUMERICS-REPAIR.md](NUMERICS-REPAIR.md)。共享执行层的内部 observer 默认关闭；启用后会下载并保存指定边界，改变执行时序，因此其性能不能代替正常流水线测量。CPU 时序编码器单独采用直接卷积，解码器保留原有路径；该策略同时用于完整执行与组件诊断。开发者可显式构建 `seedvr2-dit-trace`、`seedvr2-vae-trace`、`seedvr2-prefix-trace`，分别定位 DiT 层、VAE 内部和从真实输入开始的编码前缀；这些目标不属于默认模型验收。
 
 0.7.0 增加公共内存设置，SDK SONAME 为 `libseedvr2.so.0.7`，旧 SDK 使用程序需重新编译。GPU/RAM 选择、实际 Vulkan 分配问题的编译副本修复及 ERNIE 复用边界见 [MEMORY-VALIDATION.md](MEMORY-VALIDATION.md)。官方 ncnn 源目录不变；应用实际运行时包含报告中列出的 `host-buffer-v1` 修正。

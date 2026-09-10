@@ -2,8 +2,10 @@
 layout(local_size_x=128, local_size_y=1, local_size_z=1) in;
 layout(binding=0) readonly buffer Source { float src[]; };
 layout(binding=1) writeonly buffer Destination { float dst[]; };
+layout(binding=2) readonly buffer Bias { float bias[]; };
 layout(push_constant) uniform parameter {
     int mode, count, iw, ih, it, ic, isc, ow, oh, ot, oc, osc, kt, st, ss, pad, tile, frame, ratio;
+    float scale;
 } p;
 void main() {
     int i=int(gl_GlobalInvocationID.y)*65536+int(gl_GlobalInvocationID.x);
@@ -14,12 +16,13 @@ void main() {
         int it=clamp(t*p.st-(p.kt-1)+c%p.kt,0,p.it-1);
         dst[c*p.osc+y*p.ow+x]=(iy<0||iy>=p.ih||ix<0||ix>=p.iw)?0.:
             src[(c/p.kt)*p.isc+(it*p.ih+iy)*p.iw+ix];
-    } else if(p.mode==1) { // Convolution result: remove padding rows between frames.
+    } else if(p.mode==1 || p.mode==5) { // Crop frames; pointwise projections add bias after GEMM.
         int x=i%p.ow, y=(i/p.ow)%p.oh, t=(i/(p.ow*p.oh))%p.ot, c=i/(p.ow*p.oh*p.ot);
-        dst[c*p.osc+(t*p.oh+y)*p.ow+x]=src[c*p.isc+(t*p.tile+y)*p.iw+x];
+        float value=src[c*p.isc+(t*p.tile+y)*p.iw+x];
+        dst[c*p.osc+(t*p.oh+y)*p.ow+x]=p.mode==5?value+bias[c]:value;
     } else if(p.mode==2) { // Frame C,H,W -> sequence N,C (one SDPA head).
         int c=i%p.ic, n=i/p.ic;
-        dst[i]=src[c*p.isc+p.frame*p.iw*p.ih+n];
+        dst[i]=src[c*p.isc+p.frame*p.iw*p.ih+n]*p.scale;
     } else if(p.mode==3) { // SDPA N,C -> one frame in C,T,H,W.
         int c=i%p.oc, n=i/p.oc;
         dst[c*p.osc+p.frame*p.ow*p.oh+n]=src[i];

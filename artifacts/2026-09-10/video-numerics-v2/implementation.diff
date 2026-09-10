@@ -1,0 +1,1245 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f28470f..ab636b2 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -91,14 +91,17 @@ endif()
+ include(cmake/SeedVR2NcnnAllocator.cmake)
+ find_package(Python3 COMPONENTS Interpreter REQUIRED)
+ find_program(SEEDVR2_GLSLANG_VALIDATOR glslangValidator REQUIRED)
++find_program(SEEDVR2_SPIRV_VAL spirv-val REQUIRED)
+ set(SEEDVR2_AWA_SPV)
+-foreach(SHADER awa_gather awa_scatter awa_text_mean video_map video_norm)
++foreach(SHADER awa_gather awa_scatter awa_text_mean video_map video_norm video_projection dit_rms_norm dit_silu fp32_softmax dit_linear fp32_probe)
+     set(SPV "${CMAKE_CURRENT_BINARY_DIR}/generated/${SHADER}.spv")
+     add_custom_command(OUTPUT "${SPV}"
+         COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/generated"
+         COMMAND "${SEEDVR2_GLSLANG_VALIDATOR}" -V --target-env vulkan1.0
+             "${CMAKE_CURRENT_SOURCE_DIR}/src/engine/ncnn/shaders/${SHADER}.comp" -o "${SPV}"
+-        DEPENDS "src/engine/ncnn/shaders/${SHADER}.comp" VERBATIM)
++        COMMAND Python3::Interpreter "${CMAKE_CURRENT_SOURCE_DIR}/tools/guard_shader_fma.py" "${SPV}"
++        COMMAND "${SEEDVR2_SPIRV_VAL}" --target-env vulkan1.0 "${SPV}"
++        DEPENDS "src/engine/ncnn/shaders/${SHADER}.comp" tools/guard_shader_fma.py VERBATIM)
+     list(APPEND SEEDVR2_AWA_SPV "${SPV}")
+ endforeach()
+ add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp"
+@@ -114,12 +117,12 @@ add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_fixture.cpp
+     COMMAND Python3::Interpreter "${CMAKE_CURRENT_SOURCE_DIR}/tools/embed_awa_fixture.py"
+         "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/awa" "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_fixture.cpp"
+     DEPENDS ${AWA_FIXTURES} tools/embed_awa_fixture.py VERBATIM)
+-add_library(seedvr2_engine SHARED src/runtime/memory_policy.cpp src/engine/ncnn/awa.cpp src/engine/ncnn/constant.cpp src/engine/ncnn/runtime.cpp
++add_library(seedvr2_engine SHARED src/runtime/memory_policy.cpp src/engine/ncnn/awa.cpp src/engine/ncnn/constant.cpp src/engine/ncnn/rms_norm.cpp src/engine/ncnn/silu.cpp src/engine/ncnn/linear.cpp src/engine/ncnn/runtime.cpp
+     src/engine/ncnn/package.cpp src/engine/ncnn/pipeline.cpp
+     src/engine/ncnn/image.cpp src/engine/ncnn/image_io.cpp src/engine/ncnn/video_layers.cpp
+     src/engine/ncnn/video.cpp src/engine/ncnn/video_io.cpp
+     "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_fixture.cpp"
+-    "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp")
++    "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp" src/engine/ncnn/softmax.cpp)
+ add_library(seedvr2::sdk ALIAS seedvr2_engine)
+ set_target_properties(seedvr2_engine PROPERTIES OUTPUT_NAME seedvr2 EXPORT_NAME sdk
+     VERSION ${PROJECT_VERSION} SOVERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
+@@ -189,7 +192,7 @@ if(BUILD_TESTING)
+     add_test(NAME engine.memory-vulkan COMMAND seedvr2_memory_vulkan_tests)
+     set_tests_properties(engine.memory-vulkan PROPERTIES SKIP_RETURN_CODE 77 LABELS "vulkan" TIMEOUT 60)
+     add_executable(seedvr2_awa_rope_tests tests/awa_rope_tests.cpp src/engine/ncnn/awa.cpp
+-        "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp")
++        "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp" src/engine/ncnn/softmax.cpp)
+     target_include_directories(seedvr2_awa_rope_tests PRIVATE src/engine/ncnn "${CMAKE_CURRENT_BINARY_DIR}/generated")
+     target_include_directories(seedvr2_awa_rope_tests SYSTEM PRIVATE third_party)
+     target_link_libraries(seedvr2_awa_rope_tests PRIVATE seedvr2_planning seedvr2_ncnn_runtime OpenSSL::Crypto)
+@@ -207,10 +210,135 @@ if(BUILD_TESTING)
+     set_tests_properties(engine.awa-rope-cpu engine.awa-rope-vulkan
+         engine.awa-sdpa-fp32-cpu engine.awa-sdpa-fp32-vulkan
+         engine.awa-rope-vulkan-host engine.awa-sdpa-fp32-vulkan-host PROPERTIES TIMEOUT 60)
++    add_executable(seedvr2_temporal_conv_tests tests/temporal_conv_tests.cpp src/engine/ncnn/video_layers.cpp
++        "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp" src/engine/ncnn/softmax.cpp)
++    target_include_directories(seedvr2_temporal_conv_tests PRIVATE src/engine/ncnn "${CMAKE_CURRENT_BINARY_DIR}/generated")
++    target_include_directories(seedvr2_temporal_conv_tests SYSTEM PRIVATE third_party)
++    target_link_libraries(seedvr2_temporal_conv_tests PRIVATE seedvr2_planning seedvr2_ncnn_runtime OpenSSL::Crypto)
++    if(UNIX AND NOT APPLE)
++        target_link_options(seedvr2_temporal_conv_tests PRIVATE "-Wl,--exclude-libs,ALL")
++    endif()
++    add_executable(seedvr2_awa_rounding_tests tests/awa_rounding_tests.cpp src/engine/ncnn/awa.cpp
++        "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp" src/engine/ncnn/softmax.cpp)
++    target_include_directories(seedvr2_awa_rounding_tests PRIVATE src/engine/ncnn "${CMAKE_CURRENT_BINARY_DIR}/generated")
++    target_include_directories(seedvr2_awa_rounding_tests SYSTEM PRIVATE third_party)
++    target_link_libraries(seedvr2_awa_rounding_tests PRIVATE seedvr2_planning seedvr2_ncnn_runtime OpenSSL::Crypto)
++    if(UNIX AND NOT APPLE)
++        target_link_options(seedvr2_awa_rounding_tests PRIVATE "-Wl,--exclude-libs,ALL")
++    endif()
++    add_test(NAME engine.temporal-conv-bias-cpu COMMAND seedvr2_temporal_conv_tests cpu)
++    add_test(NAME engine.temporal-conv-bias-vulkan COMMAND seedvr2_temporal_conv_tests vulkan)
++    add_test(NAME engine.awa-rounding-vulkan COMMAND seedvr2_awa_rounding_tests vulkan)
++    set_tests_properties(engine.temporal-conv-bias-cpu PROPERTIES TIMEOUT 60)
++    set_tests_properties(engine.temporal-conv-bias-vulkan engine.awa-rounding-vulkan PROPERTIES SKIP_RETURN_CODE 77 LABELS "vulkan" TIMEOUT 60)
++    add_test(NAME build.shader-fma COMMAND Python3::Interpreter -m unittest discover -s tests -p test_shader_fma.py -v)
++    set_tests_properties(build.shader-fma PROPERTIES WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" TIMEOUT 60)
++    add_executable(seedvr2_rms_norm_tests tests/rms_norm_tests.cpp src/engine/ncnn/rms_norm.cpp "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp")
++    target_include_directories(seedvr2_rms_norm_tests PRIVATE src/engine/ncnn "${CMAKE_CURRENT_BINARY_DIR}/generated")
++    target_include_directories(seedvr2_rms_norm_tests SYSTEM PRIVATE third_party)
++    target_link_libraries(seedvr2_rms_norm_tests PRIVATE seedvr2_planning seedvr2_ncnn_runtime OpenSSL::Crypto)
++    if(UNIX AND NOT APPLE)
++        target_link_options(seedvr2_rms_norm_tests PRIVATE "-Wl,--exclude-libs,ALL")
++    endif()
++    add_test(NAME engine.rms-norm-cpu-fp32 COMMAND seedvr2_rms_norm_tests "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/rms-norm" --cpu)
++    set_tests_properties(engine.rms-norm-cpu-fp32 PROPERTIES TIMEOUT 60)
++    add_test(NAME engine.fp32-device-contract COMMAND Python3::Interpreter "${CMAKE_CURRENT_SOURCE_DIR}/tests/check_fp32_device.py" "$<TARGET_FILE:seedvr2>" "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/natural/astronaut-degraded.jpg")
++    set_tests_properties(engine.fp32-device-contract PROPERTIES SKIP_RETURN_CODE 77 LABELS "vulkan" TIMEOUT 60)
++    add_test(NAME engine.rms-norm-fp32 COMMAND seedvr2_rms_norm_tests "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/rms-norm")
++    set_tests_properties(engine.rms-norm-fp32 PROPERTIES SKIP_RETURN_CODE 77 LABELS "vulkan" TIMEOUT 60)
++    add_executable(seedvr2_linear_tests tests/linear_tests.cpp src/engine/ncnn/linear.cpp "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp")
++    target_include_directories(seedvr2_linear_tests PRIVATE src/engine/ncnn "${CMAKE_CURRENT_BINARY_DIR}/generated")
++    target_include_directories(seedvr2_linear_tests SYSTEM PRIVATE third_party)
++    target_link_libraries(seedvr2_linear_tests PRIVATE seedvr2_planning seedvr2_ncnn_runtime OpenSSL::Crypto)
++    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
++        target_link_options(seedvr2_linear_tests PRIVATE "-Wl,--exclude-libs,ALL")
++    endif()
++    add_test(NAME engine.linear-fp32 COMMAND seedvr2_linear_tests)
++    add_test(NAME engine.linear-host-fp32 COMMAND seedvr2_linear_tests host)
++    set_tests_properties(engine.linear-fp32 engine.linear-host-fp32 PROPERTIES SKIP_RETURN_CODE 77 LABELS "vulkan" TIMEOUT 60)
++    add_executable(seedvr2_silu_tests tests/silu_tests.cpp src/engine/ncnn/silu.cpp "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp")
++    target_include_directories(seedvr2_silu_tests PRIVATE src/engine/ncnn "${CMAKE_CURRENT_BINARY_DIR}/generated")
++    target_include_directories(seedvr2_silu_tests SYSTEM PRIVATE third_party)
++    target_link_libraries(seedvr2_silu_tests PRIVATE seedvr2_planning seedvr2_ncnn_runtime OpenSSL::Crypto)
++    if(UNIX AND NOT APPLE)
++        target_link_options(seedvr2_silu_tests PRIVATE "-Wl,--exclude-libs,ALL")
++    endif()
++    add_test(NAME engine.silu-fp32 COMMAND seedvr2_silu_tests "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/silu")
++    set_tests_properties(engine.silu-fp32 PROPERTIES SKIP_RETURN_CODE 77 LABELS "vulkan" TIMEOUT 60)
++    add_executable(seedvr2_softmax_tests tests/softmax_tests.cpp src/engine/ncnn/softmax.cpp "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp")
++    target_include_directories(seedvr2_softmax_tests PRIVATE src/engine/ncnn "${CMAKE_CURRENT_BINARY_DIR}/generated")
++    target_include_directories(seedvr2_softmax_tests SYSTEM PRIVATE third_party)
++    target_link_libraries(seedvr2_softmax_tests PRIVATE seedvr2_planning seedvr2_ncnn_runtime OpenSSL::Crypto)
++    if(UNIX AND NOT APPLE)
++        target_link_options(seedvr2_softmax_tests PRIVATE "-Wl,--exclude-libs,ALL")
++    endif()
++    add_test(NAME engine.softmax-fp32 COMMAND seedvr2_softmax_tests "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/softmax")
++    set_tests_properties(engine.softmax-fp32 PROPERTIES SKIP_RETURN_CODE 77 LABELS "vulkan" TIMEOUT 60)
++    add_executable(seedvr2_awa_rms_tests tests/awa_rms_tests.cpp src/engine/ncnn/awa.cpp "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp" src/engine/ncnn/softmax.cpp)
++    target_include_directories(seedvr2_awa_rms_tests PRIVATE src/engine/ncnn "${CMAKE_CURRENT_BINARY_DIR}/generated")
++    target_include_directories(seedvr2_awa_rms_tests SYSTEM PRIVATE third_party)
++    target_link_libraries(seedvr2_awa_rms_tests PRIVATE seedvr2_planning seedvr2_ncnn_runtime OpenSSL::Crypto)
++    if(UNIX AND NOT APPLE)
++        target_link_options(seedvr2_awa_rms_tests PRIVATE "-Wl,--exclude-libs,ALL")
++    endif()
++    add_test(NAME engine.awa-rms-fp32 COMMAND seedvr2_awa_rms_tests "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/awa-rms")
++    set_tests_properties(engine.awa-rms-fp32 PROPERTIES SKIP_RETURN_CODE 77 LABELS "vulkan" TIMEOUT 60)
++    add_executable(seedvr2_frame_norm_tests tests/frame_norm_tests.cpp src/engine/ncnn/video_layers.cpp
++        "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp" src/engine/ncnn/softmax.cpp)
++    target_include_directories(seedvr2_frame_norm_tests PRIVATE src/engine/ncnn "${CMAKE_CURRENT_BINARY_DIR}/generated")
++    target_include_directories(seedvr2_frame_norm_tests SYSTEM PRIVATE third_party)
++    target_link_libraries(seedvr2_frame_norm_tests PRIVATE seedvr2_planning seedvr2_ncnn_runtime OpenSSL::Crypto)
++    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
++        target_link_options(seedvr2_frame_norm_tests PRIVATE "-Wl,--exclude-libs,ALL")
++    endif()
++    add_test(NAME engine.frame-norm-fp32 COMMAND seedvr2_frame_norm_tests "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/frame-norm")
++    set_tests_properties(engine.frame-norm-fp32 PROPERTIES SKIP_RETURN_CODE 77 LABELS "vulkan" TIMEOUT 60)
++    add_test(NAME engine.frame-norm-cascade-fp32 COMMAND seedvr2_frame_norm_tests "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/frame-norm-cascade")
++    set_tests_properties(engine.frame-norm-cascade-fp32 PROPERTIES SKIP_RETURN_CODE 77 LABELS "vulkan" TIMEOUT 60)
++    add_executable(seedvr2_frame_sdpa_tests tests/frame_sdpa_tests.cpp src/engine/ncnn/video_layers.cpp "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp" src/engine/ncnn/softmax.cpp)
++    target_include_directories(seedvr2_frame_sdpa_tests PRIVATE src/engine/ncnn "${CMAKE_CURRENT_BINARY_DIR}/generated")
++    target_include_directories(seedvr2_frame_sdpa_tests SYSTEM PRIVATE third_party)
++    target_link_libraries(seedvr2_frame_sdpa_tests PRIVATE seedvr2_planning seedvr2_ncnn_runtime OpenSSL::Crypto)
++    if(UNIX AND NOT APPLE)
++        target_link_options(seedvr2_frame_sdpa_tests PRIVATE "-Wl,--exclude-libs,ALL")
++    endif()
++    add_test(NAME engine.frame-sdpa-fp32-cpu COMMAND seedvr2_frame_sdpa_tests "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/frame-sdpa" cpu)
++    add_test(NAME engine.frame-sdpa-fp32-vulkan COMMAND seedvr2_frame_sdpa_tests "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/frame-sdpa" vulkan)
++    set_tests_properties(engine.frame-sdpa-fp32-cpu PROPERTIES TIMEOUT 60)
++    set_tests_properties(engine.frame-sdpa-fp32-vulkan PROPERTIES SKIP_RETURN_CODE 77 LABELS "vulkan" TIMEOUT 60)
++    add_executable(seedvr2_rgb_conv_tests tests/rgb_conv_tests.cpp src/engine/ncnn/video_layers.cpp "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp" src/engine/ncnn/softmax.cpp)
++    target_include_directories(seedvr2_rgb_conv_tests PRIVATE src/engine/ncnn "${CMAKE_CURRENT_BINARY_DIR}/generated")
++    target_include_directories(seedvr2_rgb_conv_tests SYSTEM PRIVATE third_party)
++    target_link_libraries(seedvr2_rgb_conv_tests PRIVATE seedvr2_planning seedvr2_ncnn_runtime OpenSSL::Crypto)
++    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
++        target_link_options(seedvr2_rgb_conv_tests PRIVATE "-Wl,--exclude-libs,ALL")
++    endif()
++    add_test(NAME engine.rgb-conv-fp32 COMMAND seedvr2_rgb_conv_tests "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/rgb-conv")
++    add_test(NAME engine.rgb-conv-host-fp32 COMMAND seedvr2_rgb_conv_tests "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/rgb-conv" host)
++    set_tests_properties(engine.rgb-conv-fp32 engine.rgb-conv-host-fp32 PROPERTIES SKIP_RETURN_CODE 77 LABELS "vulkan" TIMEOUT 60)
++    add_executable(seedvr2_posterior_projection_tests tests/posterior_projection_tests.cpp src/engine/ncnn/video_layers.cpp "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp" src/engine/ncnn/softmax.cpp)
++    target_include_directories(seedvr2_posterior_projection_tests PRIVATE src/engine/ncnn "${CMAKE_CURRENT_BINARY_DIR}/generated")
++    target_include_directories(seedvr2_posterior_projection_tests SYSTEM PRIVATE third_party)
++    target_link_libraries(seedvr2_posterior_projection_tests PRIVATE seedvr2_planning seedvr2_ncnn_runtime OpenSSL::Crypto)
++    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
++        target_link_options(seedvr2_posterior_projection_tests PRIVATE "-Wl,--exclude-libs,ALL")
++    endif()
++    add_test(NAME engine.posterior-projection-fp32 COMMAND seedvr2_posterior_projection_tests "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/posterior-projection")
++    add_test(NAME engine.posterior-projection-host-fp32 COMMAND seedvr2_posterior_projection_tests "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/posterior-projection" host)
++    set_tests_properties(engine.posterior-projection-fp32 engine.posterior-projection-host-fp32 PROPERTIES SKIP_RETURN_CODE 77 LABELS "vulkan" TIMEOUT 60)
++    add_executable(seedvr2_text_pool_tests tests/text_pool_tests.cpp "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp")
++    target_include_directories(seedvr2_text_pool_tests PRIVATE src/engine/ncnn "${CMAKE_CURRENT_BINARY_DIR}/generated")
++    target_include_directories(seedvr2_text_pool_tests SYSTEM PRIVATE third_party)
++    target_link_libraries(seedvr2_text_pool_tests PRIVATE seedvr2_planning seedvr2_ncnn_runtime OpenSSL::Crypto)
++    if(UNIX AND NOT APPLE)
++        target_link_options(seedvr2_text_pool_tests PRIVATE "-Wl,--exclude-libs,ALL")
++    endif()
++    add_test(NAME engine.text-pool-fp32 COMMAND seedvr2_text_pool_tests "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/text-pool")
++    set_tests_properties(engine.text-pool-fp32 PROPERTIES SKIP_RETURN_CODE 77 LABELS "vulkan" TIMEOUT 60)
+     # Explicit developer target: real per-layer diagnostics, not a default model test.
+     add_executable(seedvr2-dit-trace EXCLUDE_FROM_ALL tools/trace_dit_layers.cpp
+-        src/engine/ncnn/awa.cpp src/engine/ncnn/constant.cpp
+-        "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp")
++        src/engine/ncnn/awa.cpp src/engine/ncnn/constant.cpp src/engine/ncnn/rms_norm.cpp src/engine/ncnn/silu.cpp src/engine/ncnn/linear.cpp
++        "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp" src/engine/ncnn/softmax.cpp)
+     target_include_directories(seedvr2-dit-trace PRIVATE src/engine/ncnn "${CMAKE_CURRENT_BINARY_DIR}/generated")
+     target_include_directories(seedvr2-dit-trace SYSTEM PRIVATE third_party)
+     target_link_libraries(seedvr2-dit-trace PRIVATE seedvr2_planning seedvr2_ncnn_runtime OpenSSL::Crypto)
+@@ -218,14 +346,27 @@ if(BUILD_TESTING)
+         target_link_options(seedvr2-dit-trace PRIVATE "-Wl,--exclude-libs,ALL")
+     endif()
+     add_executable(seedvr2-vae-trace EXCLUDE_FROM_ALL tools/trace_vae_encoder.cpp
+-        src/engine/ncnn/video_layers.cpp "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp")
++        src/engine/ncnn/silu.cpp src/engine/ncnn/video_layers.cpp "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp" src/engine/ncnn/softmax.cpp)
+     target_include_directories(seedvr2-vae-trace PRIVATE src/engine/ncnn "${CMAKE_CURRENT_BINARY_DIR}/generated")
+     target_include_directories(seedvr2-vae-trace SYSTEM PRIVATE third_party)
+     target_link_libraries(seedvr2-vae-trace PRIVATE seedvr2_planning seedvr2_ncnn_runtime OpenSSL::Crypto)
+     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+         target_link_options(seedvr2-vae-trace PRIVATE "-Wl,--exclude-libs,ALL")
+     endif()
++    add_executable(seedvr2-prefix-trace EXCLUDE_FROM_ALL tools/trace_video_prefix.cpp
++        src/engine/ncnn/awa.cpp src/engine/ncnn/constant.cpp src/engine/ncnn/rms_norm.cpp src/engine/ncnn/silu.cpp src/engine/ncnn/linear.cpp src/engine/ncnn/video_layers.cpp
++        src/runtime/memory_policy.cpp "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp" src/engine/ncnn/softmax.cpp)
++    target_include_directories(seedvr2-prefix-trace PRIVATE src/engine/ncnn "${CMAKE_CURRENT_BINARY_DIR}/generated")
++    target_include_directories(seedvr2-prefix-trace SYSTEM PRIVATE third_party)
++    target_link_libraries(seedvr2-prefix-trace PRIVATE seedvr2_planning seedvr2_ncnn_runtime OpenSSL::Crypto)
++    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
++        target_link_options(seedvr2-prefix-trace PRIVATE "-Wl,--exclude-libs,ALL")
++    endif()
+     add_executable(seedvr2_image_io_tests tests/image_io_tests.cpp)
++    add_executable(seedvr2_preprocessing_tests tests/preprocessing_tests.cpp)
++    target_include_directories(seedvr2_preprocessing_tests PRIVATE src/engine/ncnn)
++    target_link_libraries(seedvr2_preprocessing_tests PRIVATE seedvr2_engine seedvr2_ncnn_runtime)
++    add_test(NAME engine.preprocessing COMMAND seedvr2_preprocessing_tests "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/preprocessing")
+     target_include_directories(seedvr2_image_io_tests PRIVATE src/engine/ncnn)
+     target_link_libraries(seedvr2_image_io_tests PRIVATE seedvr2_engine seedvr2_ncnn_runtime)
+     add_test(NAME engine.image-decode COMMAND seedvr2_image_io_tests "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/natural")
+@@ -244,9 +385,14 @@ if(BUILD_TESTING)
+     set_tests_properties(worker.capability-boundary PROPERTIES PASS_REGULAR_EXPRESSION "seedvr2-worker-v1")
+     add_test(NAME engine.awa-cpu COMMAND seedvr2 engine self-test --backend cpu)
+     set_tests_properties(engine.awa-cpu PROPERTIES TIMEOUT 30)
+-    set_tests_properties(engine.memory-vulkan engine.awa-rope-vulkan engine.awa-sdpa-fp32-vulkan
+-        engine.awa-rope-vulkan-host engine.awa-sdpa-fp32-vulkan-host
+-        PROPERTIES FAIL_REGULAR_EXPRESSION "VUID-;Validation Error")
++    get_directory_property(SEEDVR2_TESTS TESTS)
++    foreach(TEST_NAME IN LISTS SEEDVR2_TESTS)
++        get_test_property(${TEST_NAME} LABELS TEST_LABELS)
++        if("vulkan" IN_LIST TEST_LABELS)
++            set_tests_properties(${TEST_NAME} PROPERTIES RESOURCE_LOCK seedvr2_gpu
++                FAIL_REGULAR_EXPRESSION "VUID-;Validation Error;binding_count not match;push_constant_count not match")
++        endif()
++    endforeach()
+ endif()
+ 
+ install(TARGETS seedvr2 RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+diff --git a/src/engine/ncnn/awa.cpp b/src/engine/ncnn/awa.cpp
+index 155910e..1923f12 100644
+--- a/src/engine/ncnn/awa.cpp
++++ b/src/engine/ncnn/awa.cpp
+@@ -1,4 +1,7 @@
+ #include "awa.hpp"
++#include "softmax.hpp"
++#include "text_pool.hpp"
++#include "data/rope_fp32_table.hpp"
+ #include "awa_shaders.hpp"
+ #include "seedvr2/planning.hpp"
+ #include <algorithm>
+@@ -75,20 +78,23 @@ class AdaptiveWindowAttention final : public ncnn::Layer {
+             std::memcpy(values.data(), spec.data, sizeof(values));
+             if (values != std::array<std::int32_t, 3>{1, heads_, shifted_})
+                 return -1;
+-            for (int i = 0; i < 21; ++i)
++            for (int i = 0; i < 21; ++i) {
+                 if (!std::isfinite(frequencies[i]) ||
+                     std::abs(frequencies[i]-norm_[norm_count+i]) > norm_[norm_count+i]*1e-6f)
+                     return -1;
++                norm_[norm_count+i] = frequencies[i];
++            }
+         }
+-        // Vulkan's fast sin/cos range reduction loses phase accuracy for the
+-        // text-offset temporal positions. Evaluate the small, input-independent
+-        // FP32 angle table once on the host; all tensor arithmetic stays on GPU.
++        // Preserve the original CPU FP32 trigonometric rounding with a frozen,
++        // input-independent positional cache. Nonstandard serialized frequencies
++        // are still evaluated from their actual values. Tensor math stays on GPU.
+         for (int position = 0; position < rope_positions; ++position) {
+             for (int pair = 0; pair < rope_frequencies; ++pair) {
+                 const float angle = static_cast<float>(position) * norm_[norm_count + pair];
+                 const int offset = rope_table_offset + (position * rope_frequencies + pair) * 2;
+-                norm_[offset] = std::cos(angle);
+-                norm_[offset + 1] = std::sin(angle);
++                const bool locked_frequency = norm_[norm_count + pair] == rope_fp32::frequency(pair);
++                norm_[offset] = locked_frequency ? rope_fp32::phase(position, pair, 0) : std::cos(angle);
++                norm_[offset + 1] = locked_frequency ? rope_fp32::phase(position, pair, 1) : std::sin(angle);
+             }
+         }
+         return 0;
+@@ -115,7 +121,7 @@ class AdaptiveWindowAttention final : public ncnn::Layer {
+             return 0;
+         if (!vkdev)
+             return -1;
+-        sdpa_vk_.reset(ncnn::create_layer_vulkan("SDPA"));
++        sdpa_vk_.reset(create_fp32_sdpa());
+         scale_vk_.reset(ncnn::create_layer_vulkan("BinaryOp"));
+         if (!sdpa_vk_ || !sdpa_vk_->support_vulkan || !scale_vk_ || !scale_vk_->support_vulkan)
+             return -1;
+@@ -136,7 +142,7 @@ class AdaptiveWindowAttention final : public ncnn::Layer {
+             return -1;
+         if (gather_->shader_info().push_constant_count != 15 ||
+             scatter_->shader_info().push_constant_count != 13 ||
+-            mean_->shader_info().push_constant_count != 3)
++            mean_->shader_info().push_constant_count != 4)
+             return -1;
+         return 0;
+     }
+@@ -233,7 +239,13 @@ class AdaptiveWindowAttention final : public ncnn::Layer {
+         out[1].create(hd, txt.h, size_t(4), 1, opt.blob_allocator);
+         if (out[0].empty() || out[1].empty())
+             return -100;
+-        out[1].fill(0.f);
++        std::vector<int> lengths;
++        for (const auto &win : plan.windows) lengths.push_back(static_cast<int>(win.token_count));
++        const auto order = text_pool_order(lengths, txt.h);
++        if (order.empty()) return -1;
++        ncnn::Mat text_windows(hd, txt.h, static_cast<int>(plan.windows.size()), size_t(4), 1, opt.workspace_allocator);
++        if (text_windows.empty()) return -100;
++        int window_index = 0;
+         for (const auto &win : plan.windows) {
+             const int nv = static_cast<int>(win.token_count), n = nv + txt.h;
+             std::vector<ncnn::Mat> qkv(3);
+@@ -279,9 +291,9 @@ class AdaptiveWindowAttention final : public ncnn::Layer {
+                 for (int i = 0; i < n; ++i) {
+                     const float *src = channel.row(i);
+                     if (i >= nv) {
+-                        float *dst = out[1].row(i - nv) + head * dim;
++                        float *dst = text_windows.channel(window_index).row(i - nv) + head * dim;
+                         for (int d = 0; d < dim; ++d)
+-                            dst[d] += src[d];
++                            dst[d] = src[d];
+                     } else {
+                         const int t = i / (nh * nw), h = (i / nw) % nh, w = i % nw;
+                         float *dst = out[0]
+@@ -293,11 +305,12 @@ class AdaptiveWindowAttention final : public ncnn::Layer {
+                     }
+                 }
+             }
++            ++window_index;
+         }
+-        const float count = static_cast<float>(plan.windows.size());
+         for (int i = 0; i < txt.h; ++i)
+             for (int d = 0; d < hd; ++d)
+-                out[1].row(i)[d] /= count;
++                out[1].row(i)[d] = text_pool_mean(static_cast<const float *>(text_windows.data) + i * hd + d,
++                    text_windows.cstep, std::span<const int>(order.data() + size_t(i) * plan.windows.size(), plan.windows.size()));
+         return 0;
+     }
+     int forward(const std::vector<ncnn::VkMat> &in, std::vector<ncnn::VkMat> &out,
+@@ -383,15 +396,25 @@ class AdaptiveWindowAttention final : public ncnn::Layer {
+             cmd.record_pipeline(scatter_.get(), {result[0], out[0], text_windows}, {}, s, dispatch);
+             ++window_index;
+         }
+-        std::vector<ncnn::vk_constant_type> c(3);
++        std::vector<int> lengths;
++        for (const auto &win : plan.windows) lengths.push_back(static_cast<int>(win.token_count));
++        const auto order = text_pool_order(lengths, txt.h);
++        if (order.empty()) return -1;
++        ncnn::Mat order_cpu(static_cast<int>(order.size()), size_t(4), 1);
++        for (size_t i = 0; i < order.size(); ++i) order_cpu[static_cast<int>(i)] = static_cast<float>(order[i]);
++        ncnn::VkMat order_gpu;
++        cmd.record_upload(order_cpu, order_gpu, opt);
++        if (order_gpu.empty()) return -100;
++        std::vector<ncnn::vk_constant_type> c(4);
+         c[0].i = txt.h * hd;
+         c[1].i = window_index;
+         c[2].i = static_cast<int>(text_windows.cstep);
++        c[3].i = hd;
+         ncnn::Mat dispatch;
+         dispatch.w = c[0].i;
+         dispatch.h = 1;
+         dispatch.c = 1;
+-        cmd.record_pipeline(mean_.get(), {text_windows, out[1]}, {}, c, dispatch);
++        cmd.record_pipeline(mean_.get(), {text_windows, out[1], order_gpu}, {}, c, dispatch);
+         return 0;
+     }
+ 
+diff --git a/src/engine/ncnn/image_io.cpp b/src/engine/ncnn/image_io.cpp
+index 00c9381..ffc3ee9 100644
+--- a/src/engine/ncnn/image_io.cpp
++++ b/src/engine/ncnn/image_io.cpp
+@@ -109,9 +109,9 @@ struct Filter { int first; std::vector<float> weights; };
+ float cubic(float x) {
+     x = std::abs(x);
+     if (x < 1.f)
+-        return ((1.5f*x-2.5f)*x)*x+1.f;
++        return std::fma(std::fma(1.5f,x,-2.5f)*x,x,1.f);
+     if (x < 2.f)
+-        return ((-.5f*x+2.5f)*x-4.f)*x+2.f;
++        return std::fma(std::fma(std::fma(-.5f,x,2.5f),x,-4.f),x,2.f);
+     return 0.f;
+ }
+ std::vector<Filter> filters(int source, int destination) {
+@@ -136,6 +136,23 @@ std::vector<Filter> filters(int source, int destination) {
+     }
+     return out;
+ }
++float rounded_product(float a,float b) {
++    // Keep the SIMD-batch products rounded separately, including on compilers
++    // that contract a multiplication with its subsequent addition by default.
++    volatile float product=a*b;
++    return product;
++}
++template<class Read> float resample(const Filter &filter,Read read) {
++    // Locked FP32-B antialias evaluation: first term, four-term batches with
++    // separately rounded products, then fused scalar tail. Coefficients use
++    // the same fused cubic polynomial. Applying FMA to every term is different.
++    const auto size=filter.weights.size();
++    float value=rounded_product(read(0),filter.weights[0]);
++    const auto end=1+(size-1)/4*4;
++    for (std::size_t j=1;j<end;++j) value+=rounded_product(read(j),filter.weights[j]);
++    for (std::size_t j=end;j<size;++j) value=std::fma(read(j),filter.weights[j],value);
++    return value;
++}
+ }
+ ncnn::Mat prepare_image(const ImagePixels &input, int long_side) {
+     if (long_side < 64 || long_side > 512 || long_side % 16)
+@@ -156,18 +173,15 @@ ncnn::Mat prepare_image(const ImagePixels &input, int long_side) {
+         auto temp = intermediate.channel(c);
+         for (int y = 0; y < input.height; ++y)
+             for (int x = 0; x < rw; ++x) {
+-                float value = 0;
+-                for (std::size_t j = 0; j < fx[x].weights.size(); ++j)
+-                    value += (input.rgb[(std::size_t(y)*input.width+fx[x].first+j)*3+c]/255.f)*fx[x].weights[j];
+-                temp.row(y)[x] = value;
++                temp.row(y)[x] = resample(fx[x],[&](std::size_t j) {
++                    return input.rgb[(std::size_t(y)*input.width+fx[x].first+j)*3+c]/255.f;
++                });
+             }
+         auto dest = output.channel(c);
+         for (int y = 0; y < height; ++y)
+             for (int x = 0; x < width; ++x) {
+-                float value = 0;
+                 const auto &filter = fy[y+oy];
+-                for (std::size_t j = 0; j < filter.weights.size(); ++j)
+-                    value += temp.row(filter.first+int(j))[x+ox]*filter.weights[j];
++                const float value = resample(filter,[&](std::size_t j) {return temp.row(filter.first+int(j))[x+ox];});
+                 dest.row(y)[x] = (std::clamp(value, 0.f, 1.f)-.5f)/.5f;
+             }
+     }
+diff --git a/src/engine/ncnn/inference.hpp b/src/engine/ncnn/inference.hpp
+index 247e79c..fb1150a 100644
+--- a/src/engine/ncnn/inference.hpp
++++ b/src/engine/ncnn/inference.hpp
+@@ -1,6 +1,9 @@
+ #pragma once
+ #include "awa.hpp"
+ #include "constant.hpp"
++#include "rms_norm.hpp"
++#include "linear.hpp"
++#include "silu.hpp"
+ #include "video_layers.hpp"
+ #include "engine_build.hpp"
+ #include "graph.hpp"
+@@ -60,7 +63,8 @@ inline std::vector<ncnn::Mat> execute_graph(const GraphFiles &files, const std::
+     net.opt.num_threads = request.threads;
+     net.opt.pipeline_cache = pipelines;
+     if (request.vulkan) net.set_vulkan_device(gpu);
+-    if (register_awa(net, awa) != 0 || register_constant(net) != 0 || register_video_layers(net) != 0 ||
++    if (register_awa(net, awa) != 0 || register_constant(net) != 0 || register_dit_silu(net) != 0 ||
++        (id.starts_with("block-") && (register_dit_rms_norm(net) != 0 || register_dit_linear(net) != 0)) || register_video_layers(net) != 0 ||
+         net.load_param(files.param.string().c_str()) != 0 || net.layers().size() > 512 ||
+         net.input_indexes().size() != inputs.size())
+         throw std::runtime_error("Cannot load graph structure: "+id);
+diff --git a/src/engine/ncnn/pipeline.cpp b/src/engine/ncnn/pipeline.cpp
+index ab0792c..37bd404 100644
+--- a/src/engine/ncnn/pipeline.cpp
++++ b/src/engine/ncnn/pipeline.cpp
+@@ -4,6 +4,7 @@
+ #include "package.hpp"
+ #include "video_io.hpp"
+ #include "memory.hpp"
++#include "fp32_device.hpp"
+ #include <bit>
+ #if defined(__unix__)
+ #include <unistd.h>
+@@ -74,6 +75,7 @@ Result<Preflight> preflight(const RestoreRequest &r) {
+             const int index=r.gpu_index<0?ncnn::get_default_gpu_index():r.gpu_index;
+             if (index<0 || index>=ncnn::get_gpu_count()) throw std::runtime_error("Requested Vulkan device is unavailable; select an available device or explicitly choose CPU");
+             device=device_info(index);
++            device["fp32_b_arithmetic"]=require_fp32_device(index);
+         }
+         field="model";
+         const auto p=inspect_manifest(r.model_directory,video);
+diff --git a/src/engine/ncnn/runtime.cpp b/src/engine/ncnn/runtime.cpp
+index 54d87f5..3c15bb3 100644
+--- a/src/engine/ncnn/runtime.cpp
++++ b/src/engine/ncnn/runtime.cpp
+@@ -4,7 +4,11 @@
+ #include "awa.hpp"
+ #include "video_layers.hpp"
+ #include "graph.hpp"
++#include "fp32_device.hpp"
+ #include "constant.hpp"
++#include "rms_norm.hpp"
++#include "linear.hpp"
++#include "silu.hpp"
+ #include "engine_build.hpp"
+ #include "fixture.hpp"
+ #include "seedvr2/engine.hpp"
+@@ -58,8 +62,11 @@ Result<std::string> devices() {
+         std::lock_guard lock(engine_mutex);
+         init_gpu();
+         Json list = Json::array();
+-        for (int i = 0; i < ncnn::get_gpu_count(); ++i)
+-            list.push_back(device_info(i));
++        for (int i = 0; i < ncnn::get_gpu_count(); ++i) {
++            auto info=device_info(i);
++            info["fp32_b_arithmetic"]=fp32_device_probe(i);
++            list.push_back(std::move(info));
++        }
+         return Json{{"schema_version", "1.0"},
+                     {"devices", list},
+                     {"default_gpu", ncnn::get_default_gpu_index()},
+@@ -129,6 +136,9 @@ Result<std::string> run_awa(const CaseRequest &request) {
+             if (index < 0 || index >= ncnn::get_gpu_count())
+                 throw std::runtime_error("Requested Vulkan device is unavailable");
+             gpu = device_info(index);
++            // The standalone synthetic AWA diagnostic reports its own tolerance;
++            // it does not qualify a device for the complete FP32-B model.
++            gpu["fp32_b_arithmetic"]=fp32_device_probe(index);
+             net.set_vulkan_device(index);
+         }
+         if (register_awa(net, trace) != 0 || net.load_param(params.string().c_str()) != 0 ||
+@@ -306,9 +316,11 @@ Result<std::string> run_graph_case(const CaseRequest &request, bool dit) {
+             if (index < 0 || index >= ncnn::get_gpu_count())
+                 throw std::runtime_error("Requested Vulkan device is unavailable");
+             gpu = device_info(index);
++            gpu["fp32_b_arithmetic"]=require_fp32_device(index);
+             net.set_vulkan_device(index);
+         }
+-        if (dit && (register_awa(net, awa_trace) != 0 || register_constant(net) != 0))
++        if (register_dit_silu(net) != 0) throw std::runtime_error("Cannot register FP32 SiLU");
++        if (dit && (register_awa(net, awa_trace) != 0 || register_constant(net) != 0 || register_dit_rms_norm(net) != 0 || register_dit_linear(net) != 0))
+             throw std::runtime_error("Cannot register AWA");
+         if (video_vae && register_video_layers(net)!=0) throw std::runtime_error("Cannot register temporal VAE operators");
+         if (net.load_param(param.string().c_str()) != 0 || net.layers().size() > 512 ||
+diff --git a/src/engine/ncnn/shaders/awa_gather.comp b/src/engine/ncnn/shaders/awa_gather.comp
+index bbe4264..9dfeb90 100644
+--- a/src/engine/ncnn/shaders/awa_gather.comp
++++ b/src/engine/ncnn/shaders/awa_gather.comp
+@@ -17,6 +17,12 @@ shared float q[128];
+ shared float k[128];
+ shared float qsum[128];
+ shared float ksum[128];
++float reference_rsqrt(float z) {
++    precise float root=sqrt(z);
++    root=fma(fma(-root,root,z),.5/root,root);
++    precise float q=1./root;
++    return fma(fma(-q,root,1.),1./root,q);
++}
+ void main() {
+     int token=int(gl_WorkGroupID.x), head=int(gl_WorkGroupID.y), d=int(gl_LocalInvocationID.x);
+     if (token>=p.sequence || head>=p.heads) return;
+@@ -31,14 +37,34 @@ void main() {
+     else {q[d]=text[index];k[d]=text[index+hd];v=text[index+2*hd];}
+     qsum[d]=q[d]*q[d]; ksum[d]=k[d]*k[d];
+     barrier();
+-    for (int step=64;step>0;step/=2) {
+-        if (d<step) {qsum[d]+=qsum[d+step];ksum[d]+=ksum[d+step];}
+-        barrier();
++    // Materialized squares and four interleaved eight-wide accumulators
++    // reproduce the locked CPU RMSNorm reduction without cross-head mixing.
++    if (d<8) {
++        precise float aq[4],ak[4];
++        for(int j=0;j<4;++j) {
++            aq[j]=0.;ak[j]=0.;
++            for(int i=0;i<4;++i) {
++                aq[j]=aq[j]+qsum[i*32+j*8+d];
++                ak[j]=ak[j]+ksum[i*32+j*8+d];
++            }
++        }
++        qsum[d]=((aq[0]+aq[1])+aq[2])+aq[3];
++        ksum[d]=((ak[0]+ak[1])+ak[2])+ak[3];
++    }
++    barrier();
++    if(d==0) {
++        precise float sq=0.,sk=0.;
++        for(int i=0;i<8;++i) {sq=sq+qsum[i];sk=sk+ksum[i];}
++        precise float zq=sq/128.+p.epsilon,zk=sk/128.+p.epsilon;
++        qsum[0]=reference_rsqrt(zq);ksum[0]=reference_rsqrt(zk);
+     }
++    barrier();
+     int offset=is_video?0:256;
+-    float qs=inversesqrt(qsum[0]/128.+p.epsilon);
+-    float ks=inversesqrt(ksum[0]/128.+p.epsilon);
+-    float qn=q[d]*qs*norm[offset+d], kn=k[d]*ks*norm[offset+128+d];
++    float qs=qsum[0];
++    float ks=ksum[0];
++    // Eager FP32 normalization and rotary products have separate rounding
++    // boundaries. Prevent driver contraction/reassociation across those ops.
++    precise float qn=q[d]*qs*norm[offset+d], kn=k[d]*ks*norm[offset+128+d];
+     if (d<126) {
+         int axis=d/42, pair=(d%42)/2, partner=d^1;
+         int pos=is_video ? (axis==0 ? p.text_length+local.x : (axis==1?local.y:local.z))
+diff --git a/src/engine/ncnn/shaders/awa_text_mean.comp b/src/engine/ncnn/shaders/awa_text_mean.comp
+index ceb59d6..ff52424 100644
+--- a/src/engine/ncnn/shaders/awa_text_mean.comp
++++ b/src/engine/ncnn/shaders/awa_text_mean.comp
+@@ -2,11 +2,23 @@
+ layout(local_size_x=64, local_size_y=1, local_size_z=1) in;
+ layout(binding=0) readonly buffer TextWindows { float text_windows[]; };
+ layout(binding=1) writeonly buffer Text { float text[]; };
+-layout(push_constant) uniform parameter { int size, windows, text_cstep; } p;
++layout(binding=2) readonly buffer Order { float order[]; };
++layout(push_constant) uniform parameter { int size, windows, text_cstep, channels; } p;
+ void main() {
+     int i=int(gl_GlobalInvocationID.x);
+     if(i>=p.size) return;
+-    float sum=0.;
+-    for(int w=0;w<p.windows;++w) sum+=text_windows[w*p.text_cstep+i];
+-    text[i]=sum/float(p.windows);
++    int base=(i/p.channels)*p.windows;
++    precise float sums[4]=float[4](0.,0.,0.,0.);
++    int w=0;
++    for (;w+16<=p.windows;) {
++        for(int j=0;j<16;++j,++w) sums[0]=sums[0]+text_windows[int(order[base+w])*p.text_cstep+i];
++        for(int level=1;level<4;++level) {
++            sums[level]=sums[level]+sums[level-1]; sums[level-1]=0.;
++            if((w&(15<<(level*4)))!=0) break;
++        }
++    }
++    for(;w<p.windows;++w) sums[0]=sums[0]+text_windows[int(order[base+w])*p.text_cstep+i];
++    for(int level=1;level<4;++level) sums[0]=sums[0]+sums[level];
++    precise float count=float(p.windows), q=sums[0]/count;
++    text[i]=fma(fma(-q,count,sums[0]),1./count,q);
+ }
+diff --git a/src/engine/ncnn/shaders/video_map.comp b/src/engine/ncnn/shaders/video_map.comp
+index bba17c0..6bbdd77 100644
+--- a/src/engine/ncnn/shaders/video_map.comp
++++ b/src/engine/ncnn/shaders/video_map.comp
+@@ -2,8 +2,10 @@
+ layout(local_size_x=128, local_size_y=1, local_size_z=1) in;
+ layout(binding=0) readonly buffer Source { float src[]; };
+ layout(binding=1) writeonly buffer Destination { float dst[]; };
++layout(binding=2) readonly buffer Bias { float bias[]; };
+ layout(push_constant) uniform parameter {
+     int mode, count, iw, ih, it, ic, isc, ow, oh, ot, oc, osc, kt, st, ss, pad, tile, frame, ratio;
++    float scale;
+ } p;
+ void main() {
+     int i=int(gl_GlobalInvocationID.y)*65536+int(gl_GlobalInvocationID.x);
+@@ -14,12 +16,13 @@ void main() {
+         int it=clamp(t*p.st-(p.kt-1)+c%p.kt,0,p.it-1);
+         dst[c*p.osc+y*p.ow+x]=(iy<0||iy>=p.ih||ix<0||ix>=p.iw)?0.:
+             src[(c/p.kt)*p.isc+(it*p.ih+iy)*p.iw+ix];
+-    } else if(p.mode==1) { // Convolution result: remove padding rows between frames.
++    } else if(p.mode==1 || p.mode==5) { // Crop frames; pointwise projections add bias after GEMM.
+         int x=i%p.ow, y=(i/p.ow)%p.oh, t=(i/(p.ow*p.oh))%p.ot, c=i/(p.ow*p.oh*p.ot);
+-        dst[c*p.osc+(t*p.oh+y)*p.ow+x]=src[c*p.isc+(t*p.tile+y)*p.iw+x];
++        float value=src[c*p.isc+(t*p.tile+y)*p.iw+x];
++        dst[c*p.osc+(t*p.oh+y)*p.ow+x]=p.mode==5?value+bias[c]:value;
+     } else if(p.mode==2) { // Frame C,H,W -> sequence N,C (one SDPA head).
+         int c=i%p.ic, n=i/p.ic;
+-        dst[i]=src[c*p.isc+p.frame*p.iw*p.ih+n];
++        dst[i]=src[c*p.isc+p.frame*p.iw*p.ih+n]*p.scale;
+     } else if(p.mode==3) { // SDPA N,C -> one frame in C,T,H,W.
+         int c=i%p.oc, n=i/p.oc;
+         dst[c*p.osc+p.frame*p.ow*p.oh+n]=src[i];
+diff --git a/src/engine/ncnn/shaders/video_norm.comp b/src/engine/ncnn/shaders/video_norm.comp
+index 1a448d0..c4b5673 100644
+--- a/src/engine/ncnn/shaders/video_norm.comp
++++ b/src/engine/ncnn/shaders/video_norm.comp
+@@ -1,27 +1,85 @@
+ #version 450
++// FP32-B frame GroupNorm. Eight moment lanes and a cascade of 16-vector
++// chunks follow the locked PyTorch 2.9 CPU evaluation order. Each frame and
++// group is independent; affine application retains the original FMA steps.
+ layout(local_size_x=128, local_size_y=1, local_size_z=1) in;
+ layout(binding=0) readonly buffer Source { float src[]; };
+ layout(binding=1) readonly buffer Affine { float affine[]; };
+ layout(binding=2) writeonly buffer Destination { float dst[]; };
+ layout(push_constant) uniform parameter { int spatial, frames, channels, cstep, outstep, groups; float epsilon; } p;
+-shared float reduction[128];
+-shared float mean_value;
++shared float means[8], moments[8];
++shared float mean_value, variance_value;
++const float reciprocals[16]=float[16](1.,1./2.,1./3.,1./4.,1./5.,1./6.,1./7.,1./8.,
++    1./9.,1./10.,1./11.,1./12.,1./13.,1./14.,1./15.,1./16.);
++float divide(float a,float b) {
++    precise float q=a/b;
++    precise float remainder=fma(-q,b,a);
++    return fma(remainder,1./b,q);
++}
++void merge(int added,float am,float av,inout int n,inout float mean,inout float variance) {
++    int total=n+added;
++    precise float ratio=total==0?0.:divide(float(added),float(total));
++    precise float delta=am-mean;
++    mean=fma(ratio,delta,mean);
++    precise float adjustment=(delta*delta)*ratio;
++    precise float next=variance+fma(adjustment,float(n),av);
++    variance=next;n=total;
++}
++float load_value(int g,int t,int i) {
++    int cg=p.channels/p.groups;
++    return src[(g*cg+i/p.spatial)*p.cstep+t*p.spatial+i%p.spatial];
++}
+ void main() {
+-    int lane=int(gl_LocalInvocationID.x), g=int(gl_WorkGroupID.x), t=int(gl_WorkGroupID.y);
+-    int cg=p.channels/p.groups, count=cg*p.spatial;
+-    float sum=0.;
+-    for(int i=lane;i<count;i+=128) sum+=src[(g*cg+i/p.spatial)*p.cstep+t*p.spatial+i%p.spatial];
+-    reduction[lane]=sum; barrier();
+-    for(int step=64;step>0;step/=2) { if(lane<step) reduction[lane]+=reduction[lane+step]; barrier(); }
+-    if(lane==0) mean_value=reduction[0]/float(count);
++    int lane=int(gl_LocalInvocationID.x),g=int(gl_WorkGroupID.x),t=int(gl_WorkGroupID.y);
++    int count=(p.channels/p.groups)*p.spatial,vectors=count/8,chunks=(vectors+15)/16;
++    if (lane<8) {
++        int counts[16];float mm[16],vv[16];
++        for (int i=0;i<16;++i) {counts[i]=0;mm[i]=0.;vv[i]=0.;}
++        int depth=0;
++        for (int n=chunks-1;n>0;n>>=1) ++depth;
++        for (int chunk=0;chunk<chunks;++chunk) {
++            int take=min(16,vectors-chunk*16);
++            precise float m=0.,v=0.;
++            for (int j=0;j<take;++j) {
++                float x=load_value(g,t,(chunk*16+j)*8+lane);
++                precise float delta=x-m;
++                m=fma(delta,reciprocals[j],m);
++                v=fma(delta,x-m,v);
++            }
++            merge(take,m,v,counts[0],mm[0],vv[0]);
++            int mask=chunk+1;
++            for (int j=1;j<depth && (mask&1)==0;++j) {
++                merge(counts[j-1],mm[j-1],vv[j-1],counts[j],mm[j],vv[j]);
++                counts[j-1]=0;mm[j-1]=0.;vv[j-1]=0.;mask>>=1;
++            }
++        }
++        for (int j=1;j<depth;++j) merge(counts[j],mm[j],vv[j],counts[0],mm[0],vv[0]);
++        means[lane]=mm[0];moments[lane]=vv[0];
++    }
++    barrier();
++    if (lane==0) {
++        int n=0;precise float m=0.,v=0.;
++        for (int i=vectors*8;i<count;++i) {
++            float x=load_value(g,t,i);precise float delta=x-m;++n;
++            m=m+divide(delta,float(n));v=fma(delta,x-m,v);
++        }
++        for (int j=0;j<8;++j) merge(vectors,means[j],moments[j],n,m,v);
++        mean_value=m;variance_value=divide(v,float(count));
++    }
+     barrier();
+-    sum=0.;
+-    for(int i=lane;i<count;i+=128) { float v=src[(g*cg+i/p.spatial)*p.cstep+t*p.spatial+i%p.spatial]-mean_value; sum+=v*v; }
+-    reduction[lane]=sum; barrier();
+-    for(int step=64;step>0;step/=2) { if(lane<step) reduction[lane]+=reduction[lane+step]; barrier(); }
+-    float scale=inversesqrt(reduction[0]/float(count)+p.epsilon);
++    // Refine the device rsqrt, keeping the low part of variance + epsilon.
++    precise float variance=max(variance_value,0.);
++    precise float z=variance+p.epsilon;
++    precise float z_error=variance>=p.epsilon?(variance-z)+p.epsilon:(p.epsilon-z)+variance;
++    precise float scale=inversesqrt(z);
++    precise float square=scale*scale;
++    precise float square_error=fma(scale,scale,-square);
++    precise float residual=(fma(-z,square,1.)-z*square_error)-z_error*square;
++    scale=fma(.5*scale,residual,scale);
+     for(int i=lane;i<count;i+=128) {
+-        int c=g*cg+i/p.spatial, off=t*p.spatial+i%p.spatial;
+-        dst[c*p.outstep+off]=(src[c*p.cstep+off]-mean_value)*scale*affine[c]+affine[p.channels+c];
++        int c=g*(p.channels/p.groups)+i/p.spatial,off=t*p.spatial+i%p.spatial;
++        precise float a=scale*affine[c];
++        precise float b=fma(-a,mean_value,affine[p.channels+c]);
++        dst[c*p.outstep+off]=fma(src[c*p.cstep+off],a,b);
+     }
+ }
+diff --git a/src/engine/ncnn/video_layers.cpp b/src/engine/ncnn/video_layers.cpp
+index 24b06b8..d509100 100644
+--- a/src/engine/ncnn/video_layers.cpp
++++ b/src/engine/ncnn/video_layers.cpp
+@@ -1,4 +1,5 @@
+ #include "video_layers.hpp"
++#include "softmax.hpp"
+ #include "awa_shaders.hpp"
+ #include <algorithm>
+ #include <array>
+@@ -41,12 +42,13 @@ public:
+     int destroy_pipeline(const ncnn::Option &) override { map_.reset(); return 0; }
+ protected:
+     void map(const ncnn::VkMat &x, const ncnn::VkMat &y, std::array<int,19> p,
+-             ncnn::VkCompute &cmd) const {
+-        std::vector<ncnn::vk_constant_type> constants(p.size());
++             ncnn::VkCompute &cmd, const ncnn::VkMat *bias=nullptr, float scale=1.f) const {
++        std::vector<ncnn::vk_constant_type> constants(p.size()+1);
+         for (std::size_t i=0;i<p.size();++i) constants[i].i=p[i];
++        constants.back().f=scale;
+         ncnn::Mat dispatch;
+         dispatch.w=std::min(p[1],65536); dispatch.h=(p[1]+65535)/65536; dispatch.c=1;
+-        cmd.record_pipeline(map_.get(),{x,y},{},constants,dispatch);
++        cmd.record_pipeline(map_.get(),{x,y,bias?*bias:x},{},constants,dispatch);
+     }
+     std::unique_ptr<ncnn::Pipeline> map_;
+ };
+@@ -67,20 +69,46 @@ public:
+     }
+     int create_pipeline(const ncnn::Option &opt) override {
+         if (VideoLayer::create_pipeline(opt)!=0) return -1;
++        if (opt.use_vulkan_compute && (rgb_input() || blocked_spatial_convolution() || channel_shortcut())) {
++            // FP32-B uses oneDNN's 16-input-channel partial sums for the VAE's
++            // blocked spatial convolutions; the RGB stem uses a plain FMA chain.
++            const int count=ci_*kt_*k_*k_;
++            packed_projection_.create(count,co_/4,size_t(16),4);
++            if (packed_projection_.empty()) return -100;
++            for (int c=0;c<co_;c+=4) for (int j=0;j<count;++j)
++                for (int lane=0;lane<4;++lane)
++                    packed_projection_.row(c/4)[4*j+lane]=weights_[0][(c+lane)*count+j];
++            projection_pipeline_=std::make_unique<ncnn::Pipeline>(vkdev);
++            projection_pipeline_->set_local_size_xyz(128,1,1);
++            return projection_pipeline_->create(shaders::video_projection,sizeof(shaders::video_projection),{});
++        }
+         convolution_.reset(opt.use_vulkan_compute ? ncnn::create_layer_vulkan("Convolution") : ncnn::create_layer_cpu("Convolution"));
+         if (!convolution_) return -1;
+         convolution_->vkdev=vkdev;
+         ncnn::ParamDict p;
+-        p.set(0,co_);p.set(1,k_);p.set(3,s_);p.set(4,0);p.set(5,1);p.set(6,ci_*co_*kt_*k_*k_);
++        // FP32-B adds bias after the 1x1x1 projection. Seeding the dot
++        // product with bias can lose it when large contributions cancel.
++        p.set(0,co_);p.set(1,k_);p.set(3,s_);p.set(4,0);p.set(5,pointwise()?0:1);p.set(6,ci_*co_*kt_*k_*k_);
+         ncnn::ModelBinFromMatArray mb(weights_.data());
+         return convolution_->load_param(p)==0 && convolution_->load_model(mb)==0 && convolution_->create_pipeline(opt)==0 ? 0:-1;
+     }
+     int upload_model(ncnn::VkTransfer &cmd,const ncnn::Option &opt) override {
++        if (projection_pipeline_) {
++            cmd.record_upload(packed_projection_,projection_weights_,opt,false);
++            cmd.record_upload(weights_[1],bias_gpu_,opt,false);
++            if (opt.lightmode) packed_projection_.release();
++            return projection_weights_.empty() || bias_gpu_.empty() ? -100 : 0;
++        }
++        if (pointwise()) {
++            cmd.record_upload(weights_[1],bias_gpu_,opt);
++            if (bias_gpu_.empty()) return -100;
++        }
+         return convolution_->upload_model(cmd,opt);
+     }
+     int destroy_pipeline(const ncnn::Option &opt) override {
+         if (convolution_) convolution_->destroy_pipeline(opt);
+-        convolution_.reset(); return VideoLayer::destroy_pipeline(opt);
++        convolution_.reset(); bias_gpu_.release(); projection_weights_.release();
++        packed_projection_.release(); projection_pipeline_.reset(); return VideoLayer::destroy_pipeline(opt);
+     }
+     template<class M> bool geometry(const M &x, int &t,int &h,int &w,int &tile) const {
+         if (!valid(x) || x.c!=ci_) return false;
+@@ -108,14 +136,28 @@ public:
+         if (convolution_->forward(gather,result,opt)!=0 || result.empty() || result.elempack!=1) return -1;
+         y.create(w,h,t,co_,size_t(4),1,opt.blob_allocator);
+         if (y.empty()) return -100;
+-        for (int c=0;c<co_;++c) for (int f=0;f<t;++f) for (int row=0;row<h;++row)
+-            std::memcpy(static_cast<float *>(y.channel(c))+(f*h+row)*w,
+-                static_cast<const float *>(result.channel(c))+(f*(tile/s_)+row)*result.w,std::size_t(w)*4);
++        for (int c=0;c<co_;++c) for (int f=0;f<t;++f) for (int row=0;row<h;++row) {
++            auto *dst=static_cast<float *>(y.channel(c))+(f*h+row)*w;
++            const auto *src=static_cast<const float *>(result.channel(c))+(f*(tile/s_)+row)*result.w;
++            if (pointwise()) for (int i=0;i<w;++i) dst[i]=src[i]+weights_[1][c];
++            else std::memcpy(dst,src,std::size_t(w)*4);
++        }
+         return 0;
+     }
+     int forward(const ncnn::VkMat &x,ncnn::VkMat &y,ncnn::VkCompute &cmd,const ncnn::Option &opt) const override {
+         int t,h,w,tile;
+         if (!geometry(x,t,h,w,tile)) return -1;
++        if (projection_pipeline_) {
++            y.create(w,h,t,co_,size_t(4),1,opt.blob_vkallocator);
++            if (y.empty()) return -100;
++            const std::array<int,15> values{x.w,x.h,x.d,int(x.cstep),w,h,t,int(y.cstep),co_,st_,s_,pad_,ci_,channel_shortcut()?2:blocked_spatial_convolution()?1:0,kt_};
++            std::vector<ncnn::vk_constant_type> constants(values.size());
++            for (size_t i=0;i<values.size();++i) constants[i].i=values[i];
++            const int count=w*h*t;
++            ncnn::Mat dispatch;dispatch.w=std::min(count,65536);dispatch.h=(count+65535)/65536;dispatch.c=co_/4;
++            cmd.record_pipeline(projection_pipeline_.get(),{x,projection_weights_,bias_gpu_,y},{},constants,dispatch);
++            return 0;
++        }
+         ncnn::VkMat gather(x.w+pad_+end_,t*tile,ci_*kt_,size_t(4),1,opt.workspace_vkallocator);
+         if (gather.empty()) return -100;
+         map(x,gather,{0,gather.w*gather.h*ci_*kt_,x.w,x.h,x.d,x.c,int(x.cstep),
+@@ -131,12 +173,28 @@ public:
+         }
+         y.create(w,h,t,co_,size_t(4),1,opt.blob_vkallocator);
+         if (y.empty() || result.empty()) return -100;
+-        map(result,y,{1,w*h*t*co_,result.w,result.h,1,co_,int(result.cstep),w,h,t,co_,int(y.cstep),kt_,st_,s_,pad_,tile/s_,0,0},cmd);
++        map(result,y,{pointwise()?5:1,w*h*t*co_,result.w,result.h,1,co_,int(result.cstep),w,h,t,co_,int(y.cstep),kt_,st_,s_,pad_,tile/s_,0,0},cmd,
++            pointwise()?&bias_gpu_:nullptr);
+         return 0;
+     }
+ private:
++    bool pointwise() const { return kt_==1 && k_==1; }
++    bool channel_shortcut() const {
++        // The reviewed 3B VAE changes channels only at these residual shortcuts.
++        // Their oneDNN 1x1 kernel seeds the FMA chain with bias. Equal-width
++        // attention projections remain GEMM followed by bias.
++        return pointwise() && st_==1 && s_==1 && pad_==0 && end_==0 &&
++            ((ci_==128 && co_==256) || (ci_==256 && co_==512) ||
++             (ci_==512 && co_==256) || (ci_==256 && co_==128));
++    }
++    bool rgb_input() const { return ci_==3 && co_%4==0 && kt_==3 && k_==3 && st_==1 && s_==1; }
++    bool blocked_spatial_convolution() const { return ci_%16==0 && co_%4==0 && k_==3; }
+     int ci_=0,co_=0,kt_=0,k_=0,st_=0,s_=0,pad_=0,end_=0;
+     std::array<ncnn::Mat,2> weights_;
++    ncnn::VkMat bias_gpu_;
++    ncnn::Mat packed_projection_;
++    ncnn::VkMat projection_weights_;
++    std::unique_ptr<ncnn::Pipeline> projection_pipeline_;
+     std::unique_ptr<ncnn::Layer> convolution_;
+ };
+ 
+@@ -241,9 +299,10 @@ public:
+     FrameSDPA() {one_blob_only=false;}
+     int create_pipeline(const ncnn::Option &opt) override {
+         if (VideoLayer::create_pipeline(opt)!=0) return -1;
+-        sdpa_.reset(opt.use_vulkan_compute?ncnn::create_layer_vulkan("SDPA"):ncnn::create_layer_cpu("SDPA"));
++        sdpa_.reset(opt.use_vulkan_compute?create_fp32_sdpa():ncnn::create_layer_cpu("SDPA"));
+         if (!sdpa_) return -1;
+         sdpa_->vkdev=vkdev;ncnn::ParamDict p;
++        p.set(6,1.f); // FP32-B scales Q and K separately before their dot product.
+         return sdpa_->load_param(p)==0 && sdpa_->create_pipeline(opt)==0 ? 0:-1;
+     }
+     int destroy_pipeline(const ncnn::Option &opt) override {
+@@ -259,12 +318,14 @@ public:
+         if (!prepare(x)||out.size()!=1) return -1;
+         auto &y=out[0];y.create_like(x[0],opt.blob_allocator);if (y.empty()) return -100;
+         const int n=y.w*y.h;
++        const float scale=static_cast<float>(std::sqrt(1./std::sqrt(double(y.c))));
+         for (int t=0;t<y.d;++t) {
+             std::vector<ncnn::Mat> qkv(3), result(1);
+             for (int a=0;a<3;++a) {
+                 qkv[a].create(y.c,n,1,size_t(4),1,opt.workspace_allocator);if (qkv[a].empty()) return -100;
+                 auto *dst=static_cast<float *>(qkv[a]);
+-                for (int c=0;c<y.c;++c) for (int i=0;i<n;++i) dst[i*y.c+c]=static_cast<const float *>(x[a].channel(c))[t*n+i];
++                for (int c=0;c<y.c;++c) for (int i=0;i<n;++i)
++                    dst[i*y.c+c]=static_cast<const float *>(x[a].channel(c))[t*n+i]*(a<2?scale:1.f);
+             }
+             if (sdpa_->forward(qkv,result,opt)!=0||result[0].empty()) return -1;
+             const auto *src=static_cast<const float *>(result[0]);
+@@ -276,11 +337,12 @@ public:
+         if (!prepare(x)||out.size()!=1) return -1;
+         auto &y=out[0];y.create_like(x[0],opt.blob_vkallocator);if (y.empty()) return -100;
+         const int n=y.w*y.h;
++        const float scale=static_cast<float>(std::sqrt(1./std::sqrt(double(y.c))));
+         for (int t=0;t<y.d;++t) {
+             std::vector<ncnn::VkMat> qkv(3),result(1);
+             for (int a=0;a<3;++a) {
+                 qkv[a].create(y.c,n,1,size_t(4),1,opt.workspace_vkallocator);if (qkv[a].empty()) return -100;
+-                map(x[a],qkv[a],{2,n*y.c,y.w,y.h,y.d,y.c,int(x[a].cstep),y.c,n,1,1,int(qkv[a].cstep),0,0,0,0,0,t,0},cmd);
++                map(x[a],qkv[a],{2,n*y.c,y.w,y.h,y.d,y.c,int(x[a].cstep),y.c,n,1,1,int(qkv[a].cstep),0,0,0,0,0,t,0},cmd,nullptr,a<2?scale:1.f);
+             }
+             if (sdpa_->forward(qkv,result,cmd,opt)!=0 || result[0].empty()) return -1;
+             map(result[0],y,{3,n*y.c,y.c,n,1,1,int(result[0].cstep),y.w,y.h,y.d,y.c,int(y.cstep),0,0,0,0,0,t,0},cmd);
+diff --git a/third_party/engine/sources.json b/third_party/engine/sources.json
+index 344e099..e4069d5 100644
+--- a/third_party/engine/sources.json
++++ b/third_party/engine/sources.json
+@@ -15,6 +15,28 @@
+       "path": "ncnn-LICENSE.txt",
+       "url": "https://github.com/Tencent/ncnn/blob/6a1bf000f363714839a36793addc8c879d3d899e/LICENSE.txt",
+       "sha256": "7c974bac98848df46be1af5bdaa3c3c9c01f6082a90f55caeb7f60c6208aa255"
++    },
++    {
++      "path": "SLEEF-Boost-1.0.txt",
++      "url": "https://raw.githubusercontent.com/shibatch/sleef/3.6.1/LICENSE.txt",
++      "sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
++      "adapted_source": "https://github.com/shibatch/sleef/blob/3.6.1/src/libm/sleefsimdsp.c",
++      "used_by": [
++        "src/engine/ncnn/shaders/dit_silu.comp",
++        "src/engine/ncnn/shaders/fp32_softmax.comp"
++      ]
++    },
++    {
++      "path": "oneDNN-LICENSE.txt",
++      "url": "https://raw.githubusercontent.com/oneapi-src/oneDNN/v3.7.1/LICENSE",
++      "sha256": "9dad27256276bb4fce6725c162ef619b5aa2e8abc8f341a4dab0b870aad55664",
++      "used_by": [
++        "src/engine/ncnn/shaders/video_projection.comp"
++      ],
++      "algorithm_references": [
++        "https://github.com/oneapi-src/oneDNN/blob/v3.7.1/src/cpu/x64/jit_avx512_common_conv_kernel.cpp",
++        "https://github.com/oneapi-src/oneDNN/blob/v3.7.1/src/cpu/x64/jit_avx512_common_1x1_conv_kernel.cpp"
++      ]
+     }
+   ]
+ }
+diff --git a/tools/analyze_vae_trace.py b/tools/analyze_vae_trace.py
+index de2ee31..5c5565d 100644
+--- a/tools/analyze_vae_trace.py
++++ b/tools/analyze_vae_trace.py
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env python3
+-"""Compare retained CPU encoder boundaries on identical inputs; no certification."""
++"""Compare retained CPU/Vulkan encoder boundaries on identical inputs; no certification."""
+ import argparse
+ import json
+ from pathlib import Path
+@@ -16,7 +16,10 @@ def main():
+     if args.output.exists(): raise ValueError('Output already exists')
+     doc=load_json(args.trace/'report.json');case=load_json(args.case)
+     if doc['status']!='EXECUTED' or doc['case_sha256']!=sha(args.case): raise ValueError('Trace/case identity mismatch')
+-    if case['input']['shape']!=[3,17,128,128] or case['component']!='vae-video-encoder': raise ValueError('Unexpected fixture')
++    shape=case['input']['shape']
++    if (case['component']!='vae-video-encoder' or len(shape)!=4 or shape[0]!=3 or
++            not 1<=shape[1]<=17 or (shape[1]-1)%4 or
++            any(not 8<=n<=128 or n%8 for n in shape[2:])): raise ValueError('Unexpected fixture')
+     rows={r['name']:r for r in doc['layers']}
+     names={'conv_in','norm1','add_10','pnnx_unique_45','pnnx_unique_46'}
+     if len(doc['layers'])!=5 or set(rows)!=names: raise ValueError('Incomplete trace')
+@@ -31,13 +34,17 @@ def main():
+     encoder,memory=make_reference(state,'encoder')
+     report=dict(schema_version='seedvr2-vae-isolation-v1',diagnostic_only=True,model_verified=False,
+                 case_sha256=sha(args.case),native_trace_sha256=sha(args.trace/'report.json'),
+-                script_sha256=sha(Path(__file__)),torch_version=torch.__version__,
++                script_sha256=sha(Path(__file__)),torch_version=torch.__version__,backend=doc['backend'],input_shape=shape,
+                 official_sources=verify_sources(),checkpoint_sha256=next(r['lfs']['sha256'] for r in lock['files'] if r['rfilename']=='ema_vae.pth'),boundaries={})
+     with torch.inference_mode():
+         source=read(args.case.parent,case['input'])
+         first=read(args.trace,rows['conv_in'])
+         reference=encoder.conv_in(source[None],memory_state=memory)[0]
+         report['boundaries']['first_conv_same_prepared']=compare(first,reference)
++        double=encoder.conv_in.to(dtype=torch.float64)(source[None].double(),memory_state=memory)[0]
++        report['boundaries']['first_conv_native_vs_fp64']=compare(first,double)
++        report['boundaries']['first_conv_official_vs_fp64']=compare(reference,double)
++        del double
+         del source,reference
+         for input_name,output_name,norm in [('conv_in','norm1',encoder.down_blocks[0].resnets[0].norm1),('add_10','pnnx_unique_45',encoder.conv_norm_out)]:
+             x=first if input_name=='conv_in' else read(args.trace,rows[input_name])
+diff --git a/tools/native_ci.sh b/tools/native_ci.sh
+index c66a26a..d55a561 100644
+--- a/tools/native_ci.sh
++++ b/tools/native_ci.sh
+@@ -2,9 +2,9 @@
+ set -euo pipefail
+ build=${1:?build directory required}
+ install=$(realpath "${2:?install prefix required}")
+-evidence=${3:?evidence directory required}
++evidence=$(realpath -m "${3:?evidence directory required}")
+ mkdir -p "$evidence"
+-ctest --test-dir "$build" --output-on-failure > "$evidence/ctest.log" 2>&1
++ctest --test-dir "$build" --output-junit "$evidence/ctest.xml" --output-on-failure > "$evidence/ctest.log" 2>&1
+ python3 -m unittest discover -s tests -p test_pipeline_contract.py -v > "$evidence/evidence-contract.log" 2>&1
+ python3 tools/check_cli.py "$install/bin/seedvr2" --output "$evidence/cli.json"
+ python3 tools/check_engine.py "$install/bin/seedvr2" --output "$evidence/engine-boundaries.json"
+@@ -37,6 +37,21 @@ VK_DRIVER_FILES="${icds[0]}" VK_ICD_FILENAMES="${icds[0]}" VK_INSTANCE_LAYERS=VK
+   "$install/bin/seedvr2" engine self-test --backend vulkan --gpu 0 > "$evidence/mesa.json" 2> "$evidence/mesa.stderr"
+ if rg -i 'vuid-|validation error' "$evidence/mesa.json" "$evidence/mesa.stderr"; then exit 1; fi
+ VK_DRIVER_FILES="${icds[0]}" VK_ICD_FILENAMES="${icds[0]}" VK_INSTANCE_LAYERS=VK_LAYER_KHRONOS_validation \
+-  ctest --test-dir "$build" -L vulkan --no-tests=error --output-on-failure > "$evidence/mesa-regressions.log" 2>&1
++  "$install/bin/seedvr2" engine devices > "$evidence/mesa-arithmetic.json" 2> "$evidence/mesa-arithmetic.stderr"
++VK_DRIVER_FILES="${icds[0]}" VK_ICD_FILENAMES="${icds[0]}" VK_INSTANCE_LAYERS=VK_LAYER_KHRONOS_validation \
++  ctest --test-dir "$build" -L vulkan --no-tests=error --output-junit "$evidence/mesa-ctest.xml" --output-on-failure > "$evidence/mesa-regressions.log" 2>&1
+ if rg -i 'vuid-|validation error' "$evidence/mesa-regressions.log"; then exit 1; fi
+-printf '{"scope":"Native Linux small tests and installed SDK; full 3B weights are a separate real-device protocol","full_model":"NOT_RUN_IN_CI"}\n' > "$evidence/scope.json"
++python3 - "$evidence" <<'PY'
++import json,sys,xml.etree.ElementTree as ET
++from pathlib import Path
++root=Path(sys.argv[1])
++def summary(path):
++    rows=ET.parse(path).getroot().findall('.//testcase')
++    skipped=[r.get('name') for r in rows if r.find('skipped') is not None]
++    failed=[r.get('name') for r in rows if r.find('failure') is not None or r.find('error') is not None]
++    return dict(total=len(rows),passed=len(rows)-len(skipped)-len(failed),skipped=skipped,failed=failed)
++report=dict(scope='Native Linux small tests and installed SDK; full 3B weights require separate real-device evidence',
++    full_model='NOT_RUN_IN_CI',native=summary(root/'ctest.xml'),mesa=summary(root/'mesa-ctest.xml'),
++    capability_skip='FP32 FMA prerequisite tested independently and enforced by application preflight; a skip is not a numerical PASS')
++(root/'scope.json').write_text(json.dumps(report,indent=2)+'\n')
++PY
+diff --git a/tools/trace_dit.py b/tools/trace_dit.py
+index 838cec7..8f86ba0 100644
+--- a/tools/trace_dit.py
++++ b/tools/trace_dit.py
+@@ -23,7 +23,8 @@ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+     for name in ('binary', 'sdk', 'reference', 'baseline', 'package', 'output'):
+         parser.add_argument('--'+name, type=Path, required=True)
+-    parser.add_argument('--mode', choices=('official-start', 'native-start', 'teacher-forced'), required=True)
++    parser.add_argument('--mode', choices=('official-start', 'native-start', 'teacher-forced', 'prefix-start'), required=True)
++    parser.add_argument('--prefix', type=Path, help='Explicit native prefix intervention report directory; diagnostic only')
+     parser.add_argument('--native-run', type=Path)
+     parser.add_argument('--backend', choices=('cpu', 'vulkan'), default='vulkan')
+     parser.add_argument('--gpu', type=int, default=0)
+@@ -34,6 +35,8 @@ def main():
+         parser.error('Choose ordered block indices 0..31 and a nonnegative GPU')
+     if args.mode == 'native-start' and args.native_run is None:
+         parser.error('native-start requires --native-run')
++    if (args.mode=='prefix-start') != (args.prefix is not None) or (args.prefix and args.first!=0):
++        parser.error('prefix-start requires --prefix and starts at block zero')
+     ref, baseline, shapes, reference_sha, known = bind_reference(args.reference, args.baseline, 'video')
+     if sha(args.package/'manifest.json') != known['model_manifest_sha256']:
+         raise ValueError('Model package differs from reviewed trajectory')
+@@ -42,6 +45,15 @@ def main():
+     if max(height, width) > 128 or shapes['patch-in'] != [grid[0]*grid[1]*grid[2], 2560]:
+         raise ValueError('Expected the reviewed short-video grid within the existing 128-pixel limit')
+     official = {row['stage']: row['reference'] for row in ref['stages']}
++    prefix=None
++    if args.prefix:
++        prefix=load_json(args.prefix/'report.json')
++        if (prefix.get('schema_version')!='seedvr2-video-prefix-trace-v1' or prefix.get('status')!='EXECUTED' or
++                prefix.get('diagnostic_only') is not True or prefix['case']['reference_report_sha256']!=reference_sha or
++                prefix['case']['model_manifest_sha256']!=known['model_manifest_sha256'] or
++                prefix['outputs']['patch-in']['shape']!=shapes['patch-in']):
++            raise ValueError('Prefix intervention identity/shape differs')
++        tensor_path(args.prefix,prefix['outputs']['patch-in'])
+     package = load_json(args.package/'manifest.json')
+     graphs = {row['id']: row for row in package['graphs']}
+     native = None
+@@ -72,6 +84,9 @@ def main():
+                   video_grid=grid,
+                   expected_blocks=list(range(args.first, args.last+1)), blocks=[],
+                   completed=False, model_verified=False, tolerance=ref['tolerance'])
++    if prefix:
++        report['prefix_report_sha256']=sha(args.prefix/'report.json')
++        report['prefix_case']=prefix['case']
+     previous = None
+     for index in range(args.first, args.last+1):
+         folder = args.output/f'block-{index:02d}'
+@@ -81,7 +96,10 @@ def main():
+             shutil.copyfile(source, folder/name)
+             return dict(path=name, dtype='f32le', shape=shape, sha256=sha(folder/name))
+         names = ['patch-in', 'text-in'] if index == 0 else [f'block-{index-1:02d}-video', f'block-{index-1:02d}-text']
+-        if args.mode == 'teacher-forced' or (previous is None and args.mode == 'official-start'):
++        if previous is None and prefix:
++            sources=[(args.prefix,prefix['outputs']['patch-in']),(args.reference,official['text-in'])]
++            input_kind='NATIVE_PREFIX_INTERVENTION_WITH_OFFICIAL_TEXT'
++        elif args.mode == 'teacher-forced' or (previous is None and args.mode == 'official-start'):
+             sources = [(args.reference, official[name]) for name in names]
+             input_kind = 'OFFICIAL'
+         elif previous is None:
+diff --git a/tools/trace_dit_layers.cpp b/tools/trace_dit_layers.cpp
+index 6d48f07..46a3a3d 100644
+--- a/tools/trace_dit_layers.cpp
++++ b/tools/trace_dit_layers.cpp
+@@ -2,6 +2,9 @@
+ #include "graph.hpp"
+ #include "awa.hpp"
+ #include "constant.hpp"
++#include "rms_norm.hpp"
++#include "linear.hpp"
++#include "silu.hpp"
+ #include "engine_build.hpp"
+ #include <iostream>
+ 
+@@ -32,12 +35,15 @@ int main(int argc, char **argv) {
+         e::ExecutionTrace awa;
+         const auto param=d::artifact(root,doc.at("model_param"));
+         const auto weights=d::artifact(root,doc.at("model_bin"),1024ULL*1024*1024);
+-        if (e::register_awa(net,awa) || e::register_constant(net) || net.load_param(param.c_str()) ||
++        if (e::register_awa(net,awa) || e::register_constant(net) || e::register_dit_rms_norm(net) || e::register_dit_linear(net) || e::register_dit_silu(net) || net.load_param(param.c_str()) ||
+             net.layers().size()>512 || net.input_indexes().size()!=3 || net.output_indexes().size()!=2 ||
+             awa.heads!=20 || awa.shifted!=index%2 || net.load_model(weights.c_str()))
+             throw std::runtime_error("Cannot load expected DiT graph");
+         std::vector<ncnn::Mat> inputs;
+-        const std::vector<std::vector<int>> shapes{{5,8,8,2560},{58,2560},{2560,6}};
++        const auto grid=doc.at("inputs").at(0).at("shape").get<std::vector<int>>();
++        if (grid.size()!=4 || grid[0]<1 || grid[0]>5 || grid[1]<1 || grid[1]>8 ||
++            grid[2]<1 || grid[2]>8 || grid[3]!=2560) throw std::runtime_error("Unexpected video grid");
++        const std::vector<std::vector<int>> shapes{grid,{58,2560},{2560,6}};
+         for (std::size_t i=0;i<3;++i) {
+             const auto &row=doc.at("inputs").at(i);
+             if (row.at("shape")!=shapes[i] || row.at("dtype")!="f32le") throw std::runtime_error("Unexpected input contract");
+diff --git a/tools/trace_vae_encoder.cpp b/tools/trace_vae_encoder.cpp
+index b2c6237..b7470df 100644
+--- a/tools/trace_vae_encoder.cpp
++++ b/tools/trace_vae_encoder.cpp
+@@ -1,40 +1,57 @@
+-// Bounded CPU diagnostic for the reviewed 17-frame encoder input.
++// Bounded CPU/Vulkan diagnostic for a retained temporal encoder input.
+ #include "graph.hpp"
+ #include "video_layers.hpp"
++#include "silu.hpp"
+ #include "engine_build.hpp"
+ #include <iostream>
++#include <sstream>
+ namespace d = seedvr2::engine::detail;
+ int main(int argc, char **argv) {
+     try {
+-        if (argc != 4) throw std::runtime_error("Usage: seedvr2-vae-trace CASE_JSON sgemm|direct NEW_OUTPUT");
++        if (argc != 4 && argc != 5) throw std::runtime_error("Usage: seedvr2-vae-trace CASE_JSON sgemm|direct|vulkan|vulkan-direct NEW_OUTPUT [EXTRA_LAYER_NAMES_COMMA_SEPARATED]");
+         const std::filesystem::path file=argv[1], root=file.parent_path(), output=argv[3];
+         const std::string mode=argv[2];
+-        if (mode!="sgemm" && mode!="direct") throw std::runtime_error("Unknown convolution mode");
++        if (mode!="sgemm" && mode!="direct" && mode!="vulkan" && mode!="vulkan-direct") throw std::runtime_error("Unknown convolution mode");
+         const auto doc=d::read_document(file);
+-        const std::vector<int> shape{3,17,128,128};
++        const auto shape=doc.at("input").at("shape").get<std::vector<int>>();
+         if (doc.at("schema_version")!="ncnn-graph-case-v1" || doc.at("component")!="vae-video-encoder" ||
+-            doc.at("precision")!="fp32" || doc.at("input").at("shape")!=shape ||
++            doc.at("precision")!="fp32" || doc.at("reference_profile")!="FP32-B" ||
++            shape.size()!=4 || shape[0]!=3 || shape[1]<1 || shape[1]>17 || (shape[1]-1)%4 ||
++            shape[2]<8 || shape[2]>128 || shape[2]%8 || shape[3]<8 || shape[3]>128 || shape[3]%8 ||
+             doc.at("input").at("dtype")!="f32le") throw std::runtime_error("Unexpected encoder contract");
+         const auto param=d::artifact(root,doc.at("model_param"));
+         const auto weights=d::artifact(root,doc.at("model_bin"),1024ULL*1024*1024);
+         auto input=d::allocate_tensor(shape);d::read_tensor(d::artifact(root,doc.at("input")),input);
+         if (!std::filesystem::create_directories(output)) throw std::runtime_error("Output already exists");
+         ncnn::Net net;auto &opt=net.opt;
+-        opt.use_vulkan_compute=opt.use_packing_layout=false;
++        opt.use_vulkan_compute=mode.starts_with("vulkan");opt.use_packing_layout=false;
+         opt.use_fp16_storage=opt.use_fp16_packed=opt.use_fp16_arithmetic=false;
+         opt.use_bf16_storage=opt.use_bf16_packed=false;
+         opt.use_winograd_convolution=opt.use_cooperative_matrix=false;
+-        opt.use_sgemm_convolution=mode=="sgemm";opt.num_threads=4;
+-        if (seedvr2::engine::register_video_layers(net) || net.load_param(param.c_str()) ||
++        opt.use_sgemm_convolution=mode!="direct" && mode!="vulkan-direct";opt.num_threads=4;
++        if (opt.use_vulkan_compute) { d::init_gpu();net.set_vulkan_device(0); }
++        if (seedvr2::engine::register_video_layers(net) || seedvr2::engine::register_dit_silu(net) || net.load_param(param.c_str()) ||
+             net.layers().size()!=99 || net.input_indexes().size()!=1 || net.output_indexes().size()!=1 ||
+             net.load_model(weights.c_str())) throw std::runtime_error("Cannot load reviewed encoder");
+         d::Json report{{"schema_version","seedvr2-vae-encoder-trace-v1"},{"case_sha256",d::hash(file)},
+-            {"ncnn_commit",SEEDVR2_NCNN_COMMIT},{"backend","cpu"},{"convolution",mode},{"threads",4},
++            {"ncnn_commit",SEEDVR2_NCNN_COMMIT},{"backend",opt.use_vulkan_compute?"vulkan":"cpu"},
++            {"convolution",mode},{"input_shape",shape},{"threads",4},
+             {"model_verified",false},{"layers",d::Json::array()}};
+ #if defined(__linux__)
+         report["executable_sha256"]=d::hash("/proc/self/exe");
+ #endif
+-        const std::set<std::string> selected{"conv_in","norm1","add_10","pnnx_unique_45","pnnx_unique_46"};
++        std::set<std::string> selected{"conv_in","norm1","add_10","pnnx_unique_45","pnnx_unique_46"};
++        if (argc==5) {
++            std::istringstream names(argv[4]);std::string name;
++            while (std::getline(names,name,',')) {
++                const auto &layers=net.layers();
++                if (name.empty() || std::none_of(layers.begin(),layers.end(),[&](const ncnn::Layer *layer) {return layer->name==name;}))
++                    throw std::runtime_error("Unknown extra layer: "+name);
++                selected.insert(name);
++            }
++            if (selected.size()>24) throw std::runtime_error("Too many trace layers");
++        }
++        report["selected_layers"]=selected;
+         auto observe=[&](const ncnn::Layer &layer,const std::vector<ncnn::Mat> &tops) {
+             if (!selected.contains(layer.name)) return;
+             if (tops.size()!=1) throw std::runtime_error("Unexpected selected output arity");
+@@ -43,7 +60,32 @@ int main(int argc, char **argv) {
+             report["layers"].push_back(row);
+         };
+         const auto started=d::Clock::now();d::Json dispatch=d::Json::array();
+-        auto out=d::graph_forward<ncnn::Mat>(net,{input},nullptr,opt,dispatch,{},0,observe);
++        std::vector<ncnn::Mat> out;
++        if (opt.use_vulkan_compute) {
++            const auto *device=net.vulkan_device();d::VulkanAllocators allocators(device);
++            auto options=opt;options.blob_vkallocator=options.workspace_vkallocator=allocators.blob;
++            options.staging_vkallocator=allocators.staging;
++            ncnn::VkCompute command(device);ncnn::VkMat uploaded;
++            command.record_upload(input,uploaded,options);
++            auto observe_gpu=[&](const ncnn::Layer &layer,const std::vector<ncnn::VkMat> &tops) {
++                if (!selected.contains(layer.name)) return;
++                std::vector<ncnn::Mat> downloaded(tops.size());
++                for (std::size_t i=0;i<tops.size();++i) {
++                    auto value=tops[i];
++                    if (value.elempack!=1) { ncnn::VkMat one;device->convert_packing(value,one,1,command,options);value=one; }
++                    command.record_download(value,downloaded[i],options);
++                }
++                if (command.submit_and_wait()!=0 || command.reset()!=0) throw std::runtime_error("Trace download failed");
++                observe(layer,downloaded);
++            };
++            auto gpu_out=d::graph_forward<ncnn::VkMat>(net,{uploaded},&command,options,dispatch,{},4,observe_gpu);
++            out.resize(gpu_out.size());
++            for (std::size_t i=0;i<gpu_out.size();++i) command.record_download(gpu_out[i],out[i],options);
++            if (command.submit_and_wait()!=0) throw std::runtime_error("Trace submission failed");
++            report["device"]=d::device_info(0);
++        } else {
++            out=d::graph_forward<ncnn::Mat>(net,{input},nullptr,opt,dispatch,{},0,observe);
++        }
+         report["elapsed_seconds"]=std::chrono::duration<double>(d::Clock::now()-started).count();
+         if (out.size()!=1 || report["layers"].size()!=selected.size()) throw std::runtime_error("Incomplete trace");
+         report["status"]="EXECUTED";report["dispatch"]=dispatch;

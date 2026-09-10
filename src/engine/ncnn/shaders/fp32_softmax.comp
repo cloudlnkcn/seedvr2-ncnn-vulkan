@@ -1,0 +1,79 @@
+#version 450
+layout(local_size_x=128, local_size_y=1, local_size_z=1) in;
+layout(binding=0) buffer Tensor { float data[]; };
+layout(push_constant) uniform parameter { int width, rows, cstep; } p;
+shared float partial[128];
+shared float maximum, reciprocal;
+
+// SLEEF 3.6.1 xexpf; Copyright Naoki Shibata and contributors 2010 - 2024.
+// Boost Software License, Version 1.0: third_party/engine/SLEEF-Boost-1.0.txt.
+float exponential(float x) {
+    if (x < -104.) return 0.;
+    float n = roundEven(x * 1.4426950408889634);
+    float r = fma(-n, .693145751953125, x);
+    r = fma(-n, 1.428606765330187e-6, r);
+    float y = 0.000198527617612853646278381;
+    y = fma(y, r, 0.00139304355252534151077271);
+    y = fma(y, r, 0.00833336077630519866943359);
+    y = fma(y, r, 0.0416664853692054748535156);
+    y = fma(y, r, 0.166666671633720397949219);
+    y = fma(y, r, .5);
+    precise float squared = r*r;
+    precise float reduced = 1. + fma(squared, y, r);
+    // Preserve tiny probabilities even on devices that flush FP32 subnormal
+    // arithmetic. Construct their mantissa without subnormal intermediates.
+    if (n <= -126.) return uintBitsToFloat(uint(roundEven(ldexp(reduced, int(n)+149))));
+    return ldexp(reduced, int(n));
+}
+void main() {
+    int lane=int(gl_LocalInvocationID.x);
+    int base=int(gl_WorkGroupID.y)*p.cstep+int(gl_WorkGroupID.x)*p.width;
+    float m=-3.402823466e38;
+    for (int i=lane; i<p.width; i+=128) m=max(m,data[base+i]);
+    partial[lane]=m;
+    barrier();
+    for (int stride=64; stride>0; stride/=2) {
+        if (lane<stride) partial[lane]=max(partial[lane],partial[lane+stride]);
+        barrier();
+    }
+    if (lane==0) maximum=partial[0];
+    barrier();
+    for (int i=lane; i<p.width; i+=128) {
+        precise float delta=data[base+i]-maximum;
+        data[base+i]=exponential(delta);
+    }
+    memoryBarrierBuffer(); barrier();
+    // Locked PyTorch softmax dispatch: 16 lanes, then a balanced shuffle tree.
+    if (lane<16) {
+        precise float sum=0.;
+        for (int i=lane; i<p.width; i+=16) sum=sum+data[base+i];
+        partial[lane]=sum;
+    }
+    barrier();
+    if (lane==0) {
+        precise float total=0.;
+        if (p.width<16) {
+            for (int i=0;i<p.width;++i) total=total+partial[i];
+        } else {
+            for (int stride=8;stride>0;stride/=2)
+                for (int i=0;i<stride;++i) { precise float s=partial[i]+partial[i+stride]; partial[i]=s; }
+            total=partial[0];
+        }
+        precise float q=1./total;
+        reciprocal=fma(fma(-q,total,1.),1./total,q);
+    }
+    barrier();
+    for (int i=lane;i<p.width;i+=128) {
+        uint bits=floatBitsToUint(data[base+i]);
+        if (bits<0x00800000u) {
+            data[base+i]=uintBitsToFloat(uint(roundEven(float(bits)*reciprocal)));
+        } else {
+            precise float value=data[base+i]*reciprocal;
+            // A normal exponential can become subnormal after normalization.
+            if (value<1.1754943508222875e-38) {
+                precise float scaled=ldexp(data[base+i],126)*reciprocal;
+                data[base+i]=uintBitsToFloat(uint(roundEven(scaled*8388608.)));
+            } else data[base+i]=value;
+        }
+    }
+}

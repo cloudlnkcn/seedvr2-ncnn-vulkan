@@ -4,7 +4,11 @@
 #include "awa.hpp"
 #include "video_layers.hpp"
 #include "graph.hpp"
+#include "fp32_device.hpp"
 #include "constant.hpp"
+#include "rms_norm.hpp"
+#include "linear.hpp"
+#include "silu.hpp"
 #include "engine_build.hpp"
 #include "fixture.hpp"
 #include "seedvr2/engine.hpp"
@@ -58,8 +62,11 @@ Result<std::string> devices() {
         std::lock_guard lock(engine_mutex);
         init_gpu();
         Json list = Json::array();
-        for (int i = 0; i < ncnn::get_gpu_count(); ++i)
-            list.push_back(device_info(i));
+        for (int i = 0; i < ncnn::get_gpu_count(); ++i) {
+            auto info=device_info(i);
+            info["fp32_b_arithmetic"]=fp32_device_probe(i);
+            list.push_back(std::move(info));
+        }
         return Json{{"schema_version", "1.0"},
                     {"devices", list},
                     {"default_gpu", ncnn::get_default_gpu_index()},
@@ -129,6 +136,9 @@ Result<std::string> run_awa(const CaseRequest &request) {
             if (index < 0 || index >= ncnn::get_gpu_count())
                 throw std::runtime_error("Requested Vulkan device is unavailable");
             gpu = device_info(index);
+            // The standalone synthetic AWA diagnostic reports its own tolerance;
+            // it does not qualify a device for the complete FP32-B model.
+            gpu["fp32_b_arithmetic"]=fp32_device_probe(index);
             net.set_vulkan_device(index);
         }
         if (register_awa(net, trace) != 0 || net.load_param(params.string().c_str()) != 0 ||
@@ -306,9 +316,11 @@ Result<std::string> run_graph_case(const CaseRequest &request, bool dit) {
             if (index < 0 || index >= ncnn::get_gpu_count())
                 throw std::runtime_error("Requested Vulkan device is unavailable");
             gpu = device_info(index);
+            gpu["fp32_b_arithmetic"]=require_fp32_device(index);
             net.set_vulkan_device(index);
         }
-        if (dit && (register_awa(net, awa_trace) != 0 || register_constant(net) != 0))
+        if (register_dit_silu(net) != 0) throw std::runtime_error("Cannot register FP32 SiLU");
+        if (dit && (register_awa(net, awa_trace) != 0 || register_constant(net) != 0 || register_dit_rms_norm(net) != 0 || register_dit_linear(net) != 0))
             throw std::runtime_error("Cannot register AWA");
         if (video_vae && register_video_layers(net)!=0) throw std::runtime_error("Cannot register temporal VAE operators");
         if (net.load_param(param.string().c_str()) != 0 || net.layers().size() > 512 ||

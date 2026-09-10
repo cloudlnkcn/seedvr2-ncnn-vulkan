@@ -4,7 +4,7 @@
 
 A native **C++20 / ncnn CPU/Vulkan** port of the official **SeedVR2 3B** image and short-video restoration model. The **standalone CLI, local Web application and installed C++ SDK** share one inference implementation. The tutorial covers pnnx export, custom adaptive window attention, temporal VAE and component-by-component validation.
 
-**Validated model and configuration: SeedVR2 3B, FP32, single-step CFG=1.** The 0.7.0 native preview passes **73/73 tensor boundaries** against retained official FP32-B references on a **256×256 natural-image fixture** and a **17-frame, 128×128 video fixture**; see the [image record](artifacts/2026-09-08/memory-v1/image-sdk-fixed-parity.json) and [video record](artifacts/2026-09-08/memory-v1/video-auto-parity.json). These passes apply to the recorded inputs, device and implementation versions. Numerical and quality results for additional cases appear below.
+**Validated model and configuration: SeedVR2 3B, FP32-B, one step, CFG=1.** The repaired implementation passes **73/73 tensor boundaries on all six retained trajectories**: three original clips, the held-out synthetic 17-frame clip on CPU and Vulkan, and a 256×256 natural image. The original motion 63/73 and padding 71/73 failures are closed with unchanged weights, official references, raw noise and full-model tolerance. [Repair details](docs/NUMERICS-REPAIR.md) · [Full records](artifacts/2026-09-10/video-numerics-v2/summary.json).
 
 Image output long sides reach 512 pixels; video is limited to 17 frames and 128-pixel long sides, producing SDR MP4 without audio. This is an advanced porting case study for readers with C++, PyTorch and basic Vulkan experience, not an official ByteDance or Tencent release.
 
@@ -86,9 +86,9 @@ Each AWA layer performs these steps:
 
 1. Plan regular/shifted clipped windows on the actual grid. Shifted windows use a half-window offset and clipped boundaries, without cyclic wrapping.
 2. Gather video Q/K/V and repeat the complete text Q/K/V in every window, applying Q/K normalization and multimodal 3D RoPE.
-3. Use ncnn **SDPA** for joint video/text attention within the window; scatter video results to their positions and average text results equally across windows.
+3. Compute joint video/text attention within the window. Vulkan reuses the pinned ncnn SDPA QK/PV shaders with an FP32 softmax adapter; video results are scattered to their positions and text results are averaged equally across windows.
 
-The Vulkan implementation combines [gather](src/engine/ncnn/shaders/awa_gather.comp), [scatter](src/engine/ncnn/shaders/awa_scatter.comp) and [text mean](src/engine/ncnn/shaders/awa_text_mean.comp) shaders with ncnn SDPA. The CPU path supports identical-input comparisons. Vulkan requests check every layer's capability and AWA dispatch counts, with no automatic CPU fallback. Codecs, layouts, noise and Euler run on the host; graph-boundary tensors are downloaded and uploaded for the next graph.
+The Vulkan implementation combines [gather](src/engine/ncnn/shaders/awa_gather.comp), [scatter](src/engine/ncnn/shaders/awa_scatter.comp) and [text mean](src/engine/ncnn/shaders/awa_text_mean.comp) shaders with the [FP32 SDPA adapter](src/engine/ncnn/softmax.cpp). The CPU path supports identical-input comparisons. Vulkan requests check every layer's capability and AWA dispatch counts, with no automatic CPU fallback. Codecs, layouts, noise and Euler run on the host; graph-boundary tensors are downloaded and uploaded for the next graph.
 
 ### Memory and packages: explicit lifetime and recorded decisions
 
@@ -108,9 +108,9 @@ Build/interface tests, small operators, real components, complete execution, ten
 
 ## Measured results and visual comparisons
 
-Recorded **2026-09-10**, using the frozen **0.7.0 native CLI/SDK**, SeedVR2 **3B / single-step FP32-B**, **Linux x86_64 / RTX 4060 Laptop 8 GiB**, 32 GiB host RAM. Each clip starts as **64×40, 8 fps** and produces **128×80** output. The cases use one natural source with fixed synthetic degradation; the cut is an artificial splice. They are development examples, not a representative benchmark.
+Recorded **2026-09-10**, using the frozen **0.7.0 numerical-repair CLI/SDK**, SeedVR2 **3B / single-step FP32-B**, **Linux x86_64 / RTX 4060 Laptop 8 GiB**, 32 GiB host RAM. Each clip starts as **64×40, 8 fps** and produces **128×80** output. The cases use one natural source with fixed synthetic degradation; the cut is an artificial splice. They are development examples, not a representative benchmark.
 
-**All three clips complete inference. Two full numerical comparisons still fail, and fixed-target quality metrics are below bicubic in all three cases.** The examples below show those outcomes directly.
+**All three original clips complete inference and pass all 73 numerical boundaries.** Fixed-target quality remains below bicubic for both native and official FP32-B outputs; the repaired outputs and quality measurements are shown together below.
 
 The four columns are **bicubic input baseline → native ncnn/Vulkan → official FP32-B → fixed target**. These are the original retained comparison images, rendered from pre-codec RGB8 with no extra enhancement. `f0` is the first frame. The target comes from an already compressed source, not camera-original ground truth.
 
@@ -118,36 +118,37 @@ The four columns are **bicubic input baseline → native ncnn/Vulkan → officia
 
 Frames 0, 4 and 8; no temporal padding.
 
-![motion-9 — bicubic, native, official FP32-B and target at matching frames](artifacts/2026-09-10/bounded-video-v1/quality/motion-9/comparison.png)
+![motion-9 — bicubic, native, official FP32-B and target at matching frames](artifacts/2026-09-10/video-numerics-v2/quality/motion-9/comparison.png)
 
-[Input clip](tests/fixtures/video-bounded/motion-9/input.mp4) · [Native output MP4](artifacts/2026-09-10/bounded-video-v1/motion-9-output.mp4) · [Official preview MP4](artifacts/2026-09-10/bounded-video-v1/quality/motion-9/official.mp4) · [Per-frame data](artifacts/2026-09-10/bounded-video-v1/quality/motion-9/report.json)
+[Input clip](tests/fixtures/video-bounded/motion-9/input.mp4) · [Native output MP4](artifacts/2026-09-10/video-numerics-v2/motion-9-output.mp4) · [Official preview MP4](artifacts/2026-09-10/video-numerics-v2/quality/motion-9/official.mp4) · [Per-frame data](artifacts/2026-09-10/video-numerics-v2/quality/motion-9/report.json)
 
 ### Tail padding · 8 frames → 9 → 8
 
 Frames 0, 4 and 7. The last frame is repeated for model input, then the output is cropped back to 8 frames.
 
-![padding-8 — bicubic, native, official FP32-B and target at matching frames](artifacts/2026-09-10/bounded-video-v1/quality/padding-8/comparison.png)
+![padding-8 — bicubic, native, official FP32-B and target at matching frames](artifacts/2026-09-10/video-numerics-v2/quality/padding-8/comparison.png)
 
-[Input clip](tests/fixtures/video-bounded/padding-8/input.mp4) · [Native output MP4](artifacts/2026-09-10/bounded-video-v1/padding-8-output.mp4) · [Official preview MP4](artifacts/2026-09-10/bounded-video-v1/quality/padding-8/official.mp4) · [Per-frame data](artifacts/2026-09-10/bounded-video-v1/quality/padding-8/report.json)
+[Input clip](tests/fixtures/video-bounded/padding-8/input.mp4) · [Native output MP4](artifacts/2026-09-10/video-numerics-v2/padding-8-output.mp4) · [Official preview MP4](artifacts/2026-09-10/video-numerics-v2/quality/padding-8/official.mp4) · [Per-frame data](artifacts/2026-09-10/video-numerics-v2/quality/padding-8/report.json)
 
 ### Artificial cut · 17 frames
 
 Frames 0, 7, 8 and 16. The splice is immediately before frame 8, so both sides of the cut remain visible.
 
-![cut-17 — bicubic, native, official FP32-B and target at matching frames](artifacts/2026-09-10/bounded-video-v1/quality/cut-17/comparison.png)
+![cut-17 — bicubic, native, official FP32-B and target at matching frames](artifacts/2026-09-10/video-numerics-v2/quality/cut-17/comparison.png)
 
-[Input clip](tests/fixtures/video-bounded/cut-17/input.mp4) · [Native output MP4](artifacts/2026-09-10/bounded-video-v1/cut-17-output.mp4) · [Official preview MP4](artifacts/2026-09-10/bounded-video-v1/quality/cut-17/official.mp4) · [Per-frame data](artifacts/2026-09-10/bounded-video-v1/quality/cut-17/report.json)
+[Input clip](tests/fixtures/video-bounded/cut-17/input.mp4) · [Native output MP4](artifacts/2026-09-10/video-numerics-v2/cut-17-output.mp4) · [Official preview MP4](artifacts/2026-09-10/video-numerics-v2/quality/cut-17/official.mp4) · [Per-frame data](artifacts/2026-09-10/video-numerics-v2/quality/cut-17/report.json)
 
 ### Numerical and output checks
 
-| Case | Full tensor boundaries | RGB8 max difference¹ | Native graphs | Raw reference |
+| Case | Original → repaired | RGB8 max difference¹ | Native graphs | Repair report |
 | --- | --- | --- | --- | --- |
-| motion-9 | **63/73 · FAIL** | 1 | 36/36 Vulkan | [JSON](artifacts/2026-09-10/bounded-video-v1/motion-9-reference.json) |
-| padding-8 | **71/73 · FAIL** | 1 | 36/36 Vulkan | [JSON](artifacts/2026-09-10/bounded-video-v1/padding-8-reference.json) |
-| cut-17 | **73/73 · PASS for this case** | 1 | 36/36 Vulkan | [JSON](artifacts/2026-09-10/bounded-video-v1/cut-17-reference.json) |
+| motion-9 | 63/73 → **73/73** | 1 | 36/36 Vulkan | [JSON](artifacts/2026-09-10/video-numerics-v2/motion-9.replay.json) |
+| padding-8 | 71/73 → **73/73** | 1 | 36/36 Vulkan | [JSON](artifacts/2026-09-10/video-numerics-v2/padding-8.replay.json) |
+| cut-17 | 73/73 → **73/73** | 1 | 36/36 Vulkan | [JSON](artifacts/2026-09-10/video-numerics-v2/cut-17.replay.json) |
 
+¹ Native versus official, before encoding, on a 0–255 channel scale. Frame count, dimensions, timestamps and no-audio checks pass. All graph layers run on Vulkan without CPU fallback or recorded Vulkan validation errors. Every boundary, including intermediates, uses the unchanged diagnostic tolerance `abs(error) <= 0.001 + 0.001 * abs(reference)`.
 
-¹ Native versus official, before video encoding, on a 0–255 channel scale. All three final `decoded` FP32 boundaries pass; this does not waive the earlier failures. Output frame count, dimensions, timestamps and no-audio checks pass. All graph layers execute on Vulkan with no CPU fallback; retained logs contain no Vulkan validation errors. The 73 boundaries use the unchanged `atol=rtol=0.001` diagnostic tolerance.
+The held-out **17-frame 128×128 synthetic clip** passes 73/73 on CPU and Vulkan. The **256×256 natural JPEG** also passes 73/73 with RGB8 max difference 1. [Six trajectories and implementation identities](artifacts/2026-09-10/video-numerics-v2/summary.json).
 
 ### Restoration quality
 
@@ -166,27 +167,28 @@ Each cell is **PSNR (dB) / RGB SSIM**, averaged over the real output frames, wit
 
 | Case | Native wall time (s) | Sampled process RSS (GiB) | Whole-card GPU use (MiB) |
 | --- | --- | --- | --- |
-| motion-9 | 28.09 | 1.184 | 3633 |
-| padding-8 | 27.62 | 1.126 | 4202 |
-| cut-17 | 31.31 | 0.893 | 5521 |
+| motion-9 | 28.11 | 0.918 | 2884 |
+| padding-8 | 32.20 | 0.888 | 2871 |
+| cut-17 | 32.25 | 0.927 | 3357 |
 
 
-One sequential run per case, including package hashing, weight loading and computation; no speedup claim. Whole-card GPU memory includes desktop use and is not process-exclusive VRAM. RSS is not an allocation-class breakdown of weights, activations and workspace. Full sampling data is retained in [the summary](artifacts/2026-09-10/bounded-video-v1/summary.json).
+One sequential run per case, including package hashing, weight loading, computation and diagnostic tensor output; this does not establish normal inference speed or a speedup. Whole-card GPU memory includes desktop use and is not process-exclusive VRAM. RSS is not an allocation-class breakdown of weights, activations and workspace. Full sampling data is retained in [the summary](artifacts/2026-09-10/video-numerics-v2/summary.json).
 
-### Operator checks and failure localization
+### Numerical repairs and operator checks
 
-| Check | Result | Scope |
-| --- | --- | --- |
-| AWA CPU / Vulkan | 8/8 | 4 pnnx exports; 16 output tensors; max abs 1.61e-6 |
-| motion-9 · blocks 19–31 | 26/26 | Official inputs at every block |
-| padding-8 · blocks 15–17 | 6/6 | Official inputs at every block |
-| motion-9 · all 32 DiT blocks | 64/64 | Official initial tensors; subsequent inputs remain native |
-| motion-9 · block 19 replay | **FAIL reproduced** | Both output tensors match the retained native failure byte for byte |
+The fixes address FP32 operation order and error propagation through the full model: preprocessing, blocked VAE convolution and shortcut bias, RMSNorm/FrameNorm, Q/K prescaling, RoPE, window text pooling, SiLU/softmax, and compensated DiT dot products.
 
+| Check | Result / scope |
+| --- | --- |
+| CPU/Vulkan DiT RMSNorm | 94,720 fixture values per backend match byte for byte; the CPU's 31 violations are fixed |
+| VAE projection / shortcuts | 431,328 oneDNN FP32 fixture outputs match byte for byte with device and host weight placement |
+| Real encoder isolation | 15,360 posterior projection values match on identical inputs; full-encoder error propagation is retained |
+| Native build, operators and interfaces | **36/36 locally**; installed SDK consumer and CLI load the same library |
+| Software Vulkan CI | **10 passed, 12 capability skips**; llvmpipe lacks required FMA residual behavior and preflight rejects complete FP32-B inference |
 
-The AWA grids are `(3,5,8)` and `(5,5,8)`, each regular/shifted with 20 heads and 58 text tokens, using synthetic QKV. The DiT isolation checks use real checkpoint weights. These interventions support amplification of differences entering DiT, but do not isolate one upstream operator or fix the original 63/73 and 71/73 trajectories.
+`engine devices` includes an independent FP32 arithmetic probe. Passing it is a prerequisite, not a model certificate. Skips are not numerical passes; the initial Mesa failures remain archived. Full CPU/NVIDIA model runs are recorded separately from small CI tests.
 
-[Protocol and reproduction](docs/BOUNDED-VIDEO-RESULTS.md) · [Reports and failure logs](artifacts/2026-09-10/bounded-video-v1/README.md) · [Fixture provenance](tests/fixtures/video-bounded/SOURCE.md) · [Machine-readable results](artifacts/2026-09-10/bounded-video-v1/summary.json)
+[Repair and reproduction](docs/NUMERICS-REPAIR.md) · [New evidence and failed candidates](artifacts/2026-09-10/video-numerics-v2/README.md) · [Original failures](artifacts/2026-09-10/bounded-video-v1/README.md) · [Fixture provenance](tests/fixtures/video-bounded/SOURCE.md) · [Remaining work](docs/CURRENT-GAPS.md)
 
 ## Start without downloading model weights
 

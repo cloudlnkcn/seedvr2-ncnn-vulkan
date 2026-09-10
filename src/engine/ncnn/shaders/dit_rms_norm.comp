@@ -1,0 +1,42 @@
+#version 450
+// The locked FP32-B reference materializes squares, sums four interleaved
+// eight-wide vectors in chunks of 16, divides, then performs sqrt and reciprocal.
+// Keep those rounding boundaries when targeting a GPU with approximate rsqrt.
+layout(local_size_x=128,local_size_y=1,local_size_z=1) in;
+layout(binding=0) readonly buffer Input {float src[];};
+layout(binding=1) writeonly buffer Output {float dst[];};
+shared float partials[32];
+shared float coefficient;
+float divide(float a,float b) {
+    precise float q=a/b;
+    return fma(fma(-q,b,a),1./b,q);
+}
+void main() {
+    int lane=int(gl_LocalInvocationID.x),row=int(gl_WorkGroupID.x),base=row*2560;
+    if(lane<32) {
+        precise float total=0.;
+        for(int chunk=0;chunk<5;++chunk) {
+            precise float acc=0.;
+            for(int j=0;j<16;++j) {
+                float x=src[base+(chunk*16+j)*32+lane];
+                precise float squared=x*x;acc=acc+squared;
+            }
+            total=total+acc;
+        }
+        partials[lane]=total;
+    }
+    barrier();
+    if(lane==0) {
+        precise float total=0.;
+        for(int d=0;d<8;++d) {
+            precise float s=((partials[d]+partials[8+d])+partials[16+d])+partials[24+d];
+            total=total+s;
+        }
+        precise float z=divide(total,2560.)+1e-5;
+        precise float root=sqrt(z);
+        root=fma(fma(-root,root,z),.5/root,root);
+        coefficient=divide(1.,root);
+    }
+    barrier();
+    for(int i=lane;i<2560;i+=128)dst[base+i]=src[base+i]*coefficient;
+}
