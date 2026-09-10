@@ -1,12 +1,110 @@
 # SeedVR2 ncnn Vulkan
 
-[中文](README.md) · [Measured results](#measured-results-and-visual-comparisons) · [Tutorial (Chinese)](docs/TUTORIAL.md) · [Architecture](docs/ARCHITECTURE.md) · [Contributing](CONTRIBUTING.md) · [License](LICENSE)
+[中文](README.md) · [Architecture](#architecture-and-design) · [Measured results](#measured-results-and-visual-comparisons) · [Tutorial (Chinese)](docs/TUTORIAL.md) · [Source guide](docs/ARCHITECTURE.md) · [Contributing](CONTRIBUTING.md) · [License](LICENSE)
 
 A native **C++20 / ncnn CPU/Vulkan** port of the official **SeedVR2 3B** image and short-video restoration model. The **standalone CLI, local Web application and installed C++ SDK** share one inference implementation. The tutorial covers pnnx export, custom adaptive window attention, temporal VAE and component-by-component validation.
 
-**Status: 0.7.0 native preview; full model certification remains incomplete.** Image output long sides reach 512 pixels; video is limited to 17 frames and 128-pixel long sides, producing SDR MP4 without audio. Real inference works, with the numerical and quality limitations shown below. This is an advanced porting case study for readers with C++, PyTorch and basic Vulkan experience, not an official ByteDance or Tencent release.
+**Validated model and configuration: SeedVR2 3B, FP32, single-step CFG=1.** The 0.7.0 native preview passes **73/73 tensor boundaries** against retained official FP32-B references on a **256×256 natural-image fixture** and a **17-frame, 128×128 video fixture**; see the [image record](artifacts/2026-09-08/memory-v1/image-sdk-fixed-parity.json) and [video record](artifacts/2026-09-08/memory-v1/video-auto-parity.json). These passes apply to the recorded inputs, device and implementation versions. Numerical and quality results for additional cases appear below.
+
+Image output long sides reach 512 pixels; video is limited to 17 frames and 128-pixel long sides, producing SDR MP4 without audio. This is an advanced porting case study for readers with C++, PyTorch and basic Vulkan experience, not an official ByteDance or Tencent release.
 
 The application includes model identity/integrity checks, preflight, progress/cancellation, offline model copying and per-graph device/host weight placement. React / TypeScript / Ant Design is embedded in the native Drogon host; inference needs no Python, Node.js or cloud service. See [first use and offline transfer](docs/FIRST-RUN.md) and [memory-policy measurements](docs/MEMORY-VALIDATION.md).
+
+## Architecture and design
+
+The design addresses three concrete needs: **call the same model from a UI, a command line or another application; execute a full package on a device with limited VRAM; and trace every result to its inputs, model and implementation.** The application consists of a shared native core, a local job service and offline conversion tools. The following describes the implemented code.
+
+### Application layers: three entry points, one native core
+
+```mermaid
+flowchart TB
+    Web["Local Web · React / TypeScript"] --> Service["Drogon HTTP + bounded job queue"]
+    Service <--> Store[("SQLite · jobs / events / file references")]
+    Service --> Worker["Isolated worker process"]
+    CLI["Standalone CLI · CLI11"] --> SDK["Public C++ SDK · seedvr2::restore"]
+    App["External C++ application"] --> SDK
+    Worker --> SDK
+    SDK --> Pipeline["Preflight / package verification / image or clip pipeline"]
+    Package[("Model package · manifest / graphs / constants")] --> Pipeline
+    Pipeline --> Executor["Graph executor · budget / load / execute / release"]
+    Executor --> Runtime["ncnn CPU / Vulkan · standard layers + custom AWA / temporal VAE"]
+```
+
+The Web service persists a request and its events, then starts a worker that calls the SDK. The browser reads progress and results through the job API; refreshing the page does not restart inference. CLI and external C++ callers use the same SDK directly, producing media and `run.json` independently of the Web service.
+
+| Layer | Responsibility | Design reason / implementation |
+| --- | --- | --- |
+| Entry points | Files, parameters, progress and result presentation | Model mathematics stays out of the UI; [CLI](apps/cli/main.cpp), [Web](apps/studio/src) and the [SDK example](examples/sdk) share the computation entry point |
+| Local job service | Queue, worker supervision, cancellation, persistent events and interrupted-run records | Process isolation lets the service handle inference failures; at most 8 unfinished jobs and 1 active job limit resource contention. See [service.cpp](src/jobs/service.cpp), [process.cpp](src/jobs/process.cpp) |
+| Public SDK | `RestoreRequest`, `preflight`, `restore`, model verification/copying, callbacks and errors | Standard C++ types keep callers independent of Web and ncnn internals; CLI tests and integrations exercise the same implementation. See [pipeline.hpp](include/seedvr2/pipeline.hpp), [adapter](src/engine/ncnn/pipeline.cpp) |
+| Model pipeline | VAE, posterior sampling, conditioning, 32 DiT blocks, Euler and output orchestration | Image and video retain their layout and temporal semantics while sharing the graph executor. See [image.cpp](src/engine/ncnn/image.cpp), [video.cpp](src/engine/ncnn/video.cpp) |
+| Model package | Source and sampling identity, graph/constants inventory, sizes and hashes | Exported artifacts are separate from application installation; offline copies are verified at both ends. See [package.cpp](src/engine/ncnn/package.cpp), [reviewed identities](policies/reviewed-packages.json) |
+| ncnn execution | Graph loading, backend selection, layer dispatch, resource release and custom operators | Standard operators use ncnn; custom layers implement SeedVR2-specific semantics. See [inference.hpp](src/engine/ncnn/inference.hpp), [graph.hpp](src/engine/ncnn/graph.hpp), [awa.cpp](src/engine/ncnn/awa.cpp), [video_layers.cpp](src/engine/ncnn/video_layers.cpp) |
+
+These boundaries also define how to test: use CLI for runs without a UI, an external SDK consumer for integration, and the Web service for queue, cancellation and recovery behavior. The [source guide](docs/ARCHITECTURE.md) maps further changes to implementation files.
+
+### Model pipeline: why 36 graphs
+
+The 3B package contains **1 VAE encoder + 1 patch-in + 32 DiT blocks + 1 patch-out + 1 VAE decoder = 36 ncnn graphs**. Component boundaries support comparison against identical official inputs and allow weights to be loaded and released with each stage. C++ orchestrates sampling, layouts and media handling.
+
+```mermaid
+flowchart TB
+    Input["Image or short clip · RGB"] --> Prepare["Resize / crop / normalize; pad video to 4n+1 frames"]
+    Prepare --> Encoder["VAE encoder · graph 1"]
+    Encoder --> Condition["Posterior sampling and scaling · 16-channel condition"]
+    PosteriorNoise["Posterior noise"] --> Condition
+    Condition --> Patches["Diffusion noise + condition + mask · 33 channels; patch 1×2×2"]
+    DiffusionNoise["Diffusion noise"] --> Patches
+    Patches --> PatchIn["patch-in · graph 2 · project to width 2560"]
+    PatchIn --> DiT["32 DiT blocks · graphs 3–34; update video and text per block"]
+    Constants["Fixed positive text + time condition"] --> DiT
+    DiT --> PatchOut["patch-out · graph 35 · reconstruct velocity prediction"]
+    PatchOut --> Euler["Single-step Euler endpoint · 16-channel latent"]
+    DiffusionNoise --> Euler
+    Euler --> Decoder["VAE decoder · graph 36"]
+    Decoder --> Output["Crop to real frame count / encode · PNG or silent MP4 + run.json"]
+```
+
+Here `H/W` are processed pixel dimensions, `Tₚ` is the padded frame count, `L=(Tₚ−1)/4+1`, and `N=L×(H/16)×(W/16)`. An image has `Tₚ=L=1`.
+
+| Boundary | Logical shape / meaning in the current 3B package |
+| --- | --- |
+| VAE input and posterior | Input `3×Tₚ×H×W`; posterior `32×L×(H/8)×(W/8)`, split into 16 mean and 16 log-variance channels |
+| DiT conditioning | 16 diffusion-noise channels + 16 sampled-posterior channels + 1 mask; `1×2×2` patches flatten to `N×132` |
+| DiT backbone | Video `N×2560`, retaining the temporal/spatial grid inside blocks; text `58×2560`; 20 heads of width 128 |
+| Output | patch-out produces `N×64`, reconstructed as 16-channel velocity; Euler produces the latent decoded by the VAE |
+
+**Video uses the temporal VAE and 3D attention jointly across the clip's latent.** For example, 8 frames become 9 by repeating the last frame, yielding 3 latent time positions; decoded output is cropped back to 8 frames. Temporal convolutions and first-frame rules are retained, with cross-clip VAE cache disabled. Reports record the input clip, padding and output crop. Fixed positive text and time conditions are supplied by the package; the current API does not accept free-form text prompts.
+
+### AWA: preserve export semantics, execute windows on Vulkan
+
+Adaptive window attention changes its window sizes and boundaries with the temporal/spatial grid. Tracing window loops at one shape cannot represent other shapes. Export therefore uses pnnx **`moduleop` to preserve the AWA boundary**, followed by a checked mapping to **`SeedVR2AWA`** that verifies attributes, inputs/outputs, normalization weights and RoPE frequencies. Runtime code generates window indices from the actual input shape.
+
+The path is **official implementation and weights → PyTorch export expression → TorchScript / pnnx → checked custom-layer mapping → `.param/.bin` package → native CPU/Vulkan**. Python, PyTorch and pnnx prepare and verify the package; C++ executes it. See [awa_export_module.py](tools/awa_export_module.py), [export_awa.py](tools/export_awa.py) and [real DiT block export](tools/export_dit_block.py).
+
+Each AWA layer performs these steps:
+
+1. Plan regular/shifted clipped windows on the actual grid. Shifted windows use a half-window offset and clipped boundaries, without cyclic wrapping.
+2. Gather video Q/K/V and repeat the complete text Q/K/V in every window, applying Q/K normalization and multimodal 3D RoPE.
+3. Use ncnn **SDPA** for joint video/text attention within the window; scatter video results to their positions and average text results equally across windows.
+
+The Vulkan implementation combines [gather](src/engine/ncnn/shaders/awa_gather.comp), [scatter](src/engine/ncnn/shaders/awa_scatter.comp) and [text mean](src/engine/ncnn/shaders/awa_text_mean.comp) shaders with ncnn SDPA. The CPU path supports identical-input comparisons. Vulkan requests check every layer's capability and AWA dispatch counts, with no automatic CPU fallback. Codecs, layouts, noise and Euler run on the host; graph-boundary tensors are downloaded and uploaded for the next graph.
+
+### Memory and packages: explicit lifetime and recorded decisions
+
+Each graph follows **create/check graph structure → query budget → choose placement and load weights → execute and retrieve outputs → destroy Net and allocators → next graph**. The full roughly 20 GB of FP32 graph files need not reside in memory together. The cost is file reading, graph loading and host/GPU transfers during each run. Necessary outputs survive between graphs; shader pipeline cache is shared within the run.
+
+`auto / device / host` controls weight placement per graph. Automatic mode reads the device budget, estimates weight preparation space from graph file size and reserves headroom before requesting device or host-visible memory. `host` still executes Vulkan. Policy and device queries live in [memory_policy.cpp](src/runtime/memory_policy.cpp) and [memory.hpp](src/engine/ncnn/memory.hpp). Reports record placement requests, reasons and budgets around loading/release; the driver determines actual residency. The estimate does not cover all activations, workspace and allocator overhead, so it cannot guarantee freedom from allocation failure on every device.
+
+Buffered weight reading is the default; optional read-only `mmap` remains alive until its Net is destroyed. The model uses no autoregressive KV cache, and the application keeps no full-package weight cache across jobs. Preflight checks parameters, input, paths, output space, device and package identity before full weight verification. Offline copying verifies both ends and publishes the new directory after success. Package identity comes from project review; numerics and quality have separate reports.
+
+### Validation design: trace the results to their execution
+
+Official references and candidate export code are maintained separately. The current **FP32-B** reference adapts pinned official mathematics to CPU PyTorch, with an explicit distinction from the official default BF16/Apex/FlashAttention path. Comparisons bind raw posterior and diffusion noise as well as input data; equal seeds alone do not imply equal random sequences across frameworks.
+
+The full contract checks **73 tensor boundaries: two outputs from each of 32 DiT blocks, plus nine input, VAE, conditioning and endpoint boundaries**. Reference identity, shapes, types, completeness and matching inputs are checked before error calculation; missing or duplicate boundaries fail. Run reports also identify the manifest, converter/runtime commits, executable and actually loaded SDK hashes. See [pipeline_contract.py](tools/pipeline_contract.py), [pipeline_replay.py](tools/pipeline_replay.py), [provenance.hpp](src/engine/ncnn/provenance.hpp).
+
+Build/interface tests, small operators, real components, complete execution, tensor errors, task quality and performance are reported separately. Identical-input component tests localize errors; complete trajectories expose error propagation; fixed-target and bicubic comparisons measure restoration behavior for each case. The following figures and tables retain their passes, failures and measurement conditions.
 
 ## Measured results and visual comparisons
 

@@ -2,6 +2,8 @@
 
 0.7.0，2026-09-08。目标是一个易测试的单机应用：本地 Web、独立 CLI、可安装 SDK 共用计算实现，避免引入额外服务或未有需求的扩展框架。
 
+应用分层、36 图模型流程、张量关系及设计取舍的概览见 [README 架构设计](../README.md#架构设计)（[English](../README.en.md#architecture-and-design)）。本页按修改目的提供更细的源码导航。
+
 ```mermaid
 flowchart LR
   Browser[本地 React 界面] --> HTTP[Drogon HTTP]
@@ -30,10 +32,10 @@ flowchart LR
 | Web 任务执行 | `apps/worker/main.cpp`、`src/jobs` | 独立进程、队列最多 8/同时执行 1、取消、恢复、事件 |
 | HTTP/界面 | `apps/server`、`apps/studio/src` | 资源 ID 和本机会话；运行时静态资源内嵌 |
 | 工作区 | `src/storage/workspace.cpp` | SQLite schema 3、媒体和结果引用、持久事件 |
-| 单图/短片编排 | `src/engine/ncnn/image.cpp`、`video.cpp` | 顺序执行真实 36 图，不将整段视频拆为独立单帧恢复 |
-| 共有推理数学 | `src/engine/ncnn/inference.hpp` | 后验采样、布局、噪声、条件与 Euler；不含 Web 状态 |
+| 单图/短片编排与采样数学 | `src/engine/ncnn/image.cpp`、`video.cpp` | 后验采样、布局、条件与 Euler；顺序执行真实 36 图，保留整段视频时序关系 |
+| 共享图执行 | `src/engine/ncnn/inference.hpp`、`graph.hpp` | 噪声生成器、图装载、后端/层校验、逐层调度、输出与执行记录；不含 Web 状态 |
 | 包认证 | `src/engine/ncnn/package.cpp`、`package.hpp`、`policies/reviewed-packages.json` | 审阅过的有效载荷身份、相对路径、文件大小与 SHA-256 |
-| 图执行与权重生命周期 | `graph.hpp`、`weight_io.hpp` | 一次一图、CPU/Vulkan 明确选择、可选只读 mmap |
+| 权重生命周期 | `inference.hpp`、`weight_io.hpp` | 一次一图，先销毁 Net 再释放映射；默认 buffered，可选只读 mmap |
 | 权重放置预算 | `include/seedvr2/memory.hpp`、`src/runtime/memory_policy.*`、`src/engine/ncnn/memory.hpp` | 纯策略与设备查询分开；每图重读预算，不把放置请求冒充实际驻留 |
 | 自定义数学 | `awa.cpp`、`constant.cpp`、`video_layers.cpp`、`shaders` | AWA 窗口与 RoPE、文本平均、常量、时序 VAE 变换 |
 | 输入输出 | `image_io.cpp`、`video_io.cpp` | 有界解码、预处理、PNG/MP4、输入类型/色彩范围拒绝 |
