@@ -6,6 +6,8 @@
 
 **0.7.0 原生预览：SeedVR2 3B 已接通可安装的 C++ SDK、独立 CLI 和本地 Web，使用 ncnn CPU / Vulkan 完成真实图片与整段短片处理。** 提供模型包身份/完整性校验、参数预检、离线复制、外部 SDK 示例和原生 CI。保留的 0.7.0 安装版 SDK 已在禁网、隐藏源码和中文路径下完成真实图片推理；自然 JPEG 完整轨迹 73/73 通过官方 FP32-B 对照，输出最大相差 1。**保留的 17 帧视频 CPU/Vulkan 均达到 73/73 数值通过；单张自然图的全参考画质负结果仍保留，完整模型认证未通过。** 这些大模型结论绑定原始测试候选；教程新构建的验证另见[交付核验](docs/TUTORIAL-READINESS.md)。
 
+**2026-09-10 新增自然短片验证：** 128×80 的 9 帧、8 帧补齐、17 帧人工切换案例分别为 **63/73、71/73、73/73**。前两例中间张量仍有数值失败；三例编码前原生/官方 RGB8 最大差均为 1，但相对固定目标的画质指标均低于 bicubic。新增 AWA 8/8 通过。完整结果、同输入定位及可直接使用的测试短片见[有界视频实测](docs/BOUNDED-VIDEO-RESULTS.md)。历史合成片的通过不能覆盖这些新失败。
+
 支持逐图 GPU/RAM 自动权重选择与可复算的算子/组件对照。CLI、Web 和 SDK 使用同一默认策略；0.7.0 修复了 RAM 权重路径的两项 Vulkan 校验错误。设置、验证与内存/速度代价见 [MEMORY-VALIDATION.md](docs/MEMORY-VALIDATION.md)。
 [首次使用和离线搬移](docs/FIRST-RUN.md) · [架构与源码导航](docs/ARCHITECTURE.md) · [17 帧数值修复与代价](docs/VIDEO-NUMERICS.md) · [分项实测、失败和限制](docs/DELIVERY-RESULTS.md) · [可复用 Discussion 草稿](docs/DISCUSSION-DRAFT.md)
 

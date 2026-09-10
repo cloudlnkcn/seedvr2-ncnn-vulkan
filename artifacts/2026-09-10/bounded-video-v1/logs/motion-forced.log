@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "/home/mingshi/Project/AI/pnnx_torchdynamo/seedvr2-ncnn-vulkan/tools/trace_dit.py", line 145, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "/home/mingshi/Project/AI/pnnx_torchdynamo/seedvr2-ncnn-vulkan/tools/trace_dit.py", line 111, in main
+    run = load_json(folder/'stdout.json')
+  File "/home/mingshi/Project/AI/pnnx_torchdynamo/seedvr2-ncnn-vulkan/tools/pipeline_contract.py", line 34, in load_json
+    return json.loads(path.read_text(), object_pairs_hook=pairs, parse_constant=invalid)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mingshi/.local/share/uv/python/cpython-3.13.12-linux-x86_64-gnu/lib/python3.13/json/__init__.py", line 365, in loads
+    return cls(**kw).decode(s)
+           ~~~~~~~~~~~~~~~~^^^
+  File "/home/mingshi/.local/share/uv/python/cpython-3.13.12-linux-x86_64-gnu/lib/python3.13/json/decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mingshi/.local/share/uv/python/cpython-3.13.12-linux-x86_64-gnu/lib/python3.13/json/decoder.py", line 363, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)

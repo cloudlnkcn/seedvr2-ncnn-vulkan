@@ -30,7 +30,12 @@ jobs:
       - name: Native system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y ninja-build pkg-config ripgrep libssl-dev libjpeg-dev libsqlite3-dev libvulkan-dev glslang-dev glslang-tools spirv-tools mesa-vulkan-drivers vulkan-validationlayers libavformat-dev libavcodec-dev libavutil-dev libswscale-dev libomp-dev uuid-dev zlib1g-dev bubblewrap
+          sudo apt-get install -y ninja-build pkg-config ripgrep libssl-dev libjpeg-dev libsqlite3-dev libvulkan-dev glslang-dev glslang-tools spirv-tools mesa-vulkan-drivers vulkan-validationlayers libavformat-dev libavcodec-dev libavutil-dev libswscale-dev libomp-dev uuid-dev zlib1g-dev bubblewrap python3-numpy python3-pil
+      - name: Video metric contracts without model weights
+        run: |
+          mkdir -p artifacts/ci
+          python3 -m unittest discover -s tests -p test_video_quality.py -v > artifacts/ci/video-quality-contract.log 2>&1
+          python3 -m unittest discover -s tests -p test_bounded_video_tools.py -v > artifacts/ci/bounded-video-tools.log 2>&1
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
         if: matrix.web == 'ON'
         with:

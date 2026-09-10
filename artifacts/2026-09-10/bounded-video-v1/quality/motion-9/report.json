@@ -1,0 +1,466 @@
+{
+  "schema_version": "seedvr2-bounded-video-quality-v1",
+  "case_id": "motion-9",
+  "model_verified": false,
+  "quality_gate": "NOT_DEFINED_DESCRIPTIVE_DEVELOPMENT_SAMPLE",
+  "scope": "Three development cases from ONE source, with synthetic degradation. Not a representative quality benchmark or independent natural cuts.",
+  "target_note": "Fixed RGB from an already compressed source; not camera-original ground truth.",
+  "protocol": {
+    "range": 255,
+    "color": "RGB equally averaged, no border crop",
+    "ssim": "11x11 Gaussian sigma1.5, valid convolution, population covariance; K1=.01 K2=.03",
+    "temporal": "MAE of consecutive changes in prediction-minus-target residuals; NOT motion-compensated flicker, cut transition reported separately",
+    "pixels": "Clamped/rounded pre-codec RGB8; padded output frames excluded"
+  },
+  "fixture_manifest_sha256": "45ceb036bd5546304d44bdf3d50d0bb85d55bbd531fc248851b3c8d62f4b47e8",
+  "native_run_sha256": "7361c4f902276a90c07130f6ce6af224678baaaf6f3a56105308ffee443e9448",
+  "reference_report_sha256": "9bdb77d852f4100d1909747b7c1a0fef2d420095db65b85bdecf1af59e915d1d",
+  "media": {
+    "passed": true,
+    "frames": 9,
+    "width": 128,
+    "height": 80,
+    "timestamps_90khz": [
+      0,
+      11250,
+      22500,
+      33750,
+      45000,
+      56250,
+      67500,
+      78750,
+      90000
+    ],
+    "audio": false
+  },
+  "native_official": {
+    "max_abs": 1,
+    "mae": 0.00041594328703703704,
+    "per_frame": [
+      {
+        "frame": 0,
+        "max_abs": 1,
+        "mae": 0.0009440104166666667
+      },
+      {
+        "frame": 1,
+        "max_abs": 1,
+        "mae": 0.0005208333333333333
+      },
+      {
+        "frame": 2,
+        "max_abs": 1,
+        "mae": 0.00068359375
+      },
+      {
+        "frame": 3,
+        "max_abs": 1,
+        "mae": 0.00035807291666666664
+      },
+      {
+        "frame": 4,
+        "max_abs": 1,
+        "mae": 0.0003255208333333333
+      },
+      {
+        "frame": 5,
+        "max_abs": 1,
+        "mae": 0.00016276041666666666
+      },
+      {
+        "frame": 6,
+        "max_abs": 1,
+        "mae": 0.00029296875
+      },
+      {
+        "frame": 7,
+        "max_abs": 1,
+        "mae": 0.00022786458333333334
+      },
+      {
+        "frame": 8,
+        "max_abs": 1,
+        "mae": 0.00022786458333333334
+      }
+    ],
+    "temporal": {
+      "transitions": [
+        {
+          "before_frame": 1,
+          "artificial_cut": false,
+          "residual_change_mae": 0.00146484375
+        },
+        {
+          "before_frame": 2,
+          "artificial_cut": false,
+          "residual_change_mae": 0.0012044270833333334
+        },
+        {
+          "before_frame": 3,
+          "artificial_cut": false,
+          "residual_change_mae": 0.0010416666666666667
+        },
+        {
+          "before_frame": 4,
+          "artificial_cut": false,
+          "residual_change_mae": 0.00068359375
+        },
+        {
+          "before_frame": 5,
+          "artificial_cut": false,
+          "residual_change_mae": 0.00048828125
+        },
+        {
+          "before_frame": 6,
+          "artificial_cut": false,
+          "residual_change_mae": 0.0004557291666666667
+        },
+        {
+          "before_frame": 7,
+          "artificial_cut": false,
+          "residual_change_mae": 0.0005208333333333333
+        },
+        {
+          "before_frame": 8,
+          "artificial_cut": false,
+          "residual_change_mae": 0.0004557291666666667
+        }
+      ],
+      "continuous_transition_count": 8,
+      "continuous_mean_mae": 0.0007893880208333333,
+      "cut_mae": null
+    }
+  },
+  "aggregate": {
+    "bicubic": {
+      "mean_frame_psnr_db": 26.93073869822966,
+      "mean_frame_ssim_rgb": 0.8559885416981732
+    },
+    "native": {
+      "mean_frame_psnr_db": 20.007782836688264,
+      "mean_frame_ssim_rgb": 0.6187355711124133
+    },
+    "official": {
+      "mean_frame_psnr_db": 20.007773788115433,
+      "mean_frame_ssim_rgb": 0.6187355999549239
+    }
+  },
+  "per_frame": {
+    "bicubic": [
+      {
+        "frame": 0,
+        "psnr_db": 27.46198405191352,
+        "identical": false,
+        "ssim_rgb": 0.8632070428862078
+      },
+      {
+        "frame": 1,
+        "psnr_db": 26.969671595906476,
+        "identical": false,
+        "ssim_rgb": 0.8598163053634446
+      },
+      {
+        "frame": 2,
+        "psnr_db": 26.12832803180273,
+        "identical": false,
+        "ssim_rgb": 0.850082612329362
+      },
+      {
+        "frame": 3,
+        "psnr_db": 26.021238280691147,
+        "identical": false,
+        "ssim_rgb": 0.8404997685832093
+      },
+      {
+        "frame": 4,
+        "psnr_db": 26.65819294945461,
+        "identical": false,
+        "ssim_rgb": 0.8526948690530688
+      },
+      {
+        "frame": 5,
+        "psnr_db": 26.230205466663385,
+        "identical": false,
+        "ssim_rgb": 0.8371640628699417
+      },
+      {
+        "frame": 6,
+        "psnr_db": 26.885076843139082,
+        "identical": false,
+        "ssim_rgb": 0.8538493533064839
+      },
+      {
+        "frame": 7,
+        "psnr_db": 28.267126717519794,
+        "identical": false,
+        "ssim_rgb": 0.8807170047420942
+      },
+      {
+        "frame": 8,
+        "psnr_db": 27.754824346976214,
+        "identical": false,
+        "ssim_rgb": 0.8658658561497471
+      }
+    ],
+    "native": [
+      {
+        "frame": 0,
+        "psnr_db": 21.38651561039902,
+        "identical": false,
+        "ssim_rgb": 0.6546792788553232
+      },
+      {
+        "frame": 1,
+        "psnr_db": 17.218143977127873,
+        "identical": false,
+        "ssim_rgb": 0.4643778290367052
+      },
+      {
+        "frame": 2,
+        "psnr_db": 19.306626524355465,
+        "identical": false,
+        "ssim_rgb": 0.578806123071222
+      },
+      {
+        "frame": 3,
+        "psnr_db": 19.61862753061237,
+        "identical": false,
+        "ssim_rgb": 0.6126157262416684
+      },
+      {
+        "frame": 4,
+        "psnr_db": 19.56923429868872,
+        "identical": false,
+        "ssim_rgb": 0.6013096398113063
+      },
+      {
+        "frame": 5,
+        "psnr_db": 20.01343134860644,
+        "identical": false,
+        "ssim_rgb": 0.598406311731232
+      },
+      {
+        "frame": 6,
+        "psnr_db": 20.783800237125266,
+        "identical": false,
+        "ssim_rgb": 0.6487899699037961
+      },
+      {
+        "frame": 7,
+        "psnr_db": 20.939459869854147,
+        "identical": false,
+        "ssim_rgb": 0.6944309944294877
+      },
+      {
+        "frame": 8,
+        "psnr_db": 21.234206133425083,
+        "identical": false,
+        "ssim_rgb": 0.7152042669309788
+      }
+    ],
+    "official": [
+      {
+        "frame": 0,
+        "psnr_db": 21.386452483624563,
+        "identical": false,
+        "ssim_rgb": 0.6546717029638763
+      },
+      {
+        "frame": 1,
+        "psnr_db": 17.218074085770155,
+        "identical": false,
+        "ssim_rgb": 0.4643797993878118
+      },
+      {
+        "frame": 2,
+        "psnr_db": 19.306671930407884,
+        "identical": false,
+        "ssim_rgb": 0.5788043831755949
+      },
+      {
+        "frame": 3,
+        "psnr_db": 19.618643262229565,
+        "identical": false,
+        "ssim_rgb": 0.6126216667540594
+      },
+      {
+        "frame": 4,
+        "psnr_db": 19.569292182403323,
+        "identical": false,
+        "ssim_rgb": 0.601312704829905
+      },
+      {
+        "frame": 5,
+        "psnr_db": 20.013403215727486,
+        "identical": false,
+        "ssim_rgb": 0.5984025886889335
+      },
+      {
+        "frame": 6,
+        "psnr_db": 20.783796851756794,
+        "identical": false,
+        "ssim_rgb": 0.6487844213039834
+      },
+      {
+        "frame": 7,
+        "psnr_db": 20.93942019237456,
+        "identical": false,
+        "ssim_rgb": 0.6944340417131694
+      },
+      {
+        "frame": 8,
+        "psnr_db": 21.234209888744587,
+        "identical": false,
+        "ssim_rgb": 0.7152090907769809
+      }
+    ]
+  },
+  "temporal": {
+    "bicubic": {
+      "transitions": [
+        {
+          "before_frame": 1,
+          "artificial_cut": false,
+          "residual_change_mae": 10.165559895833333
+        },
+        {
+          "before_frame": 2,
+          "artificial_cut": false,
+          "residual_change_mae": 9.53544921875
+        },
+        {
+          "before_frame": 3,
+          "artificial_cut": false,
+          "residual_change_mae": 10.681901041666666
+        },
+        {
+          "before_frame": 4,
+          "artificial_cut": false,
+          "residual_change_mae": 9.297037760416666
+        },
+        {
+          "before_frame": 5,
+          "artificial_cut": false,
+          "residual_change_mae": 7.51044921875
+        },
+        {
+          "before_frame": 6,
+          "artificial_cut": false,
+          "residual_change_mae": 9.534798177083333
+        },
+        {
+          "before_frame": 7,
+          "artificial_cut": false,
+          "residual_change_mae": 9.098763020833333
+        },
+        {
+          "before_frame": 8,
+          "artificial_cut": false,
+          "residual_change_mae": 9.176790364583333
+        }
+      ],
+      "continuous_transition_count": 8,
+      "continuous_mean_mae": 9.375093587239583,
+      "cut_mae": null
+    },
+    "native": {
+      "transitions": [
+        {
+          "before_frame": 1,
+          "artificial_cut": false,
+          "residual_change_mae": 22.520703125
+        },
+        {
+          "before_frame": 2,
+          "artificial_cut": false,
+          "residual_change_mae": 18.101725260416668
+        },
+        {
+          "before_frame": 3,
+          "artificial_cut": false,
+          "residual_change_mae": 19.53388671875
+        },
+        {
+          "before_frame": 4,
+          "artificial_cut": false,
+          "residual_change_mae": 13.519010416666667
+        },
+        {
+          "before_frame": 5,
+          "artificial_cut": false,
+          "residual_change_mae": 15.859928385416667
+        },
+        {
+          "before_frame": 6,
+          "artificial_cut": false,
+          "residual_change_mae": 18.3166015625
+        },
+        {
+          "before_frame": 7,
+          "artificial_cut": false,
+          "residual_change_mae": 18.2361328125
+        },
+        {
+          "before_frame": 8,
+          "artificial_cut": false,
+          "residual_change_mae": 18.57861328125
+        }
+      ],
+      "continuous_transition_count": 8,
+      "continuous_mean_mae": 18.083325195312504,
+      "cut_mae": null
+    },
+    "official": {
+      "transitions": [
+        {
+          "before_frame": 1,
+          "artificial_cut": false,
+          "residual_change_mae": 22.521061197916666
+        },
+        {
+          "before_frame": 2,
+          "artificial_cut": false,
+          "residual_change_mae": 18.1021484375
+        },
+        {
+          "before_frame": 3,
+          "artificial_cut": false,
+          "residual_change_mae": 19.533951822916666
+        },
+        {
+          "before_frame": 4,
+          "artificial_cut": false,
+          "residual_change_mae": 13.518782552083334
+        },
+        {
+          "before_frame": 5,
+          "artificial_cut": false,
+          "residual_change_mae": 15.8599609375
+        },
+        {
+          "before_frame": 6,
+          "artificial_cut": false,
+          "residual_change_mae": 18.316536458333335
+        },
+        {
+          "before_frame": 7,
+          "artificial_cut": false,
+          "residual_change_mae": 18.236393229166666
+        },
+        {
+          "before_frame": 8,
+          "artificial_cut": false,
+          "residual_change_mae": 18.578548177083334
+        }
+      ],
+      "continuous_transition_count": 8,
+      "continuous_mean_mae": 18.0834228515625,
+      "cut_mae": null
+    }
+  },
+  "scripts": {
+    "measure_video_quality.py": "026d7943ae0bcd49b2aeb2d9d9b9e2377a132f1a9ed6ce9661a8b0a9253fdd12",
+    "measure_image_quality.py": "ece687b4da41354b2da9b86d005a5040bb59aa9540092368320df19f6c155a0d",
+    "pipeline_contract.py": "3d38a49e7cf9f9033f6fad5ca80dfcc9a32f3dc2dd72d02a8525a3f8346129f4"
+  }
+}

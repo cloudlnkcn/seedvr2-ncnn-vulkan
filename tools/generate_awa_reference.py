@@ -16,7 +16,10 @@ def sha(path):
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--output',type=Path,required=True)
-    parser.add_argument('--quick',action='store_true')
+    selection=parser.add_mutually_exclusive_group()
+    selection.add_argument('--quick',action='store_true')
+    selection.add_argument('--video-boundaries',action='store_true',
+        help='Four new 128x80 short-video grid cases: latent T=3/5, 20 heads, 58 text tokens')
     args=parser.parse_args()
     if args.output.exists() and any(args.output.iterdir()):
         raise SystemExit('Reference output directory must be empty')
@@ -28,6 +31,7 @@ def main():
             ((3,19,29),1,7),((9,5,7),2,1),((1,3,128),1,9),
             ((1,128,3),1,9),((1,2,3),20,58),((4,1,1),2,3),((33,2,3),1,7)]
     if args.quick: shapes=shapes[:2]
+    if args.video_boundaries: shapes=[((3,5,8),20,58),((5,5,8),20,58)]
     cases=[]
     for index,(grid,heads,nt) in enumerate(shapes):
         for shifted in [False,True]:

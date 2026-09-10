@@ -12,6 +12,14 @@ This is not an official ByteDance or Tencent release.
 Full model quality certification, long-video processing and portable binary releases
 remain unfinished. This is an advanced porting tutorial, not a general Vulkan course.
 
+**2026-09-10 bounded-video update:** three new 128×80 motion, padding and artificial-cut
+cases passed **63/73, 71/73 and 73/73** tensor boundaries. The first two remain numerical
+failures. Native/official pre-codec RGB8 differences are at most one value, while both
+outputs score below bicubic against the fixed target in all three cases. Four new AWA
+cases passed on CPU/Vulkan (8/8). See [results and reproduction](docs/BOUNDED-VIDEO-RESULTS.md)
+and [raw evidence](artifacts/2026-09-10/bounded-video-v1/README.md); historical synthetic-clip
+passes do not cover these new failures.
+
 ## Start without downloading model weights
 
 On Ubuntu 24.04, install:
