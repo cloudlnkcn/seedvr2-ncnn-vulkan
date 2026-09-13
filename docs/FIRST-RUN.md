@@ -22,14 +22,35 @@
 
 ## 已转换模型与自动化范围
 
-当前已经审阅的完整 ncnn 包如下。自行转换可按教程执行，收到转换包后可使用[分发安装工具](distribution/README.md)直接部署，无需再次下载官方 checkpoint：
+已转换模型可从 [Hugging Face：DiT FP16 存储](https://huggingface.co/akashimio/SeedVR2-3B-ncnn-dit-fp16) 或 [FP32-B](https://huggingface.co/akashimio/SeedVR2-3B-ncnn) 获取。两者都包含完整的 36 个 ncnn 图、常量和 manifest；下载后无需自行运行 PyTorch/pnnx 转换。DiT FP16 包仅改变线性矩阵的存储精度，激活与算术仍为 FP32，详细差异见 [精度与实测](DIT-FP16-STORAGE.md)。
 
-| 安装目录中的位置 | 模型包 | 大小 |
-| --- | --- | --- |
-| `models/image/` | `seedvr2-3b-image-fp32-b-v1`，36 张图 | 约 20.44 GB |
-| `models/video/` | `seedvr2-3b-video-fp32-b-v1`，36 张图 | 约 21.10 GB |
+| 包 | FP32-B 安装大小 | DiT FP16 存储安装大小 |
+| --- | ---: | ---: |
+| 图片 | 约 20.44 GB | 约 10.40 GB |
+| 短视频 | 约 21.10 GB | 约 11.05 GB |
 
-每个包包含 `.param` 图结构、`.bin` 权重、常量和 `manifest.json`。这些大文件保存在本机忽略目录中，不随 Git 克隆或 `cmake --install` 自动获取；目前没有默认公开托管地址。2026-09-13 已增加 [转换包分发与安装工具](distribution/README.md)，可从离线分发目录或显式 HTTPS 镜像组装、断点续装和校验已转换模型。图片与视频共同的分发内容按哈希去重后约 21.44 GB；默认安装产生独立副本，空间另计。
+以下命令在 **Git 仓库根目录** 执行，先构建 CLI/SDK，再下载、校验并直接运行图片。需先安装 [教程中的系统开发依赖](TUTORIAL.md#1-从干净克隆开始)；下载器只用 Python 标准库，不需要 Hugging Face 账户或 PyTorch。
+
+```sh
+python3 tools/build_native.py --cli-only --jobs 2 --prefix dist/tutorial
+python3 tools/download_models.py --precision dit-fp16 --kind image \
+  --output dist/tutorial/models/image --run "/路径/照片.jpg" --result results/image
+```
+
+仅安装时去掉 `--run` 和 `--result`；加 `--plan` 可先查看精确下载字节且不写入文件。下载固定到审阅 revision，支持断点续传、SHA-256 检查和原生模型验证。结果目录需为新目录。若程序不在默认位置，使用 `--binary /路径/seedvr2`。
+
+```sh
+# 视频：默认输出长边 128，最多 17 帧
+python3 tools/download_models.py --precision dit-fp16 --kind video \
+  --output dist/tutorial/models/video --run "/路径/短片.mp4" --result results/video --frames 17
+# 已安装后禁用网络，直接校验并复用本机模型
+python3 tools/download_models.py --precision dit-fp16 --kind image \
+  --output dist/tutorial/models/image --offline
+```
+
+FP32-B 可把 `--precision` 改为 `fp32`，并选择一个单独的新模型目录。工具不会覆盖已有不同模型。图片与视频分别安装会各自占用表中空间；远端对象去重不等于本机自动共享文件。保留完整安装目录即可离线使用原生 CLI。
+
+需要 Web 时构建命令去掉 `--cli-only`，模型仍安装到上面的 `dist/tutorial/models/`，然后运行 `dist/tutorial/bin/seedvr2-studio`。启动脚本不会临时下载模型。
 
 源码目录已有分阶段自动化工具：
 
@@ -39,14 +60,15 @@
 | `tools/build_native.py` | 检查开发依赖，串起原生依赖准备、构建、小型测试和安装；不下载模型 |
 | `tools/prepare_native.py`、`tools/prepare_engine.py`、`tools/prepare_pnnx.py` | 按各自锁文件准备原生依赖、ncnn 和转换器 |
 | `tools/prepare_models.py` | 下载固定 revision 的官方 checkpoint，支持断点续传，校验文件大小与 SHA-256；已校验缓存会复用 |
-| `tools/model_distribution.py` | 组装去重转换包，从离线目录或显式 HTTPS 镜像安装；保留原始模型身份，未配置公共默认镜像 |
+| `tools/download_models.py` | 从固定 Hugging Face revision 下载可运行 ncnn 包，校验后可直接调用 CLI；支持计划与离线复用 |
+| `tools/model_distribution.py` | 组装去重转换包，从离线目录或显式 HTTPS 镜像安装；保留原始模型身份；底层安装器供固定 HF 下载入口复用 |
 | `tools/audit_native_install.py` | 核对冻结程序经 CMake RPATH 安装变换后的身份，盘点系统依赖，准备本机程序归档 |
 | `tools/export_vae_image.py`、`tools/export_dit_block.py`、`tools/export_image_package.py` | 按顺序导出图片组件并组装 ncnn 图片包 |
 | `tools/export_vae_video.py`、`tools/export_video_package.py` | 导出时序 VAE，并复用图片 DiT 组装视频包 |
 | `tools/native_ci.sh` | 对已有构建和安装执行小型测试、参数边界、Mesa Vulkan 与外部 SDK 检查；完整 3B 实机验证另行执行 |
 | `seedvr2 models verify` / `models copy` | 校验模型身份与文件完整性，或复制并复核离线模型包 |
 
-从源码准备应用可运行 `python3 tools/build_native.py --jobs 2`，或执行下方分解命令。模型按教程中的图片/视频导出顺序准备；尚未提供一条命令完成空机器系统依赖安装、权重下载、转换和模型部署的总脚本。`prepare_models.py --list` 可先看下载清单，`--offline` 校验缓存；它下载官方权重，不会直接产出可运行的 ncnn 包。
+从源码准备应用可运行 `python3 tools/build_native.py --jobs 2`，或执行下方分解命令。模型可使用上面的已转换包下载入口，或按教程中的图片/视频顺序自行导出。系统依赖安装仍由读者按发行版执行。`prepare_models.py --list` 可先看下载清单，`--offline` 校验缓存；它下载官方权重，不会直接产出可运行的 ncnn 包。
 
 ## CLI：先检查，再执行
 

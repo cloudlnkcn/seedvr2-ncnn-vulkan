@@ -75,3 +75,9 @@ AWA 的 pnnx 边界保留官方自适应窗口含义：窗口 gather、Q/K 归�
 最早的 17 帧数值修复见 [VIDEO-NUMERICS.md](VIDEO-NUMERICS.md)；当前三段自然素材及 CPU 留出回归的修复、算子测试和设备边界见 [NUMERICS-REPAIR.md](NUMERICS-REPAIR.md)。共享执行层的内部 observer 默认关闭；启用后会下载并保存指定边界，改变执行时序，因此其性能不能代替正常流水线测量。CPU 时序编码器单独采用直接卷积，解码器保留原有路径；该策略同时用于完整执行与组件诊断。开发者可显式构建 `seedvr2-dit-trace`、`seedvr2-vae-trace`、`seedvr2-prefix-trace`，分别定位 DiT 层、VAE 内部和从真实输入开始的编码前缀；这些目标不属于默认模型验收。
 
 0.7.0 增加公共内存设置，SDK SONAME 为 `libseedvr2.so.0.7`，旧 SDK 使用程序需重新编译。GPU/RAM 选择、实际 Vulkan 分配问题的编译副本修复及 ERNIE 复用边界见 [MEMORY-VALIDATION.md](MEMORY-VALIDATION.md)。官方 ncnn 源目录不变；应用实际运行时包含报告中列出的 `host-buffer-v1` 修正。
+
+## DiT FP16 权重存储路径
+
+`tools/convert_dit_storage_package.py` 验证固定 FP32 包后，由 `tools/dit_weight_storage.py` 将 32 个 DiT 图中的线性矩阵写为 IEEE FP16，保留其余权重与图语义。图片和视频包拥有独立的 profile 与有效载荷哈希；下载目录和 C++ 包验证器都检查审阅身份。`tools/download_models.py` 将固定 Hugging Face 版本交给已有内容寻址安装器，CLI 与 Web worker 从同一个 SDK 加载安装结果。
+
+运行时 ncnn 将这些矩阵展开到 FP32。`GraphFiles` 把块图的压缩存储属性交给逐图内存预算，先估算展开字节再决定 GPU/RAM 放置，避免按压缩文件大小低估需求。运行报告分别记录权重存储、激活和算术精度。该路径减少下载与磁盘占用，性能与显存收益必须另行测量；完整数据和边界见 [DiT FP16 存储](DIT-FP16-STORAGE.md)。
