@@ -35,7 +35,12 @@ def main():
             "CREATE INDEX records_kind_created ON records(kind,created_at DESC); PRAGMA user_version=1;")
         connection.execute("INSERT INTO records(id,kind,created_at,status,payload) VALUES(?,?,?,?,?)",
                            (migrated_id, 'plan', '2026-01-01T00:00:00.000Z', 'PLANNED', migrated_payload))
-    process = subprocess.Popen([str(args.server.resolve()), "--port", "0", "--database", str(database)],
+    model_dir = Path(temporary.name)/"声明模型"
+    model_dir.mkdir()
+    manifest=model_dir/"manifest.json"
+    manifest.write_text(json.dumps({"profile":"seedvr2-3b-image-dit-fp16-storage-v1",
+        "storage_precision":{"dit_linear_weights":"fp16-ieee","activation":"fp32","arithmetic":"fp32"}}))
+    process = subprocess.Popen([str(args.server.resolve()), "--port", "0", "--database", str(database), "--model", str(model_dir)],
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     results = []
     try:
@@ -121,6 +126,15 @@ def main():
         model = json.loads(body)
         expected_model = json.loads(subprocess.check_output([str(args.cli.resolve()), "models", "status"], text=True))
         check("web-cli-model-status-parity", status == 200 and model == expected_model)
+        declared=json.loads(call("/api/v1/models/image")[1])
+        check("storage-model-profile-declared",declared["profile"]=="seedvr2-3b-image-dit-fp16-storage-v1" and declared["storage_precision"]["dit_linear_weights"]=="fp16-ieee")
+        check("declaration-is-not-certification",declared["model_verified"] is False and declared["metadata_status"]=="DECLARED_UNVERIFIED")
+        manifest.write_text("{")
+        invalid=json.loads(call("/api/v1/models/image")[1])
+        check("invalid-model-metadata-is-not-ready",invalid["installed"] is False and invalid["metadata_status"]=="INVALID")
+        manifest.write_text(" "*(256*1024+1))
+        check("model-metadata-size-bounded",json.loads(call("/api/v1/models/image")[1])["metadata_status"]=="INVALID")
+
         check("model-cannot-be-certified", not model["model_verified"] and model["certificate"] is None and len(model["gates"]) == 12)
         check("policy-needs-calibration", json.loads(call("/api/v1/models/policy")[1])["calibration_status"] == "NOT_FROZEN")
         status, body, _ = call("/api/v1/plans", request_text, auth)

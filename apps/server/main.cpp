@@ -9,9 +9,12 @@
 namespace {
 std::filesystem::path default_model(const std::filesystem::path &executable, bool video=false) {
     const auto profile=video?"seedvr2-3b-video-fp32-b-v1":"seedvr2-3b-image-fp32-b-v1";
+    const auto storage_profile=video?"seedvr2-3b-video-dit-fp16-storage-v1":"seedvr2-3b-image-dit-fp16-storage-v1";
     const auto development=video?".cache/video-package-fp32":".cache/image-package-fp32";
     const auto user_model = seedvr2::default_database_path().parent_path()/"models"/profile;
     const std::array candidates{
+        executable.parent_path().parent_path()/"models"/(video?"video":"image"),
+        seedvr2::default_database_path().parent_path()/"models"/storage_profile,
         user_model,
         executable.parent_path()/"models"/profile,
         executable.parent_path().parent_path()/"share/seedvr2/models"/profile,

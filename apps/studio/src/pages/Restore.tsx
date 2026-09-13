@@ -55,6 +55,8 @@ export default function Restore() {
   }
   const active = isActive(current);
   const ready = (video ? model.data?.video_model?.installed : model.data?.installed) && model.data?.worker_available;
+  const storage = (video ? model.data?.video_model : model.data)?.storage_precision;
+  const precisionLabel = storage?.dit_linear_weights === 'fp16-ieee' ? 'DiT FP16 权重存储，FP32 计算' : 'FP32 计算';
   const progress = current ? Math.min(100, Math.floor(current.progress.completed/current.progress.total*100)) : 0;
   return <Page eyebrow="IMAGE & VIDEO RESTORATION" title="让画面重新清晰" description="导入图片或短视频，选择输出尺寸，完成后直接对比与保存。关闭页面也不会中断已经开始的处理。" actions={<Link to="/history"><Button>查看全部任务</Button></Link>}>
     <input className="sr-only" type="file" accept="image/png,image/jpeg,video/mp4,video/webm,.mkv,.mov,.m4v" ref={input} onChange={e => void importFile(e.target.files?.[0])} aria-label="选择图片或视频"/>
@@ -77,7 +79,7 @@ export default function Restore() {
           <p className="field-note">保留画面比例，边缘会居中裁至 16 的倍数。{video ? '视频会联合处理相邻帧。' : '支持最高 512 像素长边。'}</p>
           {video && <><Form.Item label="测试片段"><Select aria-label="测试片段帧数" value={frames} disabled={active} onChange={setFrames} options={[5,9,17].map(v => ({ value: v, label: `开头 ${v} 帧${picture?.fps ? ` · 约 ${(v/picture.fps).toFixed(2)} 秒` : ''}` }))}/></Form.Item><p className="field-note">8 位 SDR 短片预览：最多 17 帧、128 像素长边，输出 MP4，不含音轨。输入不足时按实际帧数输出。</p><p className="field-note">实验性短片预览：本机保留样例已通过开发数值对照，代表性画质和长视频尚未验收。请先检查短片效果，详见<Link to="/models">模型验收</Link>。</p></>}
           <Form.Item label="处理设备"><Select aria-label="处理设备" value={device} disabled={active} onChange={setDevice} options={[{ value: 'vulkan:-1', label: '自动选择显卡' }, ...(devices.data?.devices.filter(d => !d.name.toLowerCase().includes('llvmpipe')).map(d => ({ value: `vulkan:${d.index}`, label: d.name })) ?? []), { value: 'cpu:-1', label: 'CPU · 兼容模式' }]}/></Form.Item>
-          <Collapse ghost size="small" items={[{ key: 'advanced', label: '复现与高级设置', children: <><Form.Item label="随机种子"><InputNumber aria-label="随机种子" min={0} max={4294967295} precision={0} value={seed} disabled={active} onChange={v => setSeed(v ?? 666)}/></Form.Item><p className="field-note">同一版本、输入、种子与设备可复现本应用的处理。当前精度为 FP32，单步修复。</p><Button size="small" disabled={!picture} onClick={() => download('seedvr2-settings.json', { size, seed, device, model: 'seedvr2-3b' })}>导出设置</Button></> }]}/>
+          <Collapse ghost size="small" items={[{ key: 'advanced', label: '复现与高级设置', children: <><Form.Item label="随机种子"><InputNumber aria-label="随机种子" min={0} max={4294967295} precision={0} value={seed} disabled={active} onChange={v => setSeed(v ?? 666)}/></Form.Item><p className="field-note">同一版本、输入、种子与设备可复现本应用的处理。当前为{precisionLabel}，单步修复。</p><Button size="small" disabled={!picture} onClick={() => download('seedvr2-settings.json', { size, seed, device, model: 'seedvr2-3b' })}>导出设置</Button></> }]}/>
           <div className="start-action"><Button type="primary" htmlType="submit" size="large" block loading={busy && !active} disabled={!picture || !ready || active || job.isFetching && !current} icon={current && !active ? <ReloadOutlined/> : <ArrowRightOutlined/>}>{current && !active ? '按当前设置再处理' : '开始处理'}</Button></div>
         </Form>
         <div className="runtime-note"><i/>真实 ncnn / Vulkan 推理<span>模型文件会在每次运行前核验</span></div>

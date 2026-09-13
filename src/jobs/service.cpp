@@ -77,6 +77,30 @@ void write_json(const std::filesystem::path &path, const Json &doc) {
     std::ofstream out(path); out << doc.dump() << '\n'; out.close();
     if (!out) throw std::runtime_error("Cannot save worker request");
 }
+Json model_metadata(const std::filesystem::path &directory) {
+    Json result{{"installed",false},{"profile","unknown"},{"storage_precision",nullptr},
+                {"metadata_status","MISSING"}};
+    try {
+        std::ifstream in(directory/"manifest.json",std::ios::binary);
+        if (!in) return result;
+        // Status reads declarations only; worker verification remains authoritative.
+        std::string text(256*1024+1,'\0');
+        in.read(text.data(),static_cast<std::streamsize>(text.size()));
+        if (in.bad() || in.gcount()>256*1024) throw std::runtime_error("Manifest metadata too large");
+        text.resize(static_cast<std::size_t>(in.gcount()));
+        const auto doc=Json::parse(text,[](int depth,Json::parse_event_t,Json &) {
+            if (depth>16) throw std::runtime_error("Manifest metadata too deep");
+            return true;
+        });
+        result["profile"]=doc.at("profile").get<std::string>();
+        result["storage_precision"]=doc.value("storage_precision",Json(nullptr));
+        result["installed"]=true;
+        result["metadata_status"]="DECLARED_UNVERIFIED";
+    } catch (const std::exception &) {
+        result["installed"]=false; result["metadata_status"]="INVALID";
+    }
+    return result;
+}
 Json strict_request(std::string_view body) {
     if (body.size() > 4096) throw std::runtime_error("Job request exceeds 4 KiB");
     unsigned keys = 0;
@@ -366,13 +390,13 @@ Result<std::filesystem::path> Jobs::result_file(std::string_view id, std::string
     } catch (const std::exception &e) { return Error{"RESULT_NOT_FOUND", "result", e.what()}; }
 }
 std::string Jobs::model_status() {
-    return Json{{"installed", std::filesystem::is_regular_file(impl_->model/"manifest.json")},
-        {"worker_available", std::filesystem::is_regular_file(impl_->worker) && !impl_->stop},
-        {"profile", "seedvr2-3b-image-fp32-b-v1"}, {"model_verified", false},
-        {"integrity", "CHECKED_BY_WORKER_BEFORE_EVERY_RUN"}, {"sizes", {128, 256, 384, 512}},
-        {"image", true}, {"video", true},
-        {"video_model",{{"installed",!impl_->video_model.empty() && std::filesystem::is_regular_file(impl_->video_model/"manifest.json")},
-            {"profile","seedvr2-3b-video-fp32-b-v1"},{"sizes",{64,96,128}},{"max_frames",17},{"streaming_cache",false},{"audio",false}}},
-        {"max_queued", 8}, {"concurrency", 1}}.dump();
+    auto image=model_metadata(impl_->model);
+    auto video=model_metadata(impl_->video_model);
+    video.update(Json{{"sizes",{64,96,128}},{"max_frames",17},{"streaming_cache",false},{"audio",false}});
+    image.update(Json{{"worker_available",std::filesystem::is_regular_file(impl_->worker) && !impl_->stop},
+        {"model_verified",false},{"integrity","CHECKED_BY_WORKER_BEFORE_EVERY_RUN"},
+        {"sizes",{128,256,384,512}},{"image",true},{"video",true},
+        {"video_model",video},{"max_queued",8},{"concurrency",1}});
+    return image.dump();
 }
 } // namespace seedvr2
