@@ -46,9 +46,10 @@ def installed_identity(original, installed, expected, libdir):
                 matches_reproduced_install=transformed == result['installed_sha256'])
 
 
-def audit(prefix, build_dir):
+def audit(prefix, build_dir, evidence_path=None):
     prefix = prefix.resolve()
-    evidence = json.loads((ROOT / 'artifacts/2026-09-10/video-numerics-v2/summary.json').read_text())
+    evidence_path = evidence_path or ROOT / 'artifacts/2026-09-10/video-numerics-v2/summary.json'
+    evidence = json.loads(evidence_path.read_text())
     inventory, missing, libraries, errors = [], [], {}, []
     required = ['bin/seedvr2', 'bin/seedvr2-worker', 'include/seedvr2/pipeline.hpp',
                 'share/seedvr2/LICENSE', 'share/seedvr2/NOTICE']
@@ -115,9 +116,11 @@ def main():
     parser.add_argument('--build-dir', type=Path, default=ROOT / 'build/release',
                         help='Frozen build files used to reproduce CMake install RPATH changes')
     parser.add_argument('--output', required=True, type=Path)
+    parser.add_argument('--evidence', type=Path, help='Frozen CLI/SDK hash record for this candidate; defaults to the retained FP32 release')
     parser.add_argument('--archive', type=Path, help='Optional local host-specific archive; no system libraries or models')
     args = parser.parse_args()
-    report = audit(args.prefix, args.build_dir)
+    report = audit(args.prefix, args.build_dir, args.evidence)
+    if args.evidence: report["evidence_sha256"] = sha(args.evidence)
     if args.archive and not report['passed']:
         report['archive_refused'] = 'Install audit failed; no archive produced'
     elif args.archive:
