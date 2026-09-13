@@ -146,7 +146,20 @@ Linux x86_64，RTX 4060 Laptop 8 GiB，约 32 GiB RAM。对照使用锁定官方
 
 ## 使用与当前边界
 
-[教程](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/blob/main/docs/TUTORIAL.md)从干净克隆和不需要大权重的算子测试开始，再进入官方权重下载、pnnx 转换和真实模型运行。下载脚本支持固定 revision、续传和 SHA-256 校验；下载的是官方权重，还需要转换。仓库暂未提供预编译 Release 或可直接下载的完整 ncnn 模型包。
+项目采用**源码构建 → 官方权重下载 → 本机转换 → 原生校验 → CLI / 本地 Web 运行**的使用流程，不以预编译程序或转换模型 Release 为前提。官方 `.pth` 需要先转换为包含 36 个 ncnn 图的模型包；转换完成后，兼容环境中的推理无需 Python，也可以离线使用。
+
+安装[教程中的构建依赖](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/blob/main/docs/TUTORIAL.md)及 `uv` 后，命令行入口为：
+
+```sh
+python3 tools/build_native.py --cli-only --check
+python3 tools/build_native.py --cli-only --jobs 2 --prefix dist/tutorial
+bash tools/convert_models.sh --check image models/image dist/tutorial/bin/seedvr2
+bash tools/convert_models.sh image models/image dist/tutorial/bin/seedvr2
+```
+
+需要 Web 时去掉 `--cli-only`，并准备 Node.js 24 与 npm。视频转换使用 `video models/video`，指定新的输出目录。下载脚本锁定官方 revision，支持续传和 SHA-256 校验；转换入口准备私有导出环境，显式传给 pnnx，保留中间结果和失败阶段日志，最后调用原生模型校验。转换阶段暂不自动续跑，新脚本的独立 Ubuntu 完整流程尚未通过验收。[使用、失败处理与离线搬移](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/blob/main/docs/LOCAL-CONVERSION.md)。
+
+普通 CI 检查构建、算子和应用接口，不下载大模型；完整官方权重转换、首次执行与隔离网络回放是独立手动工作流，不创建 Release。原发布工作流因访问未公开模型返回 404，其构建已通过，但首次推理未执行；不把这次失败计作模型数值失败或完整交付通过。
 
 应用已包含参数预检、Unicode 路径、进度与取消、模型身份/完整性校验、离线模型复制和安装 SDK。本机原生测试 **36/36**。Mesa 的小型测试为 **10 项通过、12 项能力跳过**：本机 llvmpipe 不保留这些补偿算子要求的 FMA 残差，程序会在模型加载前明确拒绝。能力探测和数值验收分开；大模型实机证据不由 CI 小型测试替代。
 

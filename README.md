@@ -216,14 +216,15 @@ python3 tools/prepare_models.py
 
 固定官方 revision、约 14.57 GB，支持续传和 SHA-256 校验；`--offline` 仅验证缓存。下载后还需 pnnx 转换，详见教程。源仓库包含小型测试夹具和历史报告，未上传官方大权重、转换包或便携二进制。原生 CI 的实际结果见 [GitHub Actions](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/actions/workflows/native.yml)，大模型实机记录单独保留。
 
-模型采用**官方下载、本机转换**，不分发已转换权重。安装教程列出的依赖和原生程序后，可使用串联脚本：
+项目采用**源码构建、官方下载、本机转换**，不以程序或模型 Release 为使用前提。安装教程列出的依赖和原生程序后，可使用串联脚本：
 
 ```sh
+bash tools/convert_models.sh --check image models/image dist/tutorial/bin/seedvr2
 bash tools/convert_models.sh image models/image dist/tutorial/bin/seedvr2
 # 视频：将 image 改为 video，并指定新的输出目录 models/video。
 ```
 
-脚本保留日志和中间文件，最终调用原生模型校验；转换阶段尚不支持自动续跑。该新入口的独立 Ubuntu 全流程验收仍在进行，详见[程序发布与本机转换](docs/distribution/UBUNTU-RELEASE.md)。Python 只用于准备与转换，之后可离线运行。
+脚本保留日志和中间文件，最终调用原生模型校验；转换阶段尚不支持自动续跑。新入口已补齐环境传递、帮助、依赖预检和失败阶段提示，独立 Ubuntu 全流程尚未通过验收。详见[本机转换、失败处理与离线使用](docs/LOCAL-CONVERSION.md)。普通 CI 不下载大权重；完整转换与离线回放放在独立手动工作流中，不创建 Release。Python 只用于准备与转换，之后可离线运行。
 
 数值修复版提交 `7e56479` 的 Ubuntu GCC CLI、Clang CLI、GCC Web 三项远端 CI 全部通过；每项原生测试为 **24 项通过、12 项能力跳过**，Web 另有 **54/54** 接口检查。对应提交、原始日志和跳过原因见[本轮远端验证归档](artifacts/2026-09-10/github-ci-numerics-v2/README.md)；完整 3B 的 CPU/NVIDIA 实测单独记录，不由远端软件 Vulkan 测试替代。
 

@@ -1,0 +1,47 @@
+name: Manual source conversion and offline validation
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-conversion:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version: '24.18.0'
+      - name: Build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build python3-venv pkg-config ripgrep libssl-dev libjpeg-dev libsqlite3-dev libvulkan-dev glslang-dev glslang-tools spirv-tools mesa-vulkan-drivers vulkan-validationlayers libavformat-dev libavcodec-dev libavutil-dev libswscale-dev libomp-dev uuid-dev zlib1g-dev bubblewrap python3-numpy python3-pil
+      - name: Build and validate installed CLI, Web and SDK
+        run: |
+          python3 tools/build_native.py --jobs 2 --build-dir build/model-validation --prefix dist/seedvr2
+          bash tools/native_ci.sh build/model-validation dist/seedvr2 artifacts/model-validation
+          python3 tools/check_web.py dist/seedvr2/bin/seedvr2-web dist/seedvr2/bin/seedvr2 --output artifacts/model-validation/web.json
+      - name: Download official weights and convert locally
+        run: |
+          python3 -m venv "$RUNNER_TEMP/conversion-tools"
+          "$RUNNER_TEMP/conversion-tools/bin/pip" install uv==0.8.17
+          export PATH="$RUNNER_TEMP/conversion-tools/bin:$PATH"
+          bash tools/convert_models.sh --check image "$RUNNER_TEMP/模型 image" dist/seedvr2/bin/seedvr2
+          bash tools/convert_models.sh image "$RUNNER_TEMP/模型 image" dist/seedvr2/bin/seedvr2
+      - name: Real CPU first execution and isolated offline replay
+        run: |
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          python3 tools/check_release_first_run.py --binary dist/seedvr2/bin/seedvr2 --model "$RUNNER_TEMP/模型 image" --output "$RUNNER_TEMP/首次使用 evidence" --report artifacts/model-validation/run.json
+      - name: Retain evidence including failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: source-conversion-evidence
+          include-hidden-files: true
+          path: |
+            artifacts/model-validation
+            .cache/*-build*.log
+            build/model-validation/Testing/Temporary
+            ${{ runner.temp }}/conversion.*/conversion.log
+            ${{ runner.temp }}/conversion.*/*-verify.json
+            ${{ runner.temp }}/首次使用 evidence/*.json

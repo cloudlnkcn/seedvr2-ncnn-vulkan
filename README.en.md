@@ -12,6 +12,22 @@ The application includes model identity/integrity checks, preflight, progress/ca
 
 The [source and validation workflow](docs/wiki/README.md) connects pinned upstream evidence, [design comparisons](docs/wiki/synthesis/design-comparison.md), implementation and measurements. [Converted-model distribution tooling](docs/distribution/README.md) stages the image and video packages in approximately 21.44 GB of deduplicated objects and installs from a local bundle or an explicit HTTPS mirror. A public model mirror and portable prebuilt application are still pending.
 
+## Build and prepare locally
+
+Distribution is source-first: build the native application, download pinned official checkpoints, then convert them locally. Neither binary releases nor hosted converted weights are prerequisites. Official `.pth` files cannot be loaded directly by ncnn.
+
+After installing the [tutorial prerequisites](docs/TUTORIAL.md) and `uv`:
+
+```sh
+python3 tools/build_native.py --cli-only --check
+python3 tools/build_native.py --cli-only --jobs 2 --prefix dist/tutorial
+bash tools/convert_models.sh --check image models/image dist/tutorial/bin/seedvr2
+bash tools/convert_models.sh image models/image dist/tutorial/bin/seedvr2
+# For video, use `video models/video` with a new output directory.
+```
+
+Omit `--cli-only` to build the local Web application too (Node.js 24 and npm required). The conversion helper installs its own Python export environment, passes it explicitly to pnnx, retains logs and checks the resulting package with the native application. Downloads resume; conversion stages do not resume automatically. The new clean-machine conversion workflow has not passed end to end yet. Ordinary CI runs without large weights or Release assets; full conversion/offline replay is a separate manual workflow. See [local conversion and recovery](docs/LOCAL-CONVERSION.md). Inference is offline and Python-free after preparation.
+
 ## Architecture and design
 
 The design addresses three concrete needs: **call the same model from a UI, a command line or another application; execute a full package on a device with limited VRAM; and trace every result to its inputs, model and implementation.** The application consists of a shared native core, a local job service and offline conversion tools. The following describes the implemented code.

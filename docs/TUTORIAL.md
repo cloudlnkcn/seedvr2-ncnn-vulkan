@@ -62,6 +62,8 @@ Vulkan 自测必须显示实际 Vulkan 执行；找不到设备就是能力缺�
 阅读 [窗口规划](../src/planning/windows.cpp)、[AWA 实现](../src/engine/ncnn/awa.cpp)
 和 [内嵌夹具来源](../tests/fixtures/awa/provenance.json)。解释为什么视频 token 与文本 token 的聚合规则不同。
 
+需要先把应用用起来的读者，可在完成构建后使用[本机转换入口](LOCAL-CONVERSION.md)，由脚本串起官方权重下载、pnnx 构建、全部组件转换与原生校验。下面逐组件教程用于理解实现、定位失败和手动复用导出结果；二者使用同一套转换器。项目不要求下载程序或模型 Release。
+
 ## 2. 看清自定义 AWA 如何导出
 
 开发导出使用 Python 3.13 / PyTorch 2.9.0+cpu，与应用运行时分开。以下命令使用已安装的 `uv`
