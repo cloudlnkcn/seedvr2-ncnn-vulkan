@@ -2,6 +2,16 @@
 
 ## 下载已转换模型（可选）
 
+推荐先看 [首次使用的直接下载入口](FIRST-RUN.md#已转换模型与自动化范围)。支持公开的 [DiT FP16 存储包](https://huggingface.co/akashimio/SeedVR2-3B-ncnn-dit-fp16) 和 [FP32-B](https://huggingface.co/akashimio/SeedVR2-3B-ncnn)。在仓库根目录运行：
+
+```sh
+python3 tools/download_models.py --precision dit-fp16 --kind image \
+  --output dist/tutorial/models/image
+```
+
+先构建当前原生程序；`--plan` 不需要程序或网络，`--offline` 验证本机已安装包，`--run input.png --result results/image` 可在安装后直接执行。视频改用 `--kind video --output dist/tutorial/models/video`。DiT FP16 是权重存储格式，激活与运算仍为 FP32，安装大小约 10.40 / 11.05 GB。固定版本见 [下载登记](distribution/huggingface-models.json)。下面保留底层 FP32 安装命令和源码转换/离线组装方法。
+
+
 已验证的图片和时序视频 FP32-B 模型托管于 [Hugging Face：akashimio/SeedVR2-3B-ncnn](https://huggingface.co/akashimio/SeedVR2-3B-ncnn)。构建原生程序后，可直接安装模型，省去本机 PyTorch / pnnx 转换；源码转换入口继续保留。
 
 ```sh

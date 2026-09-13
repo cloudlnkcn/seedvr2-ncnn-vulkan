@@ -57,7 +57,9 @@ Linux x86_64、RTX 4060 Laptop 8 GiB、主机内存约 32 GiB。固定官方 3B 
 
 ## 获取与运行
 
-Hugging Face 模型和固定版本下载入口正在做远端字节回读与安装验证；验证完成后更新本节。源码转换仍可复现，Python/PyTorch/pnnx 只用于准备和参考，原生执行不需要它们。
+已公开 [Hugging Face DiT FP16 存储包](https://huggingface.co/akashimio/SeedVR2-3B-ncnn-dit-fp16)，全量远端回读、两个包的原生校验和断网安装 SDK 图片执行均已完成。匿名访问另行检查，见 [交付记录](../artifacts/2026-09-13/precision-full/huggingface/README.md)。直接下载与运行命令见 [首次使用](FIRST-RUN.md#已转换模型与自动化范围)，不需要本机转换。
+
+需要复现转换时，使用下列维护者入口。Python/PyTorch/pnnx 只用于准备和参考，原生执行不需要它们。
 
 ```sh
 # 在已有审阅 FP32 图片包和导出 Python 环境的维护者机器上：
@@ -73,5 +75,7 @@ Hugging Face 模型和固定版本下载入口正在做远端字节回读与安�
 ## 验证与限制
 
 36 项本机 CTest 通过，其中包括压缩存储展开后的内存预算测试；新增 15 项 Python 测试通过，包括权重转换异常、下载入口固定版本/目录身份和“量化偏差应记录而非否决”的协议测试。普通 CI 增加这些小型检查，大模型实测单独归档。
+
+新增 Web 存储标识与有界 manifest 读取后，58 项 HTTP 检查及下载模型的 39 项真实 worker 任务检查通过。安装后的断网 SDK 重放得到 77/77 个与冻结 FP16 执行一致的诊断哈希。统一下载入口完成匿名补齐、校验、真实 CLI 执行和断网复用。最新 [GCC CLI / Clang CLI / GCC Web CI](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/actions/runs/34778668488) 均通过；完整记录见 [交付目录](../artifacts/2026-09-13/precision-full/huggingface/README.md)。
 
 本轮完整实测为图片 CPU/Vulkan、上述短片 Vulkan。没有将此结果外推为全部 CPU 视频尺寸或 AMD/Intel 真机验证，也没有新增无限分辨率、长视频、音轨、流式时间缓存、INT8 或 BF16 运算能力。

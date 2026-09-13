@@ -1,26 +1,18 @@
 # SeedVR2 ncnn Vulkan
 
-## 下载已转换模型（可选）
-
-已验证的图片和时序视频 FP32-B 模型托管于 [Hugging Face：akashimio/SeedVR2-3B-ncnn](https://huggingface.co/akashimio/SeedVR2-3B-ncnn)。构建原生程序后，可直接安装模型，省去本机 PyTorch / pnnx 转换；源码转换入口继续保留。
-
-```sh
-python3 tools/model_distribution.py install --catalog docs/distribution/catalog.v1.json --kind image --base-url https://huggingface.co/akashimio/SeedVR2-3B-ncnn/resolve/9371e381e3d5581c05a0934a518b14d8aa15698b --output models/image
-```
-
-视频改用 `--kind video --output models/video`。下载固定到不可变提交，安装器支持续传和逐文件 SHA-256 校验。图片 / 视频安装约需 20.44 / 21.10 GB。模型下载工具只需 Python 标准库，原生推理不需要 Python。发布验证包括完整远端字节回读、两个模型包的原生校验及一张真实图片的 73/73 官方 FP32-B 对照；不扩大已有视频、精度或画质结论。
-
-[English](README.en.md) · [架构设计](#架构设计) · [实测对照](#实测结果与对照图) · [从零开始的教程](docs/TUTORIAL.md) · [源码导航](docs/ARCHITECTURE.md) · [ncnn Discussion](https://github.com/Tencent/ncnn/discussions/6991) · [贡献方法](CONTRIBUTING.md) · [许可证](LICENSE)
+[English](README.en.md) · [模型下载](#下载已转换模型并运行) · [架构设计](#架构设计) · [实测对照](#实测结果与对照图) · [从零开始的教程](docs/TUTORIAL.md) · [源码导航](docs/ARCHITECTURE.md) · [ncnn Discussion](https://github.com/Tencent/ncnn/discussions/6991) · [贡献方法](CONTRIBUTING.md) · [许可证](LICENSE)
 
 将官方 **SeedVR2 3B** 移植为使用 **ncnn CPU/Vulkan** 的原生 C++20 图片与短视频修复应用。提供 **独立 CLI、本地 Web 和可安装的 C++ SDK**，共用同一推理实现；教程覆盖 pnnx 导出、自定义 adaptive window attention、时序 VAE 和逐组件验证。
 
 **已验证模型与配置：SeedVR2 3B，FP32-B、单步 CFG=1。** 本轮修复后，三段原始短片、留出的 17 帧合成视频 CPU/Vulkan 和 256×256 自然图片，**六条轨迹均通过官方参考的 73/73 项张量边界对照**。原来的自然运动 63/73、尾帧补齐 71/73 数值失败已关闭；权重、官方参考、原始噪声和误差门槛保持不变。[修复过程](docs/NUMERICS-REPAIR.md) · [完整记录](artifacts/2026-09-10/video-numerics-v2/summary.json)。
 
+新增 [DiT FP16 权重存储](docs/DIT-FP16-STORAGE.md)，已记录图片 CPU/Vulkan 与三段 Vulkan 视频的完整误差对照；FP32-B 和 DiT FP16 的已转换模型均可从下方 Hugging Face 入口直接下载。
+
 当前支持图片输出长边最高 512，视频最多 17 帧、长边最高 128，输出为无音轨 SDR MP4。项目面向已有 C++、PyTorch 和基本 Vulkan 经验的读者，不属于 ByteDance 或 Tencent 官方发行。
 
 支持模型身份/完整性校验、参数预检、进度与取消、离线模型复制、逐图 GPU/RAM 权重选择。React / TypeScript / Ant Design 界面内嵌于 Drogon C++ 服务；运行时无需 Python、Node 或云服务。首次使用见[安装与离线搬移](docs/FIRST-RUN.md)，内存策略及代价见[内存验证](docs/MEMORY-VALIDATION.md)。
 
-项目改进按[来源 → 核对 → 知识页 → 检索与检查 → 验证回写](docs/wiki/README.md)推进；[同类设计对照](docs/wiki/synthesis/design-comparison.md)固定到具体源码版本。已增加[转换模型分发工具](docs/distribution/README.md)：图片与视频包按内容去重约 21.44 GB，可从离线目录或显式镜像安装；公共模型镜像和通用预编译程序仍待发布。
+项目改进按[来源 → 核对 → 知识页 → 检索与检查 → 验证回写](docs/wiki/README.md)推进；[同类设计对照](docs/wiki/synthesis/design-comparison.md)固定到具体源码版本。已增加[转换模型分发工具](docs/distribution/README.md)：FP32-B 两包按内容去重约 21.44 GB，DiT FP16 存储版约 11.40 GB，可从离线目录或固定版本镜像安装；已发布 HF 模型包，原生应用从源码构建。
 
 ## 架构设计
 
@@ -117,6 +109,55 @@ Vulkan 实现使用 [gather](src/engine/ncnn/shaders/awa_gather.comp)、[scatter
 全链合同固定检查 **73 个张量边界：32 个 DiT 块各 2 个输出，加 9 个输入、VAE、条件和末端边界**。参考来源、形状、数据类型、完整性及输入身份先通过检查，才计算误差；缺失或重复边界直接失败。运行报告另记录模型 manifest、转换器与运行库提交、可执行文件及实际加载 SDK 的哈希。见 [pipeline_contract.py](tools/pipeline_contract.py)、[pipeline_replay.py](tools/pipeline_replay.py) 与 [provenance.hpp](src/engine/ncnn/provenance.hpp)。
 
 据此分别报告构建与接口、小型算子、真实组件、完整执行、张量误差、任务画质和性能。同输入组件测试帮助定位错误，全链测试检查误差传播，固定目标与 bicubic 对照衡量本例修复效果；后两者回答不同问题。下面的图和表保留各自的通过项、失败项和测量条件。
+
+## 下载已转换模型并运行
+
+提供 [Hugging Face：DiT FP16 存储](https://huggingface.co/akashimio/SeedVR2-3B-ncnn-dit-fp16) 和 [Hugging Face：FP32-B](https://huggingface.co/akashimio/SeedVR2-3B-ncnn) 两种已转换的 ncnn 模型包，均可匿名下载。包内是 `.param` / `.bin`、常量与 manifest；**不需要在本机重新运行 PyTorch/pnnx 转换**，原生应用仍从源码构建。
+
+| 包 | FP32-B 安装大小 | DiT FP16 存储安装大小 |
+| --- | ---: | ---: |
+| 图片，36 图 | 20.44 GB | **10.40 GB** |
+| 短视频，36 图 | 21.10 GB | **11.05 GB** |
+| 图片 + 视频远端去重对象 | 21.44 GB | **11.40 GB** |
+
+DiT FP16 只压缩 32 个 DiT 块的线性矩阵存储；ncnn 加载后展开到 FP32，激活与算术仍是 FP32，其他权重保持原值。它减少下载和磁盘占用，不代表 INT8、全 FP16 运算或显存减半。图片与视频分别安装会各占一份本机空间。
+
+先按[教程](docs/TUTORIAL.md#1-从干净克隆开始)安装系统开发依赖，再在仓库根目录执行：
+
+```sh
+python3 tools/build_native.py --cli-only --jobs 2 --prefix dist/tutorial
+python3 tools/download_models.py --precision dit-fp16 --kind image \
+  --output dist/tutorial/models/image --run input.png --result results/image
+```
+
+将 `input.png` 替换为已有图片，结果目录应为新目录。仅安装时去掉 `--run` 和 `--result`；`--plan` 先查看下载计划；已有模型可加 `--offline` 校验并复用。下载器使用 Python 标准库，固定 HF revision，支持续传、逐文件 SHA-256 和原生身份校验。直接运行原生 CLI 不需要 Python：
+
+```sh
+dist/tutorial/bin/seedvr2 run --model dist/tutorial/models/image \
+  --input input.png --output results/another-image --size 256 --backend vulkan
+# 视频包与运行：输出长边 128，最多 17 帧
+python3 tools/download_models.py --precision dit-fp16 --kind video \
+  --output dist/tutorial/models/video --run input.mp4 --result results/video --frames 17
+```
+
+需要 FP32-B 时改用 `--precision fp32` 和另一模型目录；旧版可执行程序需要从当前源码重新构建才能识别新 profile。需要 Web 时构建去掉 `--cli-only`，安装模型后运行 `dist/tutorial/bin/seedvr2-studio`。完整操作见[首次使用](docs/FIRST-RUN.md)，自行转换入口见[本机转换](docs/LOCAL-CONVERSION.md)。
+
+两个版本均完成全量远端字节回读和图片/视频包原生校验；FP16 版还完成隐藏源码、断网、Unicode 路径下的安装 SDK 图片推理。公开后的匿名访问检查单独归档。这个离线实验使用同一台 Linux 主机的系统 ABI，不等于跨发行版或全新机器验证。
+
+## DiT FP16 存储实测
+
+新增五条完整执行：图片 CPU/Vulkan，以及自然运动 9 帧、尾帧补齐 8 帧和镜头切换 17 帧的 Vulkan 短片。每条都记录 73 个模型边界与辅助张量，输出有限。旧 FP32 误差门槛作为描述数据保留，不作为压缩存储的接受条件。
+
+| 案例 | 相对原生 FP32 输出的逐帧 PSNR | 最低 SSIM |
+| --- | ---: | ---: |
+| 256×256 图片，Vulkan / CPU | 40.03 dB / 40.03 dB | 0.99158 / 0.99158 |
+| 128×80，9 帧 | 61.96–64.32 dB | 0.99986 |
+| 128×80，8 帧 | 62.50–64.25 dB | 0.99987 |
+| 128×80，17 帧 | 66.48–67.86 dB | 0.99993 |
+
+这是对 FP32 的保真度，不是对目标图像的修复质量。固定目标图片 PSNR 为 FP32 **20.0184 dB** / DiT FP16 **20.0093 dB**；三段视频的对应均值差小于 0.001 dB，样例规模不足以外推普遍画质。详细逐层 max-abs/RMSE/MAE、目标质量、时序残差、资源和安装证据见 [FP16 存储报告](docs/DIT-FP16-STORAGE.md)。
+
+![FP32、DiT FP16 存储与固定目标](artifacts/2026-09-13/precision-full/final/quality/image-vulkan/comparison.png)
 
 ## 实测结果与对照图
 

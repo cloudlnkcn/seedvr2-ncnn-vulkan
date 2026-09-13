@@ -17,3 +17,7 @@
 `ernie-evidence` 的参考分层说明值得借鉴：先说明官方路径，再建立 FP32 桥接，再比较原生 CPU / Vulkan。但 ERNIE 的层数、图尺寸、误差阈值和硬件条件不进入本模型的验收协议。
 
 关联：[本项目](../entities/seedvr2-native.md)、[同类移植](../entities/peer-ports.md)、[设计对照](../synthesis/design-comparison.md)、[改进顺序](../synthesis/delivery-plan.md)。
+
+## DiT FP16 存储的验收
+
+[实际存储实验](../../DIT-FP16-STORAGE.md)只改变 DiT 线性权重的存储格式，激活与算术仍是 FP32。固定 FP32 门槛用来描述偏差，不用它否决已完成的低精度执行；形状、输入噪声、模型身份、诊断边界完整性和有限值仍是必要检查。对原生 FP32 的保真度、对目标的任务质量和时序误差分别报告。下载字节减少不自动推出显存或速度收益。

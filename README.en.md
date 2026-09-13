@@ -1,42 +1,18 @@
 # SeedVR2 ncnn Vulkan
 
-## Optional converted-model download
-
-Reviewed FP32-B image and temporal-video packages are available at [Hugging Face](https://huggingface.co/akashimio/SeedVR2-3B-ncnn). Build the native application, then install from the project root:
-
-```sh
-python3 tools/model_distribution.py install --catalog docs/distribution/catalog.v1.json --kind image --base-url https://huggingface.co/akashimio/SeedVR2-3B-ncnn/resolve/9371e381e3d5581c05a0934a518b14d8aa15698b --output models/image
-```
-
-For video use `--kind video --output models/video`. This pins the model revision and verifies every SHA-256. Downloads resume; installation requires Python 3.12+ standard library, not PyTorch/pnnx. Native inference is Python-free. Complete remote bytes, both package identities and one real-image 73-boundary reference replay were checked. Source conversion remains supported and ordinary CI does not depend on this mirror.
-
-[中文](README.md) · [Architecture](#architecture-and-design) · [Measured results](#measured-results-and-visual-comparisons) · [Tutorial (Chinese)](docs/TUTORIAL.md) · [Source guide](docs/ARCHITECTURE.md) · [ncnn Discussion](https://github.com/Tencent/ncnn/discussions/6991) · [Contributing](CONTRIBUTING.md) · [License](LICENSE)
+[中文](README.md) · [Model downloads](#download-converted-models-and-run) · [Architecture](#architecture-and-design) · [Measured results](#measured-results-and-visual-comparisons) · [Tutorial (Chinese)](docs/TUTORIAL.md) · [Source guide](docs/ARCHITECTURE.md) · [ncnn Discussion](https://github.com/Tencent/ncnn/discussions/6991) · [Contributing](CONTRIBUTING.md) · [License](LICENSE)
 
 A native **C++20 / ncnn CPU/Vulkan** port of the official **SeedVR2 3B** image and short-video restoration model. The **standalone CLI, local Web application and installed C++ SDK** share one inference implementation. The tutorial covers pnnx export, custom adaptive window attention, temporal VAE and component-by-component validation.
 
 **Validated model and configuration: SeedVR2 3B, FP32-B, one step, CFG=1.** The repaired implementation passes **73/73 tensor boundaries on all six retained trajectories**: three original clips, the held-out synthetic 17-frame clip on CPU and Vulkan, and a 256×256 natural image. The original motion 63/73 and padding 71/73 failures are closed with unchanged weights, official references, raw noise and full-model tolerance. [Repair details](docs/NUMERICS-REPAIR.md) · [Full records](artifacts/2026-09-10/video-numerics-v2/summary.json).
 
+[DiT FP16 weight storage](docs/DIT-FP16-STORAGE.md) now has complete image CPU/Vulkan and three-video Vulkan drift records. Both FP32-B and DiT FP16 converted packages can be downloaded from Hugging Face using the entry below.
+
 Image output long sides reach 512 pixels; video is limited to 17 frames and 128-pixel long sides, producing SDR MP4 without audio. This is an advanced porting case study for readers with C++, PyTorch and basic Vulkan experience, not an official ByteDance or Tencent release.
 
 The application includes model identity/integrity checks, preflight, progress/cancellation, offline model copying and per-graph device/host weight placement. React / TypeScript / Ant Design is embedded in the native Drogon host; inference needs no Python, Node.js or cloud service. See [first use and offline transfer](docs/FIRST-RUN.md) and [memory-policy measurements](docs/MEMORY-VALIDATION.md).
 
-The [source and validation workflow](docs/wiki/README.md) connects pinned upstream evidence, [design comparisons](docs/wiki/synthesis/design-comparison.md), implementation and measurements. [Converted-model distribution tooling](docs/distribution/README.md) stages the image and video packages in approximately 21.44 GB of deduplicated objects and installs from a local bundle or an explicit HTTPS mirror. The public model mirror is available above; the native application is built from source.
-
-## Build and prepare locally
-
-Distribution is source-first: build the native application, download pinned official checkpoints, then convert them locally. Neither binary releases nor hosted converted weights are prerequisites. Official `.pth` files cannot be loaded directly by ncnn.
-
-After installing the [tutorial prerequisites](docs/TUTORIAL.md) and `uv`:
-
-```sh
-python3 tools/build_native.py --cli-only --check
-python3 tools/build_native.py --cli-only --jobs 2 --prefix dist/tutorial
-bash tools/convert_models.sh --check image models/image dist/tutorial/bin/seedvr2
-bash tools/convert_models.sh image models/image dist/tutorial/bin/seedvr2
-# For video, use `video models/video` with a new output directory.
-```
-
-Omit `--cli-only` to build the local Web application too (Node.js 24 and npm required). The conversion helper installs its own Python export environment, passes it explicitly to pnnx, retains logs and checks the resulting package with the native application. Downloads resume; conversion stages do not resume automatically. The new clean-machine conversion workflow has not passed end to end yet. Ordinary CI runs without large weights or Release assets; full conversion/offline replay is a separate manual workflow. See [local conversion and recovery](docs/LOCAL-CONVERSION.md). Inference is offline and Python-free after preparation.
+The [source and validation workflow](docs/wiki/README.md) connects pinned upstream evidence, [design comparisons](docs/wiki/synthesis/design-comparison.md), implementation and measurements. [Converted-model distribution tooling](docs/distribution/README.md) stages FP32-B image/video packages in approximately 21.44 GB of deduplicated objects (11.40 GB for DiT FP16 storage) and installs from a local bundle or an explicit HTTPS mirror. The public model links and download commands are below; the native application is built from source.
 
 ## Architecture and design
 
@@ -133,6 +109,50 @@ Official references and candidate export code are maintained separately. The cur
 The full contract checks **73 tensor boundaries: two outputs from each of 32 DiT blocks, plus nine input, VAE, conditioning and endpoint boundaries**. Reference identity, shapes, types, completeness and matching inputs are checked before error calculation; missing or duplicate boundaries fail. Run reports also identify the manifest, converter/runtime commits, executable and actually loaded SDK hashes. See [pipeline_contract.py](tools/pipeline_contract.py), [pipeline_replay.py](tools/pipeline_replay.py), [provenance.hpp](src/engine/ncnn/provenance.hpp).
 
 Build/interface tests, small operators, real components, complete execution, tensor errors, task quality and performance are reported separately. Identical-input component tests localize errors; complete trajectories expose error propagation; fixed-target and bicubic comparisons measure restoration behavior for each case. The following figures and tables retain their passes, failures and measurement conditions.
+
+## Download converted models and run
+
+Ready-to-install ncnn packages are public on **[Hugging Face: DiT FP16 storage](https://huggingface.co/akashimio/SeedVR2-3B-ncnn-dit-fp16)** and **[Hugging Face: FP32-B](https://huggingface.co/akashimio/SeedVR2-3B-ncnn)**. They contain graphs, weights, constants and manifests; no local PyTorch/pnnx conversion is needed. Build the native application from source first.
+
+| Package | FP32-B installed | DiT FP16 storage installed |
+| --- | ---: | ---: |
+| Image, 36 graphs | 20.44 GB | **10.40 GB** |
+| Short video, 36 graphs | 21.10 GB | **11.05 GB** |
+| Both, deduplicated remote objects | 21.44 GB | **11.40 GB** |
+
+Only linear matrices in the 32 DiT blocks use IEEE FP16 storage. ncnn expands them to FP32 on load; activations and arithmetic remain FP32, and other weights remain unchanged. This reduces download/disk bytes, not necessarily runtime memory or latency. It is not INT8 or full FP16 compute. Separate local image/video installs each consume the corresponding space above.
+
+After installing the [system development dependencies](docs/TUTORIAL.md#1-从干净克隆开始), run from the repository root:
+
+```sh
+python3 tools/build_native.py --cli-only --jobs 2 --prefix dist/tutorial
+python3 tools/download_models.py --precision dit-fp16 --kind image \
+  --output dist/tutorial/models/image --run input.png --result results/image
+# Video: default long side 128, up to 17 frames
+python3 tools/download_models.py --precision dit-fp16 --kind video \
+  --output dist/tutorial/models/video --run input.mp4 --result results/video --frames 17
+```
+
+Supply an existing input and a new result directory. Omit `--run` / `--result` to install only. Use `--plan` for exact bytes, or `--offline` to verify/reuse installed models. The standard-library downloader pins immutable HF revisions, resumes downloads, verifies SHA-256 and calls native model verification. No HF account is required. Native inference itself has no Python dependency. Use `--precision fp32` with a different directory for the reference package.
+
+For Web, omit `--cli-only` when building, install at the paths above and run `dist/tutorial/bin/seedvr2-studio`. Older executables must be rebuilt to recognize the new profiles. See [first run](docs/FIRST-RUN.md) and the retained [source conversion route](docs/LOCAL-CONVERSION.md).
+
+Both versions completed full remote byte readback and native image/video package checks. The FP16-storage installed SDK also ran a real Vulkan image with the source tree hidden, networking disabled and Unicode paths. Anonymous access probes are recorded separately. This used the same Linux host ABI; it is not a cross-distribution or fresh-machine test.
+
+## DiT FP16 storage measurements
+
+Five complete executions recorded all 73 model boundaries and auxiliary tensors, with finite results. Historical FP32 tolerances remain descriptive, not low-precision acceptance criteria.
+
+| Case | Per-frame decoded RGB PSNR vs native FP32 | Minimum SSIM |
+| --- | ---: | ---: |
+| 256×256 image, Vulkan / CPU | 40.03 / 40.03 dB | 0.99158 / 0.99158 |
+| 128×80 motion, 9 frames | 61.96–64.32 dB | 0.99986 |
+| 128×80 tail padding, 8 frames | 62.50–64.25 dB | 0.99987 |
+| 128×80 artificial cut, 17 frames | 66.48–67.86 dB | 0.99993 |
+
+These measure FP32 fidelity, not restoration quality. Fixed-target image PSNR was 20.0184 dB (FP32) / 20.0093 dB (DiT FP16 storage); each video mean differed by less than 0.001 dB. The small development sample does not establish general quality. [Full error, task-quality, temporal, resource and delivery records](docs/DIT-FP16-STORAGE.md).
+
+![FP32, DiT FP16 storage and fixed target](artifacts/2026-09-13/precision-full/final/quality/image-vulkan/comparison.png)
 
 ## Measured results and visual comparisons
 

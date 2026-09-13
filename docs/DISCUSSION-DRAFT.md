@@ -124,6 +124,28 @@ FP32 图文件包约 20 GB，执行器一次装载一个图：检查图结构、
 
 公共 API、任务服务、模型数学、图执行和包管理分别承担自己的职责。可以从 CLI 或外部 SDK 程序直接重现问题，再按组件定位；Web 层负责提交和展示结果。更细的调用边界见[架构与源码导航](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/blob/main/docs/ARCHITECTURE.md)。
 
+## DiT FP16 权重存储与模型下载
+
+新增 **32 个 DiT 块的 IEEE FP16 线性权重存储**，ncnn 加载时展开到 FP32；激活与算术仍为 FP32，VAE、patch projection、bias 和自定义注意力属性保持原值。新模型包使用独立 profile 与 payload 哈希，CLI、Web worker 和 SDK 共用加载器。逐图内存预算按展开大小估算，避免把压缩文件大小当成运行时权重需求。
+
+已公开 [Hugging Face：DiT FP16 存储](https://huggingface.co/akashimio/SeedVR2-3B-ncnn-dit-fp16) 和 [Hugging Face：FP32-B](https://huggingface.co/akashimio/SeedVR2-3B-ncnn)。均为已转换的 ncnn 模型，包含图、权重、常量和 manifest，支持匿名下载；使用者可省去本机 PyTorch/pnnx 转换，原生程序仍从源码构建。
+
+| 包 | FP32-B | DiT FP16 存储 |
+| --- | ---: | ---: |
+| 图片安装 | 20.44 GB | 10.40 GB |
+| 视频安装 | 21.10 GB | 11.05 GB |
+| 两包远端去重对象 | 21.44 GB | 11.40 GB |
+
+这项变化降低下载与磁盘占用，不等于 INT8、全 FP16 运算、显存减半或速度提升。分别安装图片与视频仍各自占用本机空间。
+
+五条完整执行覆盖图片 CPU/Vulkan 及 9/8/17 帧 Vulkan 视频；每条记录全部 73 个模型边界及辅助张量，输出有限。相对原生 FP32，256×256 图片的 PSNR 约 **40.03 dB**、SSIM **0.99158**；三个 128×80 视频的逐帧 PSNR 分别为 **61.96–64.32 / 62.50–64.25 / 66.48–67.86 dB**。旧 FP32 门槛保留为描述统计，不作为低精度接受条件。
+
+保真度与修复质量分开：固定目标图片 PSNR 为 FP32 **20.0184** / FP16 存储 **20.0093 dB**，三段视频的对应均值差小于 0.001 dB。样例仍是一张图片和来自同一来源的三个开发短片，不外推普遍画质。逐层误差、目标质量、时序残差和资源记录见 [完整报告](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/blob/main/docs/DIT-FP16-STORAGE.md)。
+
+![FP32、DiT FP16 存储、固定目标](https://raw.githubusercontent.com/mingshi2333/seedvr2-ncnn-vulkan/main/artifacts/2026-09-13/precision-full/final/quality/image-vulkan/comparison.png)
+
+两个 HF 版本均完成固定 revision 的全量远端回读与图片/视频包原生校验；FP16 安装 SDK 完成隐藏源码、断网和 Unicode 路径下的真实图片执行，77 个诊断哈希与冻结 FP16 结果一致；下载模型的 39 项真实 Web 任务检查也已通过。公开后匿名访问范围单独记录。该实验使用同一台 Linux 主机系统库，不等于干净目标机或跨发行版验证。
+
 ## 对照结果
 
 Linux x86_64，RTX 4060 Laptop 8 GiB，约 32 GiB RAM。对照使用锁定官方数学实现的 CPU FP32-B 参考，共享**原始后验噪声和扩散噪声**，逐元素检查全部 73 个张量边界。
@@ -146,34 +168,28 @@ Linux x86_64，RTX 4060 Laptop 8 GiB，约 32 GiB RAM。对照使用锁定官方
 
 ## 使用与当前边界
 
-### 下载已转换模型（可选）
-
-已验证的图片和时序视频 FP32-B 模型托管于 [Hugging Face：akashimio/SeedVR2-3B-ncnn](https://huggingface.co/akashimio/SeedVR2-3B-ncnn)。构建原生程序后，可直接安装模型，省去本机 PyTorch / pnnx 转换；源码转换入口继续保留。
+先安装[教程中的系统开发依赖](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/blob/main/docs/TUTORIAL.md)，从仓库根目录构建并直接下载运行：
 
 ```sh
-python3 tools/model_distribution.py install --catalog docs/distribution/catalog.v1.json --kind image --base-url https://huggingface.co/akashimio/SeedVR2-3B-ncnn/resolve/9371e381e3d5581c05a0934a518b14d8aa15698b --output models/image
-```
-
-视频改用 `--kind video --output models/video`。下载固定到不可变提交，安装器支持续传和逐文件 SHA-256 校验。图片 / 视频安装约需 20.44 / 21.10 GB。模型下载工具只需 Python 标准库，原生推理不需要 Python。发布验证包括完整远端字节回读、两个模型包的原生校验及一张真实图片的 73/73 官方 FP32-B 对照；不扩大已有视频、精度或画质结论。
-
-项目采用**源码构建 → 官方权重下载 → 本机转换 → 原生校验 → CLI / 本地 Web 运行**的使用流程，不以预编译程序或转换模型 Release 为前提。官方 `.pth` 需要先转换为包含 36 个 ncnn 图的模型包；转换完成后，兼容环境中的推理无需 Python，也可以离线使用。
-
-安装[教程中的构建依赖](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/blob/main/docs/TUTORIAL.md)及 `uv` 后，命令行入口为：
-
-```sh
-python3 tools/build_native.py --cli-only --check
 python3 tools/build_native.py --cli-only --jobs 2 --prefix dist/tutorial
-bash tools/convert_models.sh --check image models/image dist/tutorial/bin/seedvr2
-bash tools/convert_models.sh image models/image dist/tutorial/bin/seedvr2
+python3 tools/download_models.py --precision dit-fp16 --kind image \
+  --output dist/tutorial/models/image --run input.png --result results/image
+# 视频包，最多 17 帧、输出长边 128
+python3 tools/download_models.py --precision dit-fp16 --kind video \
+  --output dist/tutorial/models/video --run input.mp4 --result results/video --frames 17
 ```
 
-需要 Web 时去掉 `--cli-only`，并准备 Node.js 24 与 npm。视频转换使用 `video models/video`，指定新的输出目录。下载脚本锁定官方 revision，支持续传和 SHA-256 校验；转换入口准备私有导出环境，显式传给 pnnx，保留中间结果和失败阶段日志，最后调用原生模型校验。转换阶段暂不自动续跑，新脚本的独立 Ubuntu 完整流程尚未通过验收。[使用、失败处理与离线搬移](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/blob/main/docs/LOCAL-CONVERSION.md)。
+使用已有输入和新结果目录。去掉 `--run` / `--result` 可仅安装；`--plan` 查看字节数，`--offline` 校验并复用本机模型。下载固定 revision，支持续传、逐文件 SHA-256 和原生校验；下载工具只需 Python 标准库，原生推理无需 Python。FP32-B 改用 `--precision fp32` 并指定另一模型目录。旧程序需从当前源码重新构建才能识别新的存储 profile。
 
-普通 CI 检查构建、算子和应用接口，不下载大模型；完整官方权重转换、首次执行与隔离网络回放是独立手动工作流，不创建 Release。原发布工作流因访问未公开模型返回 404，其构建已通过，但首次推理未执行；不把这次失败计作模型数值失败或完整交付通过。
+需要 Web 时构建去掉 `--cli-only`，准备 Node.js 24/npm，安装上述模型后运行 `dist/tutorial/bin/seedvr2-studio`。自行转换可继续使用[官方权重下载与本机转换入口](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/blob/main/docs/LOCAL-CONVERSION.md)；直接下载已转换模型不需要 PyTorch/pnnx 或 `uv`。[首次使用与离线搬移](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/blob/main/docs/FIRST-RUN.md)。
+
+普通 CI 检查构建、算子和应用接口，不下载大模型；完整官方权重转换、首次执行与隔离网络回放独立记录，不创建二进制 Release。原发布工作流因访问未公开模型返回 404，其构建已通过，但首次推理未执行；不把这次失败计作模型数值失败或完整交付通过。
 
 应用已包含参数预检、Unicode 路径、进度与取消、模型身份/完整性校验、离线模型复制和安装 SDK。本机原生测试 **36/36**。Mesa 的小型测试为 **10 项通过、12 项能力跳过**：本机 llvmpipe 不保留这些补偿算子要求的 FMA 残差，程序会在模型加载前明确拒绝。能力探测和数值验收分开；大模型实机证据不由 CI 小型测试替代。
 
-提交 `7e56479` 的 Ubuntu GCC CLI、Clang CLI、GCC Web 远端 CI 全部通过：每项原生套件 **24 项通过、12 项能力跳过**，Web 另有 **54/54** 接口检查。[下载归档的原始报告](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/blob/main/artifacts/2026-09-10/github-ci-numerics-v2/README.md)保留依赖日志、安装验证和跳过原因；远端 CI 没有运行完整 3B 权重。
+新增存储路径及 Web 标识修正提交 `c9af01d` 的 [Ubuntu GCC CLI、Clang CLI、GCC Web CI](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/actions/runs/34778668488) 均已通过；普通 CI 不包含完整 3B 模型实机执行。
+
+历史提交 `7e56479` 的 Ubuntu GCC CLI、Clang CLI、GCC Web 远端 CI 全部通过：每项原生套件 **24 项通过、12 项能力跳过**，Web 另有 **54/54** 接口检查。[下载归档的原始报告](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/blob/main/artifacts/2026-09-10/github-ci-numerics-v2/README.md)保留依赖日志、安装验证和跳过原因；远端 CI 没有运行完整 3B 权重。
 
 当前图片输出长边 ≤512；视频 ≤17 帧、长边 ≤128，输出无音轨 SDR MP4。官方 CUDA BF16/Apex/FlashAttention 默认路径、更高分辨率、长片、音轨、更多设备和代表性时序画质仍是后续工作。[具体缺口与验收范围](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/blob/main/docs/CURRENT-GAPS.md)。
 
