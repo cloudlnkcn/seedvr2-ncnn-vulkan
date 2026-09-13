@@ -59,7 +59,7 @@ jobs:
   clean-machine:
     needs: build
     runs-on: ubuntu-24.04
-    timeout-minutes: 60
+    timeout-minutes: 360
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
       - name: Download candidate binaries from release
@@ -73,9 +73,14 @@ jobs:
           sha256sum --check --ignore-missing SHA256SUMS
           tar -xzf seedvr2-ubuntu24.04-x86_64.tar.gz
           sudo bash seedvr2/install-runtime-ubuntu24.04.sh
-      - name: Download reviewed image model from public release
+      - name: Download official checkpoints and convert on the clean machine
         run: |
-          python3 tools/model_distribution.py install --catalog docs/distribution/catalog.v1.json --kind image --base-url https://github.com/mingshi2333/seedvr2-ncnn-vulkan/releases/download/models-fp32b-v1 --layout flat --output "$RUNNER_TEMP/模型 image" --report artifacts/clean-machine/install.json
+          sudo apt-get install -y ninja-build cmake g++ python3-venv
+          python3 -m venv "$RUNNER_TEMP/conversion-tools"
+          "$RUNNER_TEMP/conversion-tools/bin/pip" install uv==0.8.17
+          export PATH="$RUNNER_TEMP/conversion-tools/bin:$PATH"
+          bash tools/convert_models.sh image "$RUNNER_TEMP/模型 image" "$RUNNER_TEMP/delivery/seedvr2/bin/seedvr2"
+          mkdir -p artifacts/clean-machine
           "$RUNNER_TEMP/delivery/seedvr2/bin/seedvr2" models verify --model "$RUNNER_TEMP/模型 image" > artifacts/clean-machine/native-verify.json
       - name: Real CPU first execution and isolated offline replay
         run: |

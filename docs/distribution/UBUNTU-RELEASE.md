@@ -1,20 +1,20 @@
 # Ubuntu 24.04 发布与独立机器验收
 
-本流程正在首次执行。只有成功的 release workflow 和实测报告才能将候选包标记为已交付。
+本项目发布原生程序，模型由使用者从官方来源下载并在本机转换，不公开分发已转换权重。2026-09-13 的模型上传尝试已停止，未发布的模型 Release 草稿已删除。本地已有模型保留用于回归和离线搬移。
 
-- 模型：`models-fp32b-v1`，原始审阅过的 FP32-B 字节；53 个 SHA-256 对象，逐对象校验 GitHub 服务端摘要。客户端下载回读另测。
-- 程序：Ubuntu 24.04 x86_64，CLI/Web/worker/SDK；系统运行库通过随包脚本安装，不打包 Fedora 开发机的库，不宣称通用 Linux。
-- 构建：[release-linux.yml](../../.github/workflows/release-linux.yml) 在新 GitHub runner 上准备锁定依赖、构建及测试；保留源码、前端依赖、原生依赖和媒体源码归档。
-- 新机器：另一个 runner 从 Release 下载程序与转换模型，执行真实 CPU 图片修复；第二次隐藏仓库源码并隔离网络，比较完整张量集合与 PNG 字节。
-- 这项新机器测试验证首次运行和离线复用。官方 FP32-B 数值对照、GPU 设备资格、修复质量分别记录；不会由两次自身回放相同推出官方数值通过。
+- 程序目标是 Ubuntu 24.04 x86_64，包含 CLI、Web、worker 和 SDK。系统运行库通过随包脚本安装。
+- [发布工作流](../../.github/workflows/release-linux.yml) 构建程序、测试安装接口，并保留对应源码和依赖许可证。
+- 独立 runner 下载候选程序，从锁定的官方 checkpoint 本机转换图片模型，再做真实 CPU 首次执行和隔离网络的离线回放。候选程序只有通过这些检查后才公开。
+- 新的本机转换工作流尚待成功执行。前一轮构建成功，但新机器流程停在已取消的公共模型下载步骤；不能将其计为完整交付通过。
 
-模型安装示例（Release 完整发布后可用）：
+安装原生程序、`uv` 和[教程构建依赖](../TUTORIAL.md)后，可运行：
 
 ```sh
-python3 tools/model_distribution.py install \
-  --catalog docs/distribution/catalog.v1.json --kind image \
-  --base-url https://github.com/mingshi2333/seedvr2-ncnn-vulkan/releases/download/models-fp32b-v1 \
-  --layout flat --output models/image
+bash tools/convert_models.sh image models/image dist/seedvr2/bin/seedvr2
+# 视频包另选新目录，共用相同的 32 块导出逻辑：
+bash tools/convert_models.sh video models/video dist/seedvr2/bin/seedvr2
 ```
 
-发布工具不会覆盖已有同名资产；已发布且不完整的 Release 会拒绝修改。候选程序只有在独立机器检查成功后才公开，失败保留在 workflow artifacts。已转换模型与程序分别发布，以免把某个程序的失败误报为权重变更。
+脚本准备私有 Python 导出环境，下载并校验官方文件，构建锁定的 pnnx，按顺序转换组件，最后调用原生模型身份和完整性检查。它保留中间文件与日志，不覆盖已有输出目录；官方下载复用已校验文件，转换阶段暂不自动续跑。较大的 FP32 导出需要充足内存和磁盘空间。首次转换耗时和独立 Ubuntu 机器的资源要求仍待实测，不承诺一键转换已在该平台完整通过。
+
+转换工具需要 Python，模型准备完成后的原生推理不需要。程序目录和完整模型目录可以离线搬移。文件身份检查、完整执行、官方数值对照和任务画质分别报告；转换完成不自动授予新的模型认证。
