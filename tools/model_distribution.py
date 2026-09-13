@@ -215,8 +215,10 @@ def installed(folder, package):
 
 
 def install(catalog, kind, output, reviewed, source=None, base_url=None,
-            offline=False, hardlink=False, plan=False):
+            offline=False, hardlink=False, plan=False, layout='objects'):
     check_catalog(catalog, reviewed)
+    if layout not in ('objects', 'flat'):
+        raise ValueError('Unknown mirror layout')
     matches = [x for x in catalog['packages'] if x['kind'] == kind]
     if len(matches) != 1:
         raise ValueError('Requested package is absent')
@@ -277,7 +279,7 @@ def install(catalog, kind, output, reviewed, source=None, base_url=None,
                     verified(part, row)
                     part.rename(target)
             else:
-                url = (base_url or '').rstrip('/') + '/objects/' + row['sha256']
+                url = (base_url or '').rstrip('/') + ('/objects/' if layout == 'objects' else '/') + row['sha256']
                 with redirect_stdout(sys.stderr):
                     download_file(target, dict(size=row['bytes'], lfs=dict(sha256=row['sha256'])), url, offline)
             if index == 1 and json.loads(target.read_text()) != package['manifest']:
@@ -310,6 +312,8 @@ def main():
     source_group.add_argument('--from-dir', type=Path)
     source_group.add_argument('--base-url', help='Explicit immutable HTTPS mirror root')
     setup.add_argument('--offline', action='store_true')
+    setup.add_argument('--layout', choices=['objects', 'flat'], default='objects',
+                       help='flat for GitHub Release assets; objects for directory mirrors')
     setup.add_argument('--hardlink', action='store_true')
     setup.add_argument('--plan', action='store_true')
     setup.add_argument('--report', type=Path)
@@ -322,7 +326,7 @@ def main():
         result = stage(packages, args.output, reviewed, args.hardlink)
     else:
         result = install(json.loads(args.catalog.read_text()), args.kind, args.output, reviewed,
-                         args.from_dir, args.base_url, args.offline, args.hardlink, args.plan)
+                         args.from_dir, args.base_url, args.offline, args.hardlink, args.plan, args.layout)
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')

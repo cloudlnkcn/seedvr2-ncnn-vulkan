@@ -178,6 +178,29 @@ class DistributionContract(unittest.TestCase):
         self.assertEqual((self.output / row['path']).stat().st_ino,
                          (self.bundle / 'objects' / row['sha256']).stat().st_ino)
 
+    def test_flat_release_download_checks_every_object(self):
+        self.staged()
+        base = 'https://github.com/example/model/releases/download/fixed-v1'
+        urls = []
+        def fetch(target, row, url, offline):
+            self.assertFalse(offline)
+            sha = row['lfs']['sha256']
+            self.assertEqual(url, base + '/' + sha)
+            urls.append(url)
+            target.write_bytes((self.bundle / 'objects' / sha).read_bytes())
+        with patch.object(dist, 'download_file', side_effect=fetch):
+            result = dist.install(self.catalog, 'image', self.output, self.reviewed,
+                                  base_url=base, layout='flat')
+        self.assertTrue(result['passed'])
+        self.assertEqual(len(urls), 4)
+        dist.installed(self.output, self.catalog['packages'][0])
+
+    def test_unknown_layout_cannot_write(self):
+        self.staged()
+        with self.assertRaisesRegex(ValueError, 'layout'):
+            self.install(layout='../')
+        self.assertFalse(self.output.exists())
+
 
 if __name__ == '__main__':
     unittest.main()
