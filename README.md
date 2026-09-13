@@ -1,5 +1,15 @@
 # SeedVR2 ncnn Vulkan
 
+## 下载已转换模型（可选）
+
+已验证的图片和时序视频 FP32-B 模型托管于 [Hugging Face：akashimio/SeedVR2-3B-ncnn](https://huggingface.co/akashimio/SeedVR2-3B-ncnn)。构建原生程序后，可直接安装模型，省去本机 PyTorch / pnnx 转换；源码转换入口继续保留。
+
+```sh
+python3 tools/model_distribution.py install --catalog docs/distribution/catalog.v1.json --kind image --base-url https://huggingface.co/akashimio/SeedVR2-3B-ncnn/resolve/9371e381e3d5581c05a0934a518b14d8aa15698b --output models/image
+```
+
+视频改用 `--kind video --output models/video`。下载固定到不可变提交，安装器支持续传和逐文件 SHA-256 校验。图片 / 视频安装约需 20.44 / 21.10 GB。模型下载工具只需 Python 标准库，原生推理不需要 Python。发布验证包括完整远端字节回读、两个模型包的原生校验及一张真实图片的 73/73 官方 FP32-B 对照；不扩大已有视频、精度或画质结论。
+
 [English](README.en.md) · [架构设计](#架构设计) · [实测对照](#实测结果与对照图) · [从零开始的教程](docs/TUTORIAL.md) · [源码导航](docs/ARCHITECTURE.md) · [ncnn Discussion](https://github.com/Tencent/ncnn/discussions/6991) · [贡献方法](CONTRIBUTING.md) · [许可证](LICENSE)
 
 将官方 **SeedVR2 3B** 移植为使用 **ncnn CPU/Vulkan** 的原生 C++20 图片与短视频修复应用。提供 **独立 CLI、本地 Web 和可安装的 C++ SDK**，共用同一推理实现；教程覆盖 pnnx 导出、自定义 adaptive window attention、时序 VAE 和逐组件验证。
@@ -214,7 +224,7 @@ python3 tools/prepare_models.py --list
 python3 tools/prepare_models.py
 ```
 
-固定官方 revision、约 14.57 GB，支持续传和 SHA-256 校验；`--offline` 仅验证缓存。下载后还需 pnnx 转换，详见教程。源仓库包含小型测试夹具和历史报告，未上传官方大权重、转换包或便携二进制。原生 CI 的实际结果见 [GitHub Actions](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/actions/workflows/native.yml)，大模型实机记录单独保留。
+固定官方 revision、约 14.57 GB，支持续传和 SHA-256 校验；`--offline` 仅验证缓存。下载后还需 pnnx 转换，详见教程。源仓库包含小型测试夹具和历史报告，Git 仓库不包含大权重或便携二进制，转换包通过上面的 Hugging Face 地址提供。原生 CI 的实际结果见 [GitHub Actions](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/actions/workflows/native.yml)，大模型实机记录单独保留。
 
 项目采用**源码构建、官方下载、本机转换**，不以程序或模型 Release 为使用前提。安装教程列出的依赖和原生程序后，可使用串联脚本：
 

@@ -1,8 +1,18 @@
 # 转换模型分发与安装
 
+## 下载已转换模型（可选）
+
+已验证的图片和时序视频 FP32-B 模型托管于 [Hugging Face：akashimio/SeedVR2-3B-ncnn](https://huggingface.co/akashimio/SeedVR2-3B-ncnn)。构建原生程序后，可直接安装模型，省去本机 PyTorch / pnnx 转换；源码转换入口继续保留。
+
+```sh
+python3 tools/model_distribution.py install --catalog docs/distribution/catalog.v1.json --kind image --base-url https://huggingface.co/akashimio/SeedVR2-3B-ncnn/resolve/9371e381e3d5581c05a0934a518b14d8aa15698b --output models/image
+```
+
+视频改用 `--kind video --output models/video`。下载固定到不可变提交，安装器支持续传和逐文件 SHA-256 校验。图片 / 视频安装约需 20.44 / 21.10 GB。模型下载工具只需 Python 标准库，原生推理不需要 Python。发布验证包括完整远端字节回读、两个模型包的原生校验及一张真实图片的 73/73 官方 FP32-B 对照；不扩大已有视频、精度或画质结论。
+
 本目录的 [catalog.v1.json](catalog.v1.json) 记录项目已审阅的 SeedVR2 3B 图片和视频 FP32-B 包，保留原始 manifest 和文件哈希。它随源码提供；权重本体不进入 Git。
 
-**目前准备好了本机分发目录及安装工具，尚未发布公共模型镜像或通用预编译程序。** 获取官方 checkpoint 仍使用 [教程](../TUTORIAL.md) 和 `tools/prepare_models.py`。这里的工具用于安装已经转换好的包，省去接收者重新转换的步骤。
+**已提供上面的 Hugging Face 转换模型下载；原生程序仍按源码构建。** 获取官方 checkpoint 仍使用 [教程](../TUTORIAL.md) 和 `tools/prepare_models.py`。这里的工具用于安装已经转换好的包，省去接收者重新转换的步骤。
 
 ## 接收离线分发目录
 
@@ -37,7 +47,7 @@ python3 tools/model_distribution.py stage \
 
 输出按 SHA-256 存储对象，图片与视频相同的 DiT 权重和图参数只保留一份。各包的路径在安装时恢复；不能把 `objects/` 直接传给 ncnn。组装器先核对 `policies/reviewed-packages.json` 的完整 payload 身份，再检查每个文件。转换参数或模型数学改变后，需要新的审阅和新的清单，不能只生成一套新哈希绕过身份检查。
 
-发布时上传整个分发目录，保留原模型许可与来源。确认远端所有对象后记录固定 revision，再公布安装命令。工具支持显式的 `--base-url` HTTPS 根地址和断点续传，替代 `--from-dir`；地址应指向固定 revision，目录下必须包含 `objects/<sha256>`。本项目尚无默认公共地址，本文不提供虚构的下载命令。
+发布时上传整个分发目录，保留原模型许可与来源。确认远端所有对象后记录固定 revision，再公布安装命令。工具支持显式的 `--base-url` HTTPS 根地址和断点续传，替代 `--from-dir`；地址应指向固定 revision，目录下必须包含 `objects/<sha256>`。公共镜像采用上面的固定 Hugging Face revision；不要用可变 main 替代锁定提交。
 
 ## 程序分发的边界
 
