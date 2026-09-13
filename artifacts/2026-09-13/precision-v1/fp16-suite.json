@@ -1,0 +1,105 @@
+{
+  "schema_version": "dit-storage-experiment-v1",
+  "scope": "One real checkpoint-backed DiT block; storage conversion only; not full-model validation.",
+  "reference_profile": "FP32-B",
+  "checkpoint": {
+    "repository": "ByteDance-Seed/SeedVR2-3B",
+    "revision": "37255ff8cccfb01071b87f635a5948ca8d53117c",
+    "filename": "seedvr2_ema_3b.pth",
+    "sha256": "6bcc5ac59447e97b100477480aebb01be2ec724c8340bb83faae21f64848604b",
+    "tensors": 635
+  },
+  "tolerance": {
+    "atol": 0.0001,
+    "rtol": 0.001,
+    "calibration": "DIAGNOSTIC_NOT_MODEL_CERTIFICATION"
+  },
+  "cases": [
+    {
+      "path": "dit-block-16-1x2x3/case.json",
+      "sha256": "a220c74b1302011fdf2b837770b4c60d0d4b993f997d5512892012444765cb95",
+      "source_case_sha256": "d0995f9e9d70a61c7104153e42e5db16bc1220866a5446533952c69ddf8664ca"
+    },
+    {
+      "path": "dit-block-16-2x3x4/case.json",
+      "sha256": "b75d898c4880a497cd05ee2e14e93701976f03075a5b8d1388458c63c2646832",
+      "source_case_sha256": "ea372e42207fd9f2f73323e638d178ebecc0705ff6df6ae0b4ce84fb7ad60a7a"
+    }
+  ],
+  "model_verified": false,
+  "source_suite_sha256": "71dbdcf9d2e38b722b6be999f016dc69af427f40d716bfee587a7895c431503e",
+  "trace_sha256": "dd878a21b683c05cbf85e097fd893a3819d080d63c84abffb9456d2493c01e24",
+  "pnnx_sha256": "732a25bf3c8e17b1d071b3eed8c6131a14da5450564bbe1a157d6dc11c2a10ba",
+  "command": [
+    "/home/mingshi/Project/AI/pnnx_torchdynamo/seedvr2-ncnn-vulkan/.deps/bin/pnnx",
+    "model.pt",
+    "inputshape=[1,2,3,2560],[58,2560],[2560,6]",
+    "inputshape2=[2,3,4,2560],[59,2560],[2560,6]",
+    "moduleop=awa_export_module.AdaptiveWindowAttention",
+    "fp16=1"
+  ],
+  "lowering": {
+    "format": 2,
+    "binary_rewritten": false,
+    "attributes": "pnnx epsilon/norm_weights/rope_frequencies/spec",
+    "norm_weights_sha256": "64e3f447cc75c41400cafc3b10692a9cdf3c333f47c48099faab6ecd3391f1a0",
+    "constant_rewrites": 6,
+    "original_param_sha256": "8528fcbda796f256da6a8306c2705b182905a21731c92001dc7b982d6e99b1ad",
+    "shape_rewrites": [
+      {
+        "before": [
+          "0=2560",
+          "1=-1",
+          "12=233",
+          "13=0"
+        ],
+        "after": [
+          "0=2560",
+          "1=-1"
+        ],
+        "count": 1
+      },
+      {
+        "before": [
+          "6=\"7680,1h,1d\""
+        ],
+        "after": [
+          "6=\"7680,1h,1d,1c\""
+        ],
+        "count": 1
+      },
+      {
+        "before": [
+          "0=2560"
+        ],
+        "after": [
+          "0=2560",
+          "1=-1"
+        ],
+        "count": 1
+      },
+      {
+        "before": [
+          "12=0",
+          "13=233",
+          "6=\"2560,1h,1d,1c\""
+        ],
+        "after": [
+          "6=\"2560,1h,1d,1c\""
+        ],
+        "count": 1
+      }
+    ]
+  },
+  "precision": {
+    "weight_storage": "fp16",
+    "activation": "fp32",
+    "arithmetic": "fp32",
+    "note": "pnnx tagged weights only; opaque custom attributes may remain FP32."
+  },
+  "storage_bytes": {
+    "baseline": 634472588,
+    "candidate": 317278348,
+    "reduction_fraction": 0.4999337181766472
+  }
+}

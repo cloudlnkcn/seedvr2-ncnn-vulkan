@@ -34,7 +34,7 @@ inline Json budget_json(const std::optional<memory::DeviceBudget> &value) {
 }
 inline Json configure_memory(ncnn::Net &net, const std::filesystem::path &weights,
                              const MemoryOptions &options,
-                             const std::function<std::optional<memory::DeviceBudget>(const ncnn::VulkanDevice *)> &reader = device_budget) {
+                             const std::function<std::optional<memory::DeviceBudget>(const ncnn::VulkanDevice *)> &reader = device_budget, bool fp16_storage = false) {
     memory::validate(options,net.opt.use_vulkan_compute);
     Json report{{"policy",memory::name(options.weights)},{"scope","weight placement before graph loading"},
         {"actual_weight_memory","not_instrumented"},{"activation_offload",false},{"oom_recovery",false}};
@@ -43,7 +43,11 @@ inline Json configure_memory(ncnn::Net &net, const std::filesystem::path &weight
         return report;
     }
     const auto before = options.weights == WeightPlacement::automatic ? reader(net.vulkan_device()) : std::nullopt;
-    const auto estimate = memory::weight_estimate(std::filesystem::file_size(weights));
+    const auto stored_bytes = std::filesystem::file_size(weights);
+    const auto decoded_bytes = fp16_storage ? memory::weight_estimate(stored_bytes) : stored_bytes;
+    const auto estimate = memory::weight_estimate(decoded_bytes);
+    report["serialized_weight_bytes"] = stored_bytes;
+    report["storage_expansion_factor"] = fp16_storage ? 2 : 1;
     const auto decision = memory::choose(options,estimate,before);
     net.opt.use_weights_in_host_memory = decision.host;
     report["requested_memory"] = decision.host ? "host" : "device";

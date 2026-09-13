@@ -86,6 +86,19 @@ int main() {
         }
         require(queries==4,"Budget was not refreshed for every graph");
         {
+            ncnn::Net net; net.opt=option; net.set_vulkan_device(0);
+            auto budget=[](const ncnn::VulkanDevice *) {
+                return std::optional<seedvr2::memory::DeviceBudget>{{100,30,0}};
+            };
+            auto fp32=d::configure_memory(net,weights,{seedvr2::WeightPlacement::automatic,20},budget,false);
+            require(!net.opt.use_weights_in_host_memory,"FP32 should fit controlled budget");
+            auto half=d::configure_memory(net,weights,{seedvr2::WeightPlacement::automatic,20},budget,true);
+            require(net.opt.use_weights_in_host_memory,"Decoded FP16 weights must use expanded budget");
+            require(half["estimated_weight_bytes"]==80 && fp32["estimated_weight_bytes"]==40,
+                    "Storage expansion estimate differs");
+        }
+
+        {
             ncnn::Net net;net.opt=option;net.set_vulkan_device(0);
             bool rejected=false;
             try{d::configure_memory(net,temporary.path/"absent.bin",{});}catch(const std::exception &){rejected=true;}

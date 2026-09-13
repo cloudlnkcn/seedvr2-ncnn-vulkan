@@ -1,0 +1,130 @@
+{
+  "schema_version": "dit-storage-experiment-v1",
+  "scope": "One real checkpoint-backed DiT block; storage conversion only; not full-model validation.",
+  "reference_profile": "FP32-B",
+  "checkpoint": {
+    "repository": "ByteDance-Seed/SeedVR2-3B",
+    "revision": "37255ff8cccfb01071b87f635a5948ca8d53117c",
+    "filename": "seedvr2_ema_3b.pth",
+    "sha256": "6bcc5ac59447e97b100477480aebb01be2ec724c8340bb83faae21f64848604b",
+    "tensors": 635
+  },
+  "tolerance": {
+    "atol": 0.0001,
+    "rtol": 0.001,
+    "calibration": "DIAGNOSTIC_NOT_MODEL_CERTIFICATION"
+  },
+  "cases": [
+    {
+      "path": "dit-block-16-1x2x3/case.json",
+      "sha256": "8e0350c5833442fde73e073cc0b5f918357ce0078aa4ee14899113cfcb61f419",
+      "source_case_sha256": "d0995f9e9d70a61c7104153e42e5db16bc1220866a5446533952c69ddf8664ca"
+    },
+    {
+      "path": "dit-block-16-2x3x4/case.json",
+      "sha256": "349a2892efac12a6d6d451d4f9cc736015414a5312c55356dfaafd94d58174de",
+      "source_case_sha256": "ea372e42207fd9f2f73323e638d178ebecc0705ff6df6ae0b4ce84fb7ad60a7a"
+    }
+  ],
+  "model_verified": false,
+  "source_suite_sha256": "71dbdcf9d2e38b722b6be999f016dc69af427f40d716bfee587a7895c431503e",
+  "trace_sha256": "dd878a21b683c05cbf85e097fd893a3819d080d63c84abffb9456d2493c01e24",
+  "pnnx_sha256": "732a25bf3c8e17b1d071b3eed8c6131a14da5450564bbe1a157d6dc11c2a10ba",
+  "command": [],
+  "lowering": {
+    "storage_audit": [
+      {
+        "layer": "linear_6",
+        "elements": 19660800,
+        "changed": 19658424,
+        "max_abs": 0.00011903047561645508,
+        "subnormal_input_count": 41575,
+        "rounded_to_zero": 20
+      },
+      {
+        "layer": "linear_7",
+        "elements": 19660800,
+        "changed": 19658424,
+        "max_abs": 0.00011903047561645508,
+        "subnormal_input_count": 41575,
+        "rounded_to_zero": 20
+      },
+      {
+        "layer": "linear_8",
+        "elements": 6553600,
+        "changed": 6552780,
+        "max_abs": 6.079673767089844e-05,
+        "subnormal_input_count": 14170,
+        "rounded_to_zero": 8
+      },
+      {
+        "layer": "linear_9",
+        "elements": 17694720,
+        "changed": 17692523,
+        "max_abs": 0.000118255615234375,
+        "subnormal_input_count": 42401,
+        "rounded_to_zero": 26
+      },
+      {
+        "layer": "linear_10",
+        "elements": 17694720,
+        "changed": 17692638,
+        "max_abs": 0.00012087821960449219,
+        "subnormal_input_count": 36378,
+        "rounded_to_zero": 15
+      },
+      {
+        "layer": "linear_11",
+        "elements": 17694720,
+        "changed": 17692589,
+        "max_abs": 0.00012189149856567383,
+        "subnormal_input_count": 40740,
+        "rounded_to_zero": 13
+      },
+      {
+        "layer": "linear_12",
+        "elements": 6553600,
+        "changed": 6552780,
+        "max_abs": 6.079673767089844e-05,
+        "subnormal_input_count": 14170,
+        "rounded_to_zero": 8
+      },
+      {
+        "layer": "linear_13",
+        "elements": 17694720,
+        "changed": 17692523,
+        "max_abs": 0.000118255615234375,
+        "subnormal_input_count": 42401,
+        "rounded_to_zero": 26
+      },
+      {
+        "layer": "linear_14",
+        "elements": 17694720,
+        "changed": 17692638,
+        "max_abs": 0.00012087821960449219,
+        "subnormal_input_count": 36378,
+        "rounded_to_zero": 15
+      },
+      {
+        "layer": "linear_15",
+        "elements": 17694720,
+        "changed": 17692589,
+        "max_abs": 0.00012189149856567383,
+        "subnormal_input_count": 40740,
+        "rounded_to_zero": 13
+      }
+    ],
+    "converter_sha256": "d3146ef172577f464426f5ee5600829d8ec81aae168b1d3c3a845d47880df1ba"
+  },
+  "precision": {
+    "weight_storage": "fp16-ieee",
+    "activation": "fp32",
+    "arithmetic": "fp32",
+    "note": "pnnx tagged weights only; opaque custom attributes may remain FP32."
+  },
+  "storage_bytes": {
+    "baseline": 634472588,
+    "candidate": 317278348,
+    "reduction_fraction": 0.4999337181766472
+  }
+}

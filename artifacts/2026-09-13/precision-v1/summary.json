@@ -1,0 +1,130 @@
+{
+  "schema_version": "dit-storage-evaluation-v1",
+  "block": 16,
+  "shapes": [
+    [
+      1,
+      2,
+      3,
+      2560
+    ],
+    [
+      2,
+      3,
+      4,
+      2560
+    ]
+  ],
+  "scope": "Checkpoint-backed component, sampled video activations; not a full denoising trajectory or quality benchmark.",
+  "activation": "fp32",
+  "arithmetic": "fp32",
+  "baseline_bytes": 634472588,
+  "candidate_bytes": 317278348,
+  "reduction_fraction": 0.4999337181766472,
+  "audit": [
+    {
+      "layer": "linear_6",
+      "elements": 19660800,
+      "changed": 19658424,
+      "max_abs": 0.00011903047561645508,
+      "subnormal_input_count": 41575,
+      "rounded_to_zero": 20
+    },
+    {
+      "layer": "linear_7",
+      "elements": 19660800,
+      "changed": 19658424,
+      "max_abs": 0.00011903047561645508,
+      "subnormal_input_count": 41575,
+      "rounded_to_zero": 20
+    },
+    {
+      "layer": "linear_8",
+      "elements": 6553600,
+      "changed": 6552780,
+      "max_abs": 6.079673767089844e-05,
+      "subnormal_input_count": 14170,
+      "rounded_to_zero": 8
+    },
+    {
+      "layer": "linear_9",
+      "elements": 17694720,
+      "changed": 17692523,
+      "max_abs": 0.000118255615234375,
+      "subnormal_input_count": 42401,
+      "rounded_to_zero": 26
+    },
+    {
+      "layer": "linear_10",
+      "elements": 17694720,
+      "changed": 17692638,
+      "max_abs": 0.00012087821960449219,
+      "subnormal_input_count": 36378,
+      "rounded_to_zero": 15
+    },
+    {
+      "layer": "linear_11",
+      "elements": 17694720,
+      "changed": 17692589,
+      "max_abs": 0.00012189149856567383,
+      "subnormal_input_count": 40740,
+      "rounded_to_zero": 13
+    },
+    {
+      "layer": "linear_12",
+      "elements": 6553600,
+      "changed": 6552780,
+      "max_abs": 6.079673767089844e-05,
+      "subnormal_input_count": 14170,
+      "rounded_to_zero": 8
+    },
+    {
+      "layer": "linear_13",
+      "elements": 17694720,
+      "changed": 17692523,
+      "max_abs": 0.000118255615234375,
+      "subnormal_input_count": 42401,
+      "rounded_to_zero": 26
+    },
+    {
+      "layer": "linear_14",
+      "elements": 17694720,
+      "changed": 17692638,
+      "max_abs": 0.00012087821960449219,
+      "subnormal_input_count": 36378,
+      "rounded_to_zero": 15
+    },
+    {
+      "layer": "linear_15",
+      "elements": 17694720,
+      "changed": 17692589,
+      "max_abs": 0.00012189149856567383,
+      "subnormal_input_count": 40740,
+      "rounded_to_zero": 13
+    }
+  ],
+  "implementation": {
+    "tools/dit_weight_storage.py": "bde495a1d4fc9ecad8b9ade2a58768d68bffa991bb5ad49e7491c8d4166781ae",
+    "tools/experiment_dit_storage.py": "bc12527237b1c9949c376536aeed78351c3e3ad0f706c3b52ca079b9d95efd5a",
+    "tests/test_dit_weight_storage.py": "ad866f55222d36ca28615cc8b33a13123182997ccab7ad818b9c89519ff97678",
+    "tools/check_graph.py": "c4fd0e8f6b11cd3e22d62b94575cb3bac5197164b5fedc174c60f860d6ae141d",
+    "dist/numerics-v2/bin/seedvr2": "4b3647da60f5926462ef0aaf25a93733d09e190c094b5ac9729e1db7bb33125a"
+  },
+  "final_converter_reproduction": {
+    "passed": true,
+    "candidate_sha256": "fbed1760ffe2cc090fb1300a88effb2fc62b67b7793d215310a6d2a10f23f26f"
+  },
+  "tests": {
+    "unit_tests_passed": 7,
+    "fp32_control_passed": 4,
+    "fp32_control_total": 4,
+    "pnnx_fp16_passed": 0,
+    "pnnx_fp16_total": 4,
+    "ieee_fp16_passed": 0,
+    "ieee_fp16_total": 4
+  },
+  "decision": "RESEARCH_ONLY_KEEP_FP32_DEFAULT",
+  "model_verified": false,
+  "benchmark_limitations": "One observation per case/backend, validation layer enabled, concurrent HF network upload; no isolated load timing, GPU peak or speedup claim.",
+  "next": "Use a separate, declared low-precision error/quality protocol and real trajectory sensitivity analysis before package integration. Preserve FP32-B thresholds."
+}

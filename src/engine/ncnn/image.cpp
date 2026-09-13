@@ -17,7 +17,7 @@ Result<std::string> inspect_image(const std::filesystem::path &path) {
 Result<std::string> inspect_image_package(const std::filesystem::path &directory) {
     try {
         Package p(directory);
-        return Json{{"status", "INTEGRITY_CHECKED"}, {"profile", profile},
+        return Json{{"status", "INTEGRITY_CHECKED"}, {"profile", p.manifest.at("profile")},
             {"manifest_sha256", p.identity}, {"graphs", p.graphs.size()},
             {"limits", p.manifest.at("limits")}, {"model_verified", false}}.dump();
     } catch (const std::exception &e) { return Error{"MODEL_PACKAGE_INVALID", "model", e.what()}; }
@@ -163,7 +163,7 @@ Result<std::string> run_image(const ImageRequest &request, ImageObserver observe
         check();
         Json report{{"schema_version", "seedvr2-image-run-v1"}, {"status", "SUCCEEDED"},
             {"build", SEEDVR2_BUILD_VERSION},
-            {"profile", profile}, {"backend", request.vulkan ? "ncnn-vulkan" : "ncnn-cpu"},
+            {"profile", package.manifest.at("profile")}, {"backend", request.vulkan ? "ncnn-vulkan" : "ncnn-cpu"},
             {"device", gpu_info}, {"ncnn_commit", SEEDVR2_NCNN_COMMIT},
             {"model_manifest_sha256", package.identity}, {"model_verified", false},
             {"numerical_validation", "NOT_PERFORMED_BY_RUNNER"}, {"model_certificate", nullptr},
@@ -177,6 +177,7 @@ Result<std::string> run_image(const ImageRequest &request, ImageObserver observe
             {"dispatch", "EXPLICIT_PER_LAYER_NO_BACKEND_FALLBACK"}, {"stages", stages},
             {"diagnostics", diagnostics},
             {"total_ms", std::chrono::duration<double, std::milli>(Clock::now()-started).count()}};
+        report["storage_precision"] = package.manifest.value("storage_precision", Json{{"dit_linear_weights","fp32"},{"other_weights","fp32"},{"activation","fp32"},{"arithmetic","fp32"}});
         report["implementation"]=implementation_identity();
         if (report["implementation"].contains("executable_sha256")) report["executable_sha256"]=report["implementation"]["executable_sha256"];
         report["resources"]=process_resources();

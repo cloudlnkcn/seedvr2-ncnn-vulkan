@@ -85,7 +85,7 @@ inline std::vector<ncnn::Mat> execute_graph(const GraphFiles &files, const std::
         (awa.heads != 20 || awa.shifted != std::stoi(id.substr(6))%2)))
         throw std::runtime_error("Adaptive attention graph metadata mismatch");
     check();
-    auto memory_report = configure_memory(net,files.weights,request.memory);
+    auto memory_report = configure_memory(net,files.weights,request.memory,device_budget,files.fp16_storage);
     if (request.mapped_weights) mapped=std::make_unique<MappedWeights>(files.weights);
     if ((mapped?net.load_model(*mapped):net.load_model(files.weights.string().c_str())) != 0 || (mapped && !mapped->consumed()))
         throw std::runtime_error("Cannot load graph weights: "+id);

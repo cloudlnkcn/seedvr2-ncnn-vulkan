@@ -1,0 +1,2277 @@
+{
+  "schema_version": "ncnn-graph-validation-v1",
+  "scope": "One real checkpoint-backed DiT block; storage conversion only; not full-model validation.",
+  "reference_profile": "FP32-B",
+  "checkpoint": {
+    "repository": "ByteDance-Seed/SeedVR2-3B",
+    "revision": "37255ff8cccfb01071b87f635a5948ca8d53117c",
+    "filename": "seedvr2_ema_3b.pth",
+    "sha256": "6bcc5ac59447e97b100477480aebb01be2ec724c8340bb83faae21f64848604b",
+    "tensors": 635
+  },
+  "weight_io": "buffered",
+  "suite_sha256": "c858f2920927932915264dbcc03e46e09cd5aa708353a6ad47aac67729b222cc",
+  "binary_sha256": "4b3647da60f5926462ef0aaf25a93733d09e190c094b5ac9729e1db7bb33125a",
+  "threshold": {
+    "atol": 0.0001,
+    "rtol": 0.001,
+    "calibration": "DIAGNOSTIC_NOT_MODEL_CERTIFICATION"
+  },
+  "validation_layer_requested": true,
+  "cases": [
+    {
+      "case_id": "dit-block-16-1x2x3",
+      "backend": "cpu",
+      "exit_code": 0,
+      "passed": false,
+      "execution": {
+        "awa_dispatch": {
+          "cpu_calls": 1,
+          "sdpa_calls": 1,
+          "vulkan_calls": 0,
+          "windows": 1
+        },
+        "backend": "ncnn-cpu",
+        "block_index": 16,
+        "case_id": "dit-block-16-1x2x3",
+        "case_sha256": "8e0350c5833442fde73e073cc0b5f918357ce0078aa4ee14899113cfcb61f419",
+        "component": "dit-block",
+        "cpu_calls": 83,
+        "device": null,
+        "dispatch": "EXPLICIT_PER_LAYER_NO_BACKEND_FALLBACK",
+        "implementation": {
+          "executable_sha256": "4b3647da60f5926462ef0aaf25a93733d09e190c094b5ac9729e1db7bb33125a",
+          "ncnn_runtime_patches": [
+            {
+              "compiled_allocator_sha256": "b8398e0d5ef5a367f80c5d2f13af1c8f170a83a39d0a1b458a40100924a55320",
+              "id": "host-buffer-v1",
+              "original_allocator_sha256": "601d69dab40823366fa6aa2be00c8e37bb0f1e960fe96323c36daed887c4fda2",
+              "scope": "Imported-host buffer declaration and weight-buffer transfer-source usage"
+            }
+          ],
+          "sdk_library_sha256": "e07b758736fe9f6f3ddab1ab0aa7dc4f012734b9129e38e1d725430b1cc3ba9c"
+        },
+        "layers": [
+          {
+            "backend": "cpu",
+            "name": "splitncnn_0",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_1",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "vid",
+            "type": "SeedVR2Constant"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_0",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "pnnx_unique_0",
+            "type": "SeedVR2Constant"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_1",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "pnnx_unique_1",
+            "type": "SeedVR2Constant"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_2",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "pnnx_unique_2",
+            "type": "SeedVR2Constant"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_3",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "pnnx_unique_3",
+            "type": "SeedVR2Constant"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_4",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "pnnx_unique_4",
+            "type": "SeedVR2Constant"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_5",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "reshape_16",
+            "type": "Reshape"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_2",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "rmsn_0",
+            "type": "RMSNorm"
+          },
+          {
+            "backend": "cpu",
+            "name": "unbind_0",
+            "type": "Slice"
+          },
+          {
+            "backend": "cpu",
+            "name": "reshape_17",
+            "type": "Reshape"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_3",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "reshape_18",
+            "type": "Reshape"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_4",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "reshape_19",
+            "type": "Reshape"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_5",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "reshape_20",
+            "type": "Reshape"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_6",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "reshape_21",
+            "type": "Reshape"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_7",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "reshape_22",
+            "type": "Reshape"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_8",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_0",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_1",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "mul_2",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_3",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "linear_6",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "cpu",
+            "name": "Tensor.reshape_4",
+            "type": "Reshape"
+          },
+          {
+            "backend": "cpu",
+            "name": "rmsn_1",
+            "type": "RMSNorm"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_4",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_5",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "mul_6",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_7",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "linear_7",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "cpu",
+            "name": "awa",
+            "type": "SeedVR2AWA"
+          },
+          {
+            "backend": "cpu",
+            "name": "reshape_23",
+            "type": "Reshape"
+          },
+          {
+            "backend": "cpu",
+            "name": "linear_8",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_8",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "mul_9",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_10",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_9",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "rmsn_2",
+            "type": "RMSNorm"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_11",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_12",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "mul_13",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_14",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_10",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "linear_9",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "cpu",
+            "name": "silu_4",
+            "type": "Swish"
+          },
+          {
+            "backend": "cpu",
+            "name": "linear_10",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "cpu",
+            "name": "mul_15",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "linear_11",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_16",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "mul_17",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_18",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "linear_12",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_19",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "mul_20",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_21",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_11",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "rmsn_3",
+            "type": "RMSNorm"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_22",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_23",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "mul_24",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_25",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_12",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "linear_13",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "cpu",
+            "name": "silu_5",
+            "type": "Swish"
+          },
+          {
+            "backend": "cpu",
+            "name": "linear_14",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "cpu",
+            "name": "mul_26",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "linear_15",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_27",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "mul_28",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_29",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "Tensor.reshape_6",
+            "type": "Reshape"
+          }
+        ],
+        "memory": {
+          "activation_offload": false,
+          "actual_weight_memory": "not_instrumented",
+          "after_load": null,
+          "oom_recovery": false,
+          "policy": "auto",
+          "reason": "cpu_backend",
+          "requested_memory": "cpu",
+          "scope": "weight placement before graph loading"
+        },
+        "model_verified": false,
+        "ncnn_commit": "3b7bdba7fc8aea8fd46779533eee027df77c639d",
+        "numerical_validation": "NOT_PERFORMED_BY_RUNNER",
+        "outputs": {
+          "text": {
+            "dtype": "f32le",
+            "elements": 148480,
+            "path": "text.f32",
+            "sha256": "c19ce76870860d7c7c85d94352e937e4aacff2e0ffce5f489e13fb7dfae63436",
+            "shape": [
+              58,
+              2560
+            ]
+          },
+          "video": {
+            "dtype": "f32le",
+            "elements": 15360,
+            "path": "video.f32",
+            "sha256": "d6c0cf5ee6c1029ee020b4bcabcde1ca88ff41761720b0debd2d37f05b6b38cc",
+            "shape": [
+              1,
+              2,
+              3,
+              2560
+            ]
+          }
+        },
+        "precision": "fp32",
+        "schema_version": "ncnn-graph-execution-v1",
+        "status": "EXECUTED",
+        "timing_ms": {
+          "compute_including_transfers": 192.182997,
+          "total": 765.426049
+        },
+        "vulkan_calls": 0
+      },
+      "comparison": {
+        "video": {
+          "reference_sha256": "21312ca2b6e1a16f1377f738ff27d9bdfd418c48802ef09ca448cb88ec65fdaf",
+          "candidate_sha256": "d6c0cf5ee6c1029ee020b4bcabcde1ca88ff41761720b0debd2d37f05b6b38cc",
+          "shape": [
+            1,
+            2,
+            3,
+            2560
+          ],
+          "max_abs": 0.007425785064697266,
+          "rmse": 0.0005053980580479321,
+          "violations": 3522,
+          "finite": true,
+          "passed": false
+        },
+        "text": {
+          "reference_sha256": "61704245d7e7a049d84ee314175589fee70cd72e37659fbf3bebd6b5989e8fac",
+          "candidate_sha256": "c19ce76870860d7c7c85d94352e937e4aacff2e0ffce5f489e13fb7dfae63436",
+          "shape": [
+            58,
+            2560
+          ],
+          "max_abs": 0.0103912353515625,
+          "rmse": 0.000278373023821959,
+          "violations": 15421,
+          "finite": true,
+          "passed": false
+        }
+      }
+    },
+    {
+      "case_id": "dit-block-16-1x2x3",
+      "backend": "vulkan",
+      "exit_code": 0,
+      "passed": false,
+      "execution": {
+        "awa_dispatch": {
+          "cpu_calls": 0,
+          "sdpa_calls": 1,
+          "vulkan_calls": 1,
+          "windows": 1
+        },
+        "backend": "ncnn-vulkan",
+        "block_index": 16,
+        "case_id": "dit-block-16-1x2x3",
+        "case_sha256": "8e0350c5833442fde73e073cc0b5f918357ce0078aa4ee14899113cfcb61f419",
+        "component": "dit-block",
+        "cpu_calls": 0,
+        "device": {
+          "api_version": 4211017,
+          "device_id": 10464,
+          "driver_version": 2497102272,
+          "fp32_b_arithmetic": {
+            "checked": 8,
+            "failed": 0,
+            "model_verified": false,
+            "protocol": "fp32-fma-residual-v1",
+            "scope": "Required arithmetic prerequisite; not a full numerical or model validation",
+            "supported": true,
+            "values": [
+              {
+                "actual": -1.4901161193847656e-08,
+                "expected": -1.4901161193847656e-08,
+                "matched": true
+              },
+              {
+                "actual": 3.725290298461914e-09,
+                "expected": 3.725290298461914e-09,
+                "matched": true
+              },
+              {
+                "actual": -9.313225746154785e-10,
+                "expected": -9.313225746154785e-10,
+                "matched": true
+              },
+              {
+                "actual": 2.3283064365386963e-10,
+                "expected": 2.3283064365386963e-10,
+                "matched": true
+              },
+              {
+                "actual": -5.820766091346741e-11,
+                "expected": -5.820766091346741e-11,
+                "matched": true
+              },
+              {
+                "actual": 1.4551915228366852e-11,
+                "expected": 1.4551915228366852e-11,
+                "matched": true
+              },
+              {
+                "actual": -3.637978807091713e-12,
+                "expected": -3.637978807091713e-12,
+                "matched": true
+              },
+              {
+                "actual": 9.094947017729282e-13,
+                "expected": 9.094947017729282e-13,
+                "matched": true
+              }
+            ]
+          },
+          "index": 0,
+          "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+          "subgroup_size": 32,
+          "vendor_id": 4318
+        },
+        "dispatch": "EXPLICIT_PER_LAYER_NO_BACKEND_FALLBACK",
+        "implementation": {
+          "executable_sha256": "4b3647da60f5926462ef0aaf25a93733d09e190c094b5ac9729e1db7bb33125a",
+          "ncnn_runtime_patches": [
+            {
+              "compiled_allocator_sha256": "b8398e0d5ef5a367f80c5d2f13af1c8f170a83a39d0a1b458a40100924a55320",
+              "id": "host-buffer-v1",
+              "original_allocator_sha256": "601d69dab40823366fa6aa2be00c8e37bb0f1e960fe96323c36daed887c4fda2",
+              "scope": "Imported-host buffer declaration and weight-buffer transfer-source usage"
+            }
+          ],
+          "sdk_library_sha256": "e07b758736fe9f6f3ddab1ab0aa7dc4f012734b9129e38e1d725430b1cc3ba9c"
+        },
+        "layers": [
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_0",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_1",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "vid",
+            "type": "SeedVR2Constant"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_0",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_0",
+            "type": "SeedVR2Constant"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_1",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_1",
+            "type": "SeedVR2Constant"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_2",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_2",
+            "type": "SeedVR2Constant"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_3",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_3",
+            "type": "SeedVR2Constant"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_4",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_4",
+            "type": "SeedVR2Constant"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_5",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "reshape_16",
+            "type": "Reshape"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_2",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "rmsn_0",
+            "type": "RMSNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "unbind_0",
+            "type": "Slice"
+          },
+          {
+            "backend": "vulkan",
+            "name": "reshape_17",
+            "type": "Reshape"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_3",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "reshape_18",
+            "type": "Reshape"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_4",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "reshape_19",
+            "type": "Reshape"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_5",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "reshape_20",
+            "type": "Reshape"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_6",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "reshape_21",
+            "type": "Reshape"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_7",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "reshape_22",
+            "type": "Reshape"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_8",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_0",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_1",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "mul_2",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_3",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "linear_6",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "vulkan",
+            "name": "Tensor.reshape_4",
+            "type": "Reshape"
+          },
+          {
+            "backend": "vulkan",
+            "name": "rmsn_1",
+            "type": "RMSNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_4",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_5",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "mul_6",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_7",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "linear_7",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "vulkan",
+            "name": "awa",
+            "type": "SeedVR2AWA"
+          },
+          {
+            "backend": "vulkan",
+            "name": "reshape_23",
+            "type": "Reshape"
+          },
+          {
+            "backend": "vulkan",
+            "name": "linear_8",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_8",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "mul_9",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_10",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_9",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "rmsn_2",
+            "type": "RMSNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_11",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_12",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "mul_13",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_14",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_10",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "linear_9",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_4",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "linear_10",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "vulkan",
+            "name": "mul_15",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "linear_11",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_16",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "mul_17",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_18",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "linear_12",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_19",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "mul_20",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_21",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_11",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "rmsn_3",
+            "type": "RMSNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_22",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_23",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "mul_24",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_25",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_12",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "linear_13",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_5",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "linear_14",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "vulkan",
+            "name": "mul_26",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "linear_15",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_27",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "mul_28",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_29",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "Tensor.reshape_6",
+            "type": "Reshape"
+          }
+        ],
+        "memory": {
+          "activation_offload": false,
+          "actual_weight_memory": "not_instrumented",
+          "after_load": {
+            "budget_bytes": 5370544128,
+            "heap_index": 0,
+            "source": "VK_EXT_memory_budget_estimate",
+            "usage_bytes": 665976832
+          },
+          "available_bytes": 5358747648,
+          "before_load": {
+            "budget_bytes": 5375852544,
+            "heap_index": 0,
+            "source": "VK_EXT_memory_budget_estimate",
+            "usage_bytes": 17104896
+          },
+          "estimated_weight_bytes": 634556696,
+          "oom_recovery": false,
+          "policy": "auto",
+          "reason": "budget_available",
+          "requested_memory": "device",
+          "reserve_bytes": 1343963136,
+          "reserve_policy": "quarter_heap_budget",
+          "scope": "weight placement before graph loading"
+        },
+        "model_verified": false,
+        "ncnn_commit": "3b7bdba7fc8aea8fd46779533eee027df77c639d",
+        "numerical_validation": "NOT_PERFORMED_BY_RUNNER",
+        "outputs": {
+          "text": {
+            "dtype": "f32le",
+            "elements": 148480,
+            "path": "text.f32",
+            "sha256": "8aef8e66a388185557641567621d15e384133b79d4969c6985824b4641cc8b5a",
+            "shape": [
+              58,
+              2560
+            ]
+          },
+          "video": {
+            "dtype": "f32le",
+            "elements": 15360,
+            "path": "video.f32",
+            "sha256": "10adf3a22a50738ca4f6068184dadeff178efba929792421aa9249cb732d77b9",
+            "shape": [
+              1,
+              2,
+              3,
+              2560
+            ]
+          }
+        },
+        "precision": "fp32",
+        "schema_version": "ncnn-graph-execution-v1",
+        "status": "EXECUTED",
+        "timing_ms": {
+          "compute_including_transfers": 59.409473,
+          "total": 1407.534627
+        },
+        "vulkan_calls": 83
+      },
+      "comparison": {
+        "video": {
+          "reference_sha256": "21312ca2b6e1a16f1377f738ff27d9bdfd418c48802ef09ca448cb88ec65fdaf",
+          "candidate_sha256": "10adf3a22a50738ca4f6068184dadeff178efba929792421aa9249cb732d77b9",
+          "shape": [
+            1,
+            2,
+            3,
+            2560
+          ],
+          "max_abs": 0.007424831390380859,
+          "rmse": 0.0005053950775908108,
+          "violations": 3527,
+          "finite": true,
+          "passed": false
+        },
+        "text": {
+          "reference_sha256": "61704245d7e7a049d84ee314175589fee70cd72e37659fbf3bebd6b5989e8fac",
+          "candidate_sha256": "8aef8e66a388185557641567621d15e384133b79d4969c6985824b4641cc8b5a",
+          "shape": [
+            58,
+            2560
+          ],
+          "max_abs": 0.010417938232421875,
+          "rmse": 0.00027838003496820016,
+          "violations": 15431,
+          "finite": true,
+          "passed": false
+        }
+      }
+    },
+    {
+      "case_id": "dit-block-16-2x3x4",
+      "backend": "cpu",
+      "exit_code": 0,
+      "passed": false,
+      "execution": {
+        "awa_dispatch": {
+          "cpu_calls": 1,
+          "sdpa_calls": 2,
+          "vulkan_calls": 0,
+          "windows": 2
+        },
+        "backend": "ncnn-cpu",
+        "block_index": 16,
+        "case_id": "dit-block-16-2x3x4",
+        "case_sha256": "349a2892efac12a6d6d451d4f9cc736015414a5312c55356dfaafd94d58174de",
+        "component": "dit-block",
+        "cpu_calls": 83,
+        "device": null,
+        "dispatch": "EXPLICIT_PER_LAYER_NO_BACKEND_FALLBACK",
+        "implementation": {
+          "executable_sha256": "4b3647da60f5926462ef0aaf25a93733d09e190c094b5ac9729e1db7bb33125a",
+          "ncnn_runtime_patches": [
+            {
+              "compiled_allocator_sha256": "b8398e0d5ef5a367f80c5d2f13af1c8f170a83a39d0a1b458a40100924a55320",
+              "id": "host-buffer-v1",
+              "original_allocator_sha256": "601d69dab40823366fa6aa2be00c8e37bb0f1e960fe96323c36daed887c4fda2",
+              "scope": "Imported-host buffer declaration and weight-buffer transfer-source usage"
+            }
+          ],
+          "sdk_library_sha256": "e07b758736fe9f6f3ddab1ab0aa7dc4f012734b9129e38e1d725430b1cc3ba9c"
+        },
+        "layers": [
+          {
+            "backend": "cpu",
+            "name": "splitncnn_0",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_1",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "vid",
+            "type": "SeedVR2Constant"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_0",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "pnnx_unique_0",
+            "type": "SeedVR2Constant"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_1",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "pnnx_unique_1",
+            "type": "SeedVR2Constant"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_2",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "pnnx_unique_2",
+            "type": "SeedVR2Constant"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_3",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "pnnx_unique_3",
+            "type": "SeedVR2Constant"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_4",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "pnnx_unique_4",
+            "type": "SeedVR2Constant"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_5",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "reshape_16",
+            "type": "Reshape"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_2",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "rmsn_0",
+            "type": "RMSNorm"
+          },
+          {
+            "backend": "cpu",
+            "name": "unbind_0",
+            "type": "Slice"
+          },
+          {
+            "backend": "cpu",
+            "name": "reshape_17",
+            "type": "Reshape"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_3",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "reshape_18",
+            "type": "Reshape"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_4",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "reshape_19",
+            "type": "Reshape"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_5",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "reshape_20",
+            "type": "Reshape"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_6",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "reshape_21",
+            "type": "Reshape"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_7",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "reshape_22",
+            "type": "Reshape"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_8",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_0",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_1",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "mul_2",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_3",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "linear_6",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "cpu",
+            "name": "Tensor.reshape_4",
+            "type": "Reshape"
+          },
+          {
+            "backend": "cpu",
+            "name": "rmsn_1",
+            "type": "RMSNorm"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_4",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_5",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "mul_6",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_7",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "linear_7",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "cpu",
+            "name": "awa",
+            "type": "SeedVR2AWA"
+          },
+          {
+            "backend": "cpu",
+            "name": "reshape_23",
+            "type": "Reshape"
+          },
+          {
+            "backend": "cpu",
+            "name": "linear_8",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_8",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "mul_9",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_10",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_9",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "rmsn_2",
+            "type": "RMSNorm"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_11",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_12",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "mul_13",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_14",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_10",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "linear_9",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "cpu",
+            "name": "silu_4",
+            "type": "Swish"
+          },
+          {
+            "backend": "cpu",
+            "name": "linear_10",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "cpu",
+            "name": "mul_15",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "linear_11",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_16",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "mul_17",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_18",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "linear_12",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_19",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "mul_20",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_21",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_11",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "rmsn_3",
+            "type": "RMSNorm"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_22",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_23",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "mul_24",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_25",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "splitncnn_12",
+            "type": "Split"
+          },
+          {
+            "backend": "cpu",
+            "name": "linear_13",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "cpu",
+            "name": "silu_5",
+            "type": "Swish"
+          },
+          {
+            "backend": "cpu",
+            "name": "linear_14",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "cpu",
+            "name": "mul_26",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "linear_15",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_27",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "mul_28",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "add_29",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "cpu",
+            "name": "Tensor.reshape_6",
+            "type": "Reshape"
+          }
+        ],
+        "memory": {
+          "activation_offload": false,
+          "actual_weight_memory": "not_instrumented",
+          "after_load": null,
+          "oom_recovery": false,
+          "policy": "auto",
+          "reason": "cpu_backend",
+          "requested_memory": "cpu",
+          "scope": "weight placement before graph loading"
+        },
+        "model_verified": false,
+        "ncnn_commit": "3b7bdba7fc8aea8fd46779533eee027df77c639d",
+        "numerical_validation": "NOT_PERFORMED_BY_RUNNER",
+        "outputs": {
+          "text": {
+            "dtype": "f32le",
+            "elements": 148480,
+            "path": "text.f32",
+            "sha256": "a1a6549977aa6d851a18bdfd0b8e028c6c3a1ede5bf80f3de100e8262feffac0",
+            "shape": [
+              58,
+              2560
+            ]
+          },
+          "video": {
+            "dtype": "f32le",
+            "elements": 61440,
+            "path": "video.f32",
+            "sha256": "0e943dfb4999473b6a72aeabfb8bc4899961d1a4bf9354015fb85a49b64c7a6a",
+            "shape": [
+              2,
+              3,
+              4,
+              2560
+            ]
+          }
+        },
+        "precision": "fp32",
+        "schema_version": "ncnn-graph-execution-v1",
+        "status": "EXECUTED",
+        "timing_ms": {
+          "compute_including_transfers": 239.998426,
+          "total": 760.560061
+        },
+        "vulkan_calls": 0
+      },
+      "comparison": {
+        "video": {
+          "reference_sha256": "ea50c8649b01f12ee99e755c9f90e50c8fa9e4d28b8aacfe42bcf8ef3382a297",
+          "candidate_sha256": "0e943dfb4999473b6a72aeabfb8bc4899961d1a4bf9354015fb85a49b64c7a6a",
+          "shape": [
+            2,
+            3,
+            4,
+            2560
+          ],
+          "max_abs": 0.02126312255859375,
+          "rmse": 0.0005570905195576113,
+          "violations": 14822,
+          "finite": true,
+          "passed": false
+        },
+        "text": {
+          "reference_sha256": "4e496d7eb7c293d6070fb367c3cf4bd05d18150ddf73eb338bc38a1cf05fb5b6",
+          "candidate_sha256": "a1a6549977aa6d851a18bdfd0b8e028c6c3a1ede5bf80f3de100e8262feffac0",
+          "shape": [
+            58,
+            2560
+          ],
+          "max_abs": 0.0098114013671875,
+          "rmse": 0.0002623280920162052,
+          "violations": 14331,
+          "finite": true,
+          "passed": false
+        }
+      }
+    },
+    {
+      "case_id": "dit-block-16-2x3x4",
+      "backend": "vulkan",
+      "exit_code": 0,
+      "passed": false,
+      "execution": {
+        "awa_dispatch": {
+          "cpu_calls": 0,
+          "sdpa_calls": 2,
+          "vulkan_calls": 1,
+          "windows": 2
+        },
+        "backend": "ncnn-vulkan",
+        "block_index": 16,
+        "case_id": "dit-block-16-2x3x4",
+        "case_sha256": "349a2892efac12a6d6d451d4f9cc736015414a5312c55356dfaafd94d58174de",
+        "component": "dit-block",
+        "cpu_calls": 0,
+        "device": {
+          "api_version": 4211017,
+          "device_id": 10464,
+          "driver_version": 2497102272,
+          "fp32_b_arithmetic": {
+            "checked": 8,
+            "failed": 0,
+            "model_verified": false,
+            "protocol": "fp32-fma-residual-v1",
+            "scope": "Required arithmetic prerequisite; not a full numerical or model validation",
+            "supported": true,
+            "values": [
+              {
+                "actual": -1.4901161193847656e-08,
+                "expected": -1.4901161193847656e-08,
+                "matched": true
+              },
+              {
+                "actual": 3.725290298461914e-09,
+                "expected": 3.725290298461914e-09,
+                "matched": true
+              },
+              {
+                "actual": -9.313225746154785e-10,
+                "expected": -9.313225746154785e-10,
+                "matched": true
+              },
+              {
+                "actual": 2.3283064365386963e-10,
+                "expected": 2.3283064365386963e-10,
+                "matched": true
+              },
+              {
+                "actual": -5.820766091346741e-11,
+                "expected": -5.820766091346741e-11,
+                "matched": true
+              },
+              {
+                "actual": 1.4551915228366852e-11,
+                "expected": 1.4551915228366852e-11,
+                "matched": true
+              },
+              {
+                "actual": -3.637978807091713e-12,
+                "expected": -3.637978807091713e-12,
+                "matched": true
+              },
+              {
+                "actual": 9.094947017729282e-13,
+                "expected": 9.094947017729282e-13,
+                "matched": true
+              }
+            ]
+          },
+          "index": 0,
+          "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+          "subgroup_size": 32,
+          "vendor_id": 4318
+        },
+        "dispatch": "EXPLICIT_PER_LAYER_NO_BACKEND_FALLBACK",
+        "implementation": {
+          "executable_sha256": "4b3647da60f5926462ef0aaf25a93733d09e190c094b5ac9729e1db7bb33125a",
+          "ncnn_runtime_patches": [
+            {
+              "compiled_allocator_sha256": "b8398e0d5ef5a367f80c5d2f13af1c8f170a83a39d0a1b458a40100924a55320",
+              "id": "host-buffer-v1",
+              "original_allocator_sha256": "601d69dab40823366fa6aa2be00c8e37bb0f1e960fe96323c36daed887c4fda2",
+              "scope": "Imported-host buffer declaration and weight-buffer transfer-source usage"
+            }
+          ],
+          "sdk_library_sha256": "e07b758736fe9f6f3ddab1ab0aa7dc4f012734b9129e38e1d725430b1cc3ba9c"
+        },
+        "layers": [
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_0",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_1",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "vid",
+            "type": "SeedVR2Constant"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_0",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_0",
+            "type": "SeedVR2Constant"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_1",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_1",
+            "type": "SeedVR2Constant"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_2",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_2",
+            "type": "SeedVR2Constant"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_3",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_3",
+            "type": "SeedVR2Constant"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_4",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "pnnx_unique_4",
+            "type": "SeedVR2Constant"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_5",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "reshape_16",
+            "type": "Reshape"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_2",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "rmsn_0",
+            "type": "RMSNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "unbind_0",
+            "type": "Slice"
+          },
+          {
+            "backend": "vulkan",
+            "name": "reshape_17",
+            "type": "Reshape"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_3",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "reshape_18",
+            "type": "Reshape"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_4",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "reshape_19",
+            "type": "Reshape"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_5",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "reshape_20",
+            "type": "Reshape"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_6",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "reshape_21",
+            "type": "Reshape"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_7",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "reshape_22",
+            "type": "Reshape"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_8",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_0",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_1",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "mul_2",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_3",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "linear_6",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "vulkan",
+            "name": "Tensor.reshape_4",
+            "type": "Reshape"
+          },
+          {
+            "backend": "vulkan",
+            "name": "rmsn_1",
+            "type": "RMSNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_4",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_5",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "mul_6",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_7",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "linear_7",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "vulkan",
+            "name": "awa",
+            "type": "SeedVR2AWA"
+          },
+          {
+            "backend": "vulkan",
+            "name": "reshape_23",
+            "type": "Reshape"
+          },
+          {
+            "backend": "vulkan",
+            "name": "linear_8",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_8",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "mul_9",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_10",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_9",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "rmsn_2",
+            "type": "RMSNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_11",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_12",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "mul_13",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_14",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_10",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "linear_9",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_4",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "linear_10",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "vulkan",
+            "name": "mul_15",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "linear_11",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_16",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "mul_17",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_18",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "linear_12",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_19",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "mul_20",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_21",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_11",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "rmsn_3",
+            "type": "RMSNorm"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_22",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_23",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "mul_24",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_25",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "splitncnn_12",
+            "type": "Split"
+          },
+          {
+            "backend": "vulkan",
+            "name": "linear_13",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "vulkan",
+            "name": "silu_5",
+            "type": "Swish"
+          },
+          {
+            "backend": "vulkan",
+            "name": "linear_14",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "vulkan",
+            "name": "mul_26",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "linear_15",
+            "type": "InnerProduct"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_27",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "mul_28",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "add_29",
+            "type": "BinaryOp"
+          },
+          {
+            "backend": "vulkan",
+            "name": "Tensor.reshape_6",
+            "type": "Reshape"
+          }
+        ],
+        "memory": {
+          "activation_offload": false,
+          "actual_weight_memory": "not_instrumented",
+          "after_load": {
+            "budget_bytes": 5352062976,
+            "heap_index": 0,
+            "source": "VK_EXT_memory_budget_estimate",
+            "usage_bytes": 665976832
+          },
+          "available_bytes": 5342101504,
+          "before_load": {
+            "budget_bytes": 5359206400,
+            "heap_index": 0,
+            "source": "VK_EXT_memory_budget_estimate",
+            "usage_bytes": 17104896
+          },
+          "estimated_weight_bytes": 634556696,
+          "oom_recovery": false,
+          "policy": "auto",
+          "reason": "budget_available",
+          "requested_memory": "device",
+          "reserve_bytes": 1339801600,
+          "reserve_policy": "quarter_heap_budget",
+          "scope": "weight placement before graph loading"
+        },
+        "model_verified": false,
+        "ncnn_commit": "3b7bdba7fc8aea8fd46779533eee027df77c639d",
+        "numerical_validation": "NOT_PERFORMED_BY_RUNNER",
+        "outputs": {
+          "text": {
+            "dtype": "f32le",
+            "elements": 148480,
+            "path": "text.f32",
+            "sha256": "0b7715b8add15cbdaa1742532672c45a71a859ae569d889939eef5f40067e98c",
+            "shape": [
+              58,
+              2560
+            ]
+          },
+          "video": {
+            "dtype": "f32le",
+            "elements": 61440,
+            "path": "video.f32",
+            "sha256": "168916448c209a31f0f42e30c9b8beed32ffd8ead844d92d8c0fa996ed04292b",
+            "shape": [
+              2,
+              3,
+              4,
+              2560
+            ]
+          }
+        },
+        "precision": "fp32",
+        "schema_version": "ncnn-graph-execution-v1",
+        "status": "EXECUTED",
+        "timing_ms": {
+          "compute_including_transfers": 85.971971,
+          "total": 1499.502982
+        },
+        "vulkan_calls": 83
+      },
+      "comparison": {
+        "video": {
+          "reference_sha256": "ea50c8649b01f12ee99e755c9f90e50c8fa9e4d28b8aacfe42bcf8ef3382a297",
+          "candidate_sha256": "168916448c209a31f0f42e30c9b8beed32ffd8ead844d92d8c0fa996ed04292b",
+          "shape": [
+            2,
+            3,
+            4,
+            2560
+          ],
+          "max_abs": 0.021251678466796875,
+          "rmse": 0.0005570564437774296,
+          "violations": 14816,
+          "finite": true,
+          "passed": false
+        },
+        "text": {
+          "reference_sha256": "4e496d7eb7c293d6070fb367c3cf4bd05d18150ddf73eb338bc38a1cf05fb5b6",
+          "candidate_sha256": "0b7715b8add15cbdaa1742532672c45a71a859ae569d889939eef5f40067e98c",
+          "shape": [
+            58,
+            2560
+          ],
+          "max_abs": 0.00981903076171875,
+          "rmse": 0.0002623352544218906,
+          "violations": 14329,
+          "finite": true,
+          "passed": false
+        }
+      }
+    }
+  ],
+  "passed": false,
+  "passed_count": 0,
+  "total": 4,
+  "model_verified": false
+}

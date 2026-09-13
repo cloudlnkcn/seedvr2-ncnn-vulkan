@@ -63,6 +63,7 @@ std::string application_capabilities() {
                 {"architecture", "shared-native-sdk"},
                 {"installed_cpp_sdk",true},
                 {"reviewed_package_identity",true},
+                {"model_storage_formats",{"fp32","dit-fp16"}},
                 {"offline_model_copy",true},
                 {"frontend", "react-typescript-antd"},
                 {"http_framework", "Drogon 1.9.13"},

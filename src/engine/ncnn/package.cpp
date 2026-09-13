@@ -18,7 +18,8 @@ PackageManifest inspect_manifest(const std::filesystem::path &root, bool video) 
     if (!known) throw std::runtime_error("Model package identity is not reviewed for this build; use the documented pinned export");
     const auto &manifest = result.document;
     if (manifest.at("schema_version") != (video ? "seedvr2-video-package-v1" : "seedvr2-image-package-v1") ||
-        manifest.at("profile") != (video ? video_profile : profile) || manifest.at("model_id") != "seedvr2-3b" ||
+        (manifest.at("profile") != (video ? video_profile : profile) &&
+         manifest.at("profile") != (video ? "seedvr2-3b-video-dit-fp16-storage-v1" : "seedvr2-3b-image-dit-fp16-storage-v1")) || manifest.at("model_id") != "seedvr2-3b" ||
         manifest.at("precision") != "fp32" || manifest.at("reference_profile") != "FP32-B" ||
         manifest.at("sampling") != Json({{"steps",1},{"timestep",1000},{"cfg",1},{"latent_scale",.9152},{"color_fix","none"}}) ||
         !manifest.at("graphs").is_array() || manifest.at("graphs").size() != 36)
@@ -52,7 +53,8 @@ Package::Package(const std::filesystem::path &root, const std::function<void()> 
         if (observer) observer({"validating",0,38,std::chrono::duration<double,std::milli>(Clock::now()-started).count()});
         const auto id = row.at("id").get<std::string>();
         graphs.emplace(id, GraphFiles{artifact(root,row.at("param"),128*1024),
-                                     artifact(root,row.at("weights"),1024ULL*1024*1024)});
+                                     artifact(root,row.at("weights"),1024ULL*1024*1024),
+                                     id.starts_with("block-") && manifest.contains("storage_precision")});
     }
     for (const auto *key : {"text", "time"}) {
         if (check) check();

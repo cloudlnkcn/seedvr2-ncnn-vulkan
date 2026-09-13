@@ -9,7 +9,7 @@ inline constexpr auto video_profile = "seedvr2-3b-video-fp32-b-v1";
 struct Cancelled final : std::exception {
     const char *what() const noexcept override { return "Processing cancelled"; }
 };
-struct GraphFiles { std::filesystem::path param, weights; };
+struct GraphFiles { std::filesystem::path param, weights; bool fp16_storage = false; };
 struct PackageManifest {
     Json document;
     std::string identity;
