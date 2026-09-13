@@ -1,0 +1,366 @@
+{
+  "schema_version": "seedvr2-knowledge-v1",
+  "sources": [
+    {
+      "id": "official-code",
+      "title": "Official SeedVR source identity",
+      "url": "https://github.com/ByteDance-Seed/SeedVR/tree/e4de8c24441a67e1b7df56abea10645059bb1185",
+      "revision": "e4de8c24441a67e1b7df56abea10645059bb1185",
+      "checked_at": "2026-09-13",
+      "scope": "Retained official source inventory and the 3B configuration",
+      "files": [
+        {
+          "path": "tests/reference/seedvr/sources.json",
+          "sha256": "e301a5c0b2052e5d9cd60be8e1524bef8a984e3450a2640e5010dd96ed78e727"
+        },
+        {
+          "path": "tests/reference/seedvr/configs_3b/main.yaml",
+          "sha256": "2606dcfde7544c3b69686b633411fcf6f37a4c159182596c4ce8347537d22f35"
+        }
+      ]
+    },
+    {
+      "id": "official-model",
+      "title": "Official SeedVR2 3B checkpoints",
+      "url": "https://huggingface.co/ByteDance-Seed/SeedVR2-3B/tree/37255ff8cccfb01071b87f635a5948ca8d53117c",
+      "revision": "37255ff8cccfb01071b87f635a5948ca8d53117c",
+      "checked_at": "2026-09-13",
+      "scope": "Immutable checkpoint identities; not numerical evidence",
+      "files": [
+        {
+          "path": "model-sources.lock.json",
+          "sha256": "3be1e8e1cd16720394be8014da3eb5b0c5b8fde556f87e45837371838e1b42fc"
+        }
+      ]
+    },
+    {
+      "id": "runtime-converter",
+      "title": "Separately pinned ncnn runtime and pnnx converter",
+      "url": "https://github.com/Tencent/ncnn",
+      "revision": "runtime 3b7bdba7fc8aea8fd46779533eee027df77c639d; converter 6a1bf000f363714839a36793addc8c879d3d899e",
+      "checked_at": "2026-09-13",
+      "scope": "Locks and documented host-buffer overlay, not newest upstream claims",
+      "files": [
+        {
+          "path": "engine-dependencies.lock.json",
+          "sha256": "4404c06e5b228809c8045d44026a0e8fc4297f54a0cb9714fb056b52dfce0a57"
+        },
+        {
+          "path": "converter-dependencies.lock.json",
+          "sha256": "7ecdcfd8d255699d596ef7b2a08a97826ea2ef363145554ede090fb4c77f6fe1"
+        },
+        {
+          "path": "docs/MEMORY-VALIDATION.md",
+          "sha256": "c6ed019dc299d770c7d30755a1a66e6162b16ad929a8699cb888fbf42cd6e8ca"
+        }
+      ]
+    },
+    {
+      "id": "seedvr2-native",
+      "title": "SeedVR2 native API and per-graph execution",
+      "url": "https://github.com/mingshi2333/seedvr2-ncnn-vulkan/tree/65aa871ccfeaddb1b0b151428770feb8aed00730",
+      "revision": "65aa871ccfeaddb1b0b151428770feb8aed00730",
+      "checked_at": "2026-09-13",
+      "scope": "Public file-based API, precision options, per-graph load/upload/compute/download and release",
+      "files": [
+        {
+          "path": "include/seedvr2/pipeline.hpp",
+          "sha256": "71decb84a1bd8ac756bdd8ba3a863ba03d1be660167e862084a5b7c423805aef"
+        },
+        {
+          "path": "src/engine/ncnn/inference.hpp",
+          "sha256": "498a47d78111fc32f9b449c765d9096f4160abd85f69c4927defb69c0d167a00"
+        },
+        {
+          "path": "docs/ARCHITECTURE.md",
+          "sha256": "8ef78f3dd39e25d1f11a9cf4eea0b2dee298f844fe0079ed358f5c27e09973bc"
+        }
+      ]
+    },
+    {
+      "id": "numerics-v2",
+      "title": "Six fixed FP32-B regression trajectories",
+      "url": "https://github.com/mingshi2333/seedvr2-ncnn-vulkan/tree/65aa871ccfeaddb1b0b151428770feb8aed00730/artifacts/2026-09-10/video-numerics-v2",
+      "revision": "release-fp32-v2 / 2026-09-10",
+      "checked_at": "2026-09-13",
+      "scope": "Reviewed 73-boundary regressions and retained quality limitations; no general certificate",
+      "files": [
+        {
+          "path": "artifacts/2026-09-10/video-numerics-v2/summary.json",
+          "sha256": "7cd3b8d5d1e872fa00f201317e4c6bdbfdfa72886d8dc902dcaaeb0b80648f5a"
+        },
+        {
+          "path": "docs/NUMERICS-REPAIR.md",
+          "sha256": "35399b005f452ff241acefa725ca70438292850631839538d8897162e7cb3453"
+        }
+      ]
+    },
+    {
+      "id": "aichi-port",
+      "title": "SeedVR2 port discussed in Tencent/ncnn #6988",
+      "url": "https://github.com/AiChiTuDouPian/SeedVR2-2b-ncnn",
+      "revision": "e8f9294066dc9e2d903f9f3f645767dce56944e6",
+      "checked_at": "2026-09-13",
+      "scope": "README, graph orchestration and custom AWA; author benchmarks were not independently reproduced",
+      "files": [
+        {
+          "url": "https://raw.githubusercontent.com/AiChiTuDouPian/SeedVR2-2b-ncnn/e8f9294066dc9e2d903f9f3f645767dce56944e6/README.md",
+          "sha256": "4fe86c2d4a79516becbaaf822b78d8843e857b0b4accd4cb91ff34d2471248c4"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/AiChiTuDouPian/SeedVR2-2b-ncnn/e8f9294066dc9e2d903f9f3f645767dce56944e6/src/dit_graph.cpp",
+          "sha256": "58d625a57f0ba8458f635dff7874ecf9c418f3d27c5096332b9f8669512bebf2"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/AiChiTuDouPian/SeedVR2-2b-ncnn/e8f9294066dc9e2d903f9f3f645767dce56944e6/src/awa_layer.cpp",
+          "sha256": "b788c69e030640fca08e774a14216da128c7a9f6e84d81dc978f7debf4a50581"
+        }
+      ]
+    },
+    {
+      "id": "chisato-port",
+      "title": "SeedVR2 port discussed in Tencent/ncnn #6968",
+      "url": "https://github.com/Chisato623/seedvr2_ncnn",
+      "revision": "16b2535198855fe79bac63f94919dbb382f00279",
+      "checked_at": "2026-09-13",
+      "scope": "Inspected VAE query chunking, temporal state and DiT graph code; not long-video hardware qualification",
+      "files": [
+        {
+          "url": "https://raw.githubusercontent.com/Chisato623/seedvr2_ncnn/16b2535198855fe79bac63f94919dbb382f00279/README.md",
+          "sha256": "5b7f12073080f99cc638c83911e7580ac79ba2c79687ccc07392b59dc42f1e75"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/Chisato623/seedvr2_ncnn/16b2535198855fe79bac63f94919dbb382f00279/src/seedvr2/seedvr2_vae.cpp",
+          "sha256": "9316692e7dc01df96f705f596b884cb8f1fcf3d3a3ad2a5dcf7895fec837bbb6"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/Chisato623/seedvr2_ncnn/16b2535198855fe79bac63f94919dbb382f00279/src/seedvr2/vae_chunked_mha.cpp",
+          "sha256": "ff3eebbc4772b9ca15d738550ba8e4f1a4deb346a771324d3f33c641e5d8de61"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/Chisato623/seedvr2_ncnn/16b2535198855fe79bac63f94919dbb382f00279/src/seedvr2/seedvr2_dit.cpp",
+          "sha256": "16407855a9e9e75187bdd6bd2ec29222025fb366e4b0369352e2f3acb1864cb0"
+        }
+      ]
+    },
+    {
+      "id": "ernie-evidence",
+      "title": "ERNIE reference layering in Tencent/ncnn #6998",
+      "url": "https://github.com/everythingfornothing/ernie-image-ncnn-vulkan",
+      "revision": "77b4cbbd90bb49723efda95b9009c0bab4f0f6f5",
+      "checked_at": "2026-09-13",
+      "scope": "Documented reference hierarchy and scope, not independently rerun experiments",
+      "files": [
+        {
+          "url": "https://raw.githubusercontent.com/everythingfornothing/ernie-image-ncnn-vulkan/77b4cbbd90bb49723efda95b9009c0bab4f0f6f5/README.md",
+          "sha256": "a36c195e9d110fbb2c062b7c3afa87275ed529013e7e079456dde1b505202d45"
+        }
+      ]
+    },
+    {
+      "id": "ernie-cli",
+      "title": "ERNIE native CLI in Tencent/ncnn #6996",
+      "url": "https://github.com/futz12/ernie-image-ncnn-vulkan",
+      "revision": "8dcd6e4411137d8abe92c9d78581c4c96d5182c6",
+      "checked_at": "2026-09-13",
+      "scope": "CLI preparation and runtime interface; no SeedVR2 thresholds imported",
+      "files": [
+        {
+          "url": "https://raw.githubusercontent.com/futz12/ernie-image-ncnn-vulkan/8dcd6e4411137d8abe92c9d78581c4c96d5182c6/README.md",
+          "sha256": "9c1dafd950a5b748c8560158d665c881d9b41c05520ff040036b1c3dff4788d1"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/futz12/ernie-image-ncnn-vulkan/8dcd6e4411137d8abe92c9d78581c4c96d5182c6/src/ernie_image_pipeline.h",
+          "sha256": "8f20c5d6c757018bf52f41061f1fb30de91a5e1da2a480ce4613c636f0bb6eb5"
+        }
+      ]
+    },
+    {
+      "id": "zimage-release",
+      "title": "Maintainer zimage native release example",
+      "url": "https://github.com/nihui/zimage-ncnn-vulkan",
+      "revision": "c1938eef9cd7e03cb216da4f4c89a0c041543e7a",
+      "checked_at": "2026-09-13",
+      "scope": "Release workflow and usage, not a portable SeedVR2 release recipe",
+      "files": [
+        {
+          "url": "https://raw.githubusercontent.com/nihui/zimage-ncnn-vulkan/c1938eef9cd7e03cb216da4f4c89a0c041543e7a/README.md",
+          "sha256": "82a5569ff14072bce44035c6d6869cade22a79aff5284562b8e3bedf065add75"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/nihui/zimage-ncnn-vulkan/c1938eef9cd7e03cb216da4f4c89a0c041543e7a/.github/workflows/release.yml",
+          "sha256": "2d9945a480786ed99cb49483cf585b2219c1660ba001af83bd60c25e263c2047"
+        }
+      ]
+    },
+    {
+      "id": "delivery-round",
+      "title": "Source workflow and converted package delivery evidence",
+      "url": "https://github.com/mingshi2333/seedvr2-ncnn-vulkan",
+      "revision": "2026-09-13/model-distribution-v1",
+      "checked_at": "2026-09-13",
+      "scope": "Locally staged converted objects and model installations; no public model mirror",
+      "files": [
+        {
+          "path": "artifacts/2026-09-13/source-workflow/model-stage.json",
+          "sha256": "f67ecddf483dd9977e31c1bbae7330e1ba458cb2d601999a5907bc7a7f75451b"
+        },
+        {
+          "path": "artifacts/2026-09-13/source-workflow/image-install.json",
+          "sha256": "42eb480f06bd9102fd8b661f922b911bf5aa86cb52e8db0f849c19c24e925739"
+        },
+        {
+          "path": "artifacts/2026-09-13/source-workflow/video-install.json",
+          "sha256": "51b012e7f48e84705c3832b9a335b4ea3ba06d9f5f70d091abd68d65410f1862"
+        },
+        {
+          "path": "artifacts/2026-09-13/source-workflow/native-install.json",
+          "sha256": "b3dde188f28f26c5de3ab32538c982538760a35915f6e4390cb5503f32f16b80"
+        },
+        {
+          "path": "artifacts/2026-09-13/source-workflow/image-native-verify.json",
+          "sha256": "bc45c9ee1a530396a4ba8a14078efffd9f0e8266c7ef1ecea96a9f78d44e3642"
+        },
+        {
+          "path": "artifacts/2026-09-13/source-workflow/video-native-verify.json",
+          "sha256": "23fd3086b49f767d72c4ca420018bef26acb3365498ac18afb58855b66d9dc04"
+        },
+        {
+          "path": "artifacts/2026-09-13/source-workflow/image-replay.json",
+          "sha256": "33e6419a3519114660a884028d4d5512177e6ca1b83254c5737592236c05dc1c"
+        },
+        {
+          "path": "artifacts/2026-09-13/source-workflow/image-run.json",
+          "sha256": "dcb3b4c6ebdca77da854ad565bb43f81d7890e68429b7b83a0bbb624108d48c0"
+        }
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "id": "native",
+      "kind": "entity",
+      "path": "docs/wiki/entities/seedvr2-native.md",
+      "status": "reviewed",
+      "sources": [
+        "official-code",
+        "official-model",
+        "runtime-converter",
+        "seedvr2-native",
+        "numerics-v2"
+      ],
+      "related": [
+        "peers",
+        "precision",
+        "video-memory",
+        "delivery"
+      ]
+    },
+    {
+      "id": "peers",
+      "kind": "entity",
+      "path": "docs/wiki/entities/peer-ports.md",
+      "status": "reviewed",
+      "sources": [
+        "aichi-port",
+        "chisato-port",
+        "ernie-evidence",
+        "ernie-cli",
+        "zimage-release"
+      ],
+      "related": [
+        "native",
+        "comparison",
+        "precision",
+        "video-memory"
+      ]
+    },
+    {
+      "id": "precision",
+      "kind": "concept",
+      "path": "docs/wiki/concepts/precision-and-evidence.md",
+      "status": "reviewed",
+      "sources": [
+        "numerics-v2",
+        "aichi-port",
+        "ernie-evidence"
+      ],
+      "related": [
+        "native",
+        "peers",
+        "comparison",
+        "plan"
+      ]
+    },
+    {
+      "id": "video-memory",
+      "kind": "concept",
+      "path": "docs/wiki/concepts/video-and-memory.md",
+      "status": "reviewed",
+      "sources": [
+        "seedvr2-native",
+        "chisato-port",
+        "aichi-port",
+        "runtime-converter"
+      ],
+      "related": [
+        "native",
+        "peers",
+        "comparison",
+        "plan"
+      ]
+    },
+    {
+      "id": "comparison",
+      "kind": "synthesis",
+      "path": "docs/wiki/synthesis/design-comparison.md",
+      "status": "reviewed",
+      "sources": [
+        "seedvr2-native",
+        "aichi-port",
+        "chisato-port",
+        "ernie-evidence",
+        "zimage-release"
+      ],
+      "related": [
+        "peers",
+        "precision",
+        "video-memory",
+        "plan"
+      ]
+    },
+    {
+      "id": "plan",
+      "kind": "synthesis",
+      "path": "docs/wiki/synthesis/delivery-plan.md",
+      "status": "open",
+      "sources": [
+        "seedvr2-native",
+        "numerics-v2",
+        "delivery-round",
+        "chisato-port",
+        "zimage-release"
+      ],
+      "related": [
+        "precision",
+        "video-memory",
+        "comparison",
+        "delivery"
+      ]
+    },
+    {
+      "id": "delivery",
+      "kind": "synthesis",
+      "path": "docs/wiki/synthesis/delivery-2026-09-13.md",
+      "status": "reviewed",
+      "sources": [
+        "delivery-round",
+        "numerics-v2"
+      ],
+      "related": [
+        "native",
+        "plan"
+      ]
+    }
+  ]
+}

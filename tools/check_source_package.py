@@ -10,7 +10,8 @@ from urllib.parse import unquote
 
 ROOT = Path(__file__).resolve().parents[1]
 ENTRY_DOCS = ['README.md', 'README.en.md', 'CONTRIBUTING.md', 'docs/TUTORIAL.md',
-              'docs/FIRST-RUN.md', 'docs/ARCHITECTURE.md', 'docs/LICENSING.md']
+              'docs/FIRST-RUN.md', 'docs/ARCHITECTURE.md', 'docs/LICENSING.md',
+              'docs/wiki/README.md', 'docs/distribution/README.md']
 
 
 def check(root):

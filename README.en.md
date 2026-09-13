@@ -10,6 +10,8 @@ Image output long sides reach 512 pixels; video is limited to 17 frames and 128-
 
 The application includes model identity/integrity checks, preflight, progress/cancellation, offline model copying and per-graph device/host weight placement. React / TypeScript / Ant Design is embedded in the native Drogon host; inference needs no Python, Node.js or cloud service. See [first use and offline transfer](docs/FIRST-RUN.md) and [memory-policy measurements](docs/MEMORY-VALIDATION.md).
 
+The [source and validation workflow](docs/wiki/README.md) connects pinned upstream evidence, [design comparisons](docs/wiki/synthesis/design-comparison.md), implementation and measurements. [Converted-model distribution tooling](docs/distribution/README.md) stages the image and video packages in approximately 21.44 GB of deduplicated objects and installs from a local bundle or an explicit HTTPS mirror. A public model mirror and portable prebuilt application are still pending.
+
 ## Architecture and design
 
 The design addresses three concrete needs: **call the same model from a UI, a command line or another application; execute a full package on a device with limited VRAM; and trace every result to its inputs, model and implementation.** The application consists of a shared native core, a local job service and offline conversion tools. The following describes the implemented code.

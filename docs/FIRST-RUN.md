@@ -1,14 +1,14 @@
 # 首次使用与离线搬移
 
-0.7.0 原生预览，Linux x86_64。图片和短片通过同一套 C++ SDK 执行，CLI 不依赖 Web。完整模型认证未通过，当前范围和失败记录见 [交付实测](DELIVERY-RESULTS.md) 与 [0.7.0 内存及算子验证](MEMORY-VALIDATION.md)。
+0.7.0 原生预览，Linux x86_64。图片和短片通过同一套 C++ SDK 执行，CLI 不依赖 Web。已通过固定 SeedVR2 3B / FP32-B 的六条图片与短片数值轨迹，每条 73/73 个张量边界；适用设备、输入与画质结果见 [数值修复](NUMERICS-REPAIR.md)，资源边界见 [内存及算子验证](MEMORY-VALIDATION.md)。
 
-**首次从 GitHub 克隆的读者请从 [教程第 1 课](TUTORIAL.md#1-从干净克隆开始) 开始。** 下文 `dist/seedvr2-0.7.0` 是维护者已经准备好的本机安装，不随 Git 提供。教程构建默认输出为 `dist/tutorial`。
+**首次从 GitHub 克隆的读者请从 [教程第 1 课](TUTORIAL.md#1-从干净克隆开始) 开始。** 下文以教程构建默认输出 `dist/tutorial` 为安装目录。程序和权重需要分别准备，不随 Git 克隆自动提供。
 
-2026-09-08 的后续数值修复已安装到本机：保留的 17 帧、128×128 短片在 CPU 和 Vulkan 上各通过 73/73 项原协议对照。CPU 时序编码器使用误差更小、计算更慢的直接卷积；CLI、Web 和 SDK 自动共用此策略。适用范围、成本与回归记录见 [视频数值修复](VIDEO-NUMERICS.md)。
+2026-09-10 的后续数值修复冻结在维护者本机 `dist/numerics-v2` 安装，修复版 CPU/Vulkan 共享同一套 SDK。新读者按当前源码构建；旧 `dist/seedvr2-0.7.0` 目录是早期安装，不能仅凭目录中的版本号判断是否已包含修复。早期 17 帧数值修复和直接卷积的成本保留在 [历史记录](VIDEO-NUMERICS.md)，后续修复以 [NUMERICS-REPAIR](NUMERICS-REPAIR.md) 为准。
 
-## 已准备好的本机安装
+## 安装目录与启动
 
-本轮安装位于项目的 `dist/seedvr2-0.7.0/`，包含 CLI、本地 Web、worker、共享 SDK、头文件、CMake 配置，以及独立复制并校验过的图片和视频模型包。进入该目录后运行：
+完成构建及模型准备后，`dist/tutorial/` 包含 CLI、本地 Web、worker、共享 SDK、头文件、CMake 配置，`models/image` 和 `models/video` 则保存另行安装的图片和视频包。进入该安装目录后运行：
 
 ```sh
 ./bin/seedvr2-studio
@@ -22,14 +22,14 @@
 
 ## 已转换模型与自动化范围
 
-本机安装已经包含以下完整 ncnn 包，直接使用它们无需再次下载官方 checkpoint 或重新转换：
+当前已经审阅的完整 ncnn 包如下。自行转换可按教程执行，收到转换包后可使用[分发安装工具](distribution/README.md)直接部署，无需再次下载官方 checkpoint：
 
 | 安装目录中的位置 | 模型包 | 大小 |
 | --- | --- | --- |
 | `models/image/` | `seedvr2-3b-image-fp32-b-v1`，36 张图 | 约 20.44 GB |
 | `models/video/` | `seedvr2-3b-video-fp32-b-v1`，36 张图 | 约 21.10 GB |
 
-每个包包含 `.param` 图结构、`.bin` 权重、常量和 `manifest.json`。这些大文件保存在本机忽略目录中，不随 Git 克隆或 `cmake --install` 自动获取；目前没有公开托管的转换包下载流程。
+每个包包含 `.param` 图结构、`.bin` 权重、常量和 `manifest.json`。这些大文件保存在本机忽略目录中，不随 Git 克隆或 `cmake --install` 自动获取；目前没有默认公开托管地址。2026-09-13 已增加 [转换包分发与安装工具](distribution/README.md)，可从离线分发目录或显式 HTTPS 镜像组装、断点续装和校验已转换模型。图片与视频共同的分发内容按哈希去重后约 21.44 GB；默认安装产生独立副本，空间另计。
 
 源码目录已有分阶段自动化工具：
 
@@ -39,6 +39,8 @@
 | `tools/build_native.py` | 检查开发依赖，串起原生依赖准备、构建、小型测试和安装；不下载模型 |
 | `tools/prepare_native.py`、`tools/prepare_engine.py`、`tools/prepare_pnnx.py` | 按各自锁文件准备原生依赖、ncnn 和转换器 |
 | `tools/prepare_models.py` | 下载固定 revision 的官方 checkpoint，支持断点续传，校验文件大小与 SHA-256；已校验缓存会复用 |
+| `tools/model_distribution.py` | 组装去重转换包，从离线目录或显式 HTTPS 镜像安装；保留原始模型身份，未配置公共默认镜像 |
+| `tools/audit_native_install.py` | 核对冻结程序经 CMake RPATH 安装变换后的身份，盘点系统依赖，准备本机程序归档 |
 | `tools/export_vae_image.py`、`tools/export_dit_block.py`、`tools/export_image_package.py` | 按顺序导出图片组件并组装 ncnn 图片包 |
 | `tools/export_vae_video.py`、`tools/export_video_package.py` | 导出时序 VAE，并复用图片 DiT 组装视频包 |
 | `tools/native_ci.sh` | 对已有构建和安装执行小型测试、参数边界、Mesa Vulkan 与外部 SDK 检查；完整 3B 实机验证另行执行 |
@@ -100,7 +102,7 @@ npm run build --prefix apps/studio
 cmake --preset release
 cmake --build --preset release --parallel 4
 ctest --preset release
-cmake --install build/release --prefix dist/seedvr2-0.7.0
+cmake --install build/release --prefix dist/tutorial
 ```
 
 依赖脚本按锁文件显式下载；已有完整归档缓存时加 `--offline`。CMake 自身不下载依赖。只构建 CLI/SDK 时，准备依赖加 `--cli-only`，CMake 设置 `-DSEEDVR2_BUILD_WEB=OFF`。转换模型另需专用 PyTorch/pnnx 环境，完整命令见 [图片导出](image-runtime.md) 和 [视频导出](video-runtime.md)。转换器与运行库分别锁定，重新构建运行库不要求无理由重导出已验证模型。
