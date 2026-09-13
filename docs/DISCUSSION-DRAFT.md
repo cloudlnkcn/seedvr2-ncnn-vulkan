@@ -146,6 +146,16 @@ Linux x86_64，RTX 4060 Laptop 8 GiB，约 32 GiB RAM。对照使用锁定官方
 
 ## 使用与当前边界
 
+### 下载已转换模型（可选）
+
+已验证的图片和时序视频 FP32-B 模型托管于 [Hugging Face：akashimio/SeedVR2-3B-ncnn](https://huggingface.co/akashimio/SeedVR2-3B-ncnn)。构建原生程序后，可直接安装模型，省去本机 PyTorch / pnnx 转换；源码转换入口继续保留。
+
+```sh
+python3 tools/model_distribution.py install --catalog docs/distribution/catalog.v1.json --kind image --base-url https://huggingface.co/akashimio/SeedVR2-3B-ncnn/resolve/9371e381e3d5581c05a0934a518b14d8aa15698b --output models/image
+```
+
+视频改用 `--kind video --output models/video`。下载固定到不可变提交，安装器支持续传和逐文件 SHA-256 校验。图片 / 视频安装约需 20.44 / 21.10 GB。模型下载工具只需 Python 标准库，原生推理不需要 Python。发布验证包括完整远端字节回读、两个模型包的原生校验及一张真实图片的 73/73 官方 FP32-B 对照；不扩大已有视频、精度或画质结论。
+
 项目采用**源码构建 → 官方权重下载 → 本机转换 → 原生校验 → CLI / 本地 Web 运行**的使用流程，不以预编译程序或转换模型 Release 为前提。官方 `.pth` 需要先转换为包含 36 个 ncnn 图的模型包；转换完成后，兼容环境中的推理无需 Python，也可以离线使用。
 
 安装[教程中的构建依赖](https://github.com/mingshi2333/seedvr2-ncnn-vulkan/blob/main/docs/TUTORIAL.md)及 `uv` 后，命令行入口为：

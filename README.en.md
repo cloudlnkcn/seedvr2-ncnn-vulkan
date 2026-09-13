@@ -1,5 +1,15 @@
 # SeedVR2 ncnn Vulkan
 
+## Optional converted-model download
+
+Reviewed FP32-B image and temporal-video packages are available at [Hugging Face](https://huggingface.co/akashimio/SeedVR2-3B-ncnn). Build the native application, then install from the project root:
+
+```sh
+python3 tools/model_distribution.py install --catalog docs/distribution/catalog.v1.json --kind image --base-url https://huggingface.co/akashimio/SeedVR2-3B-ncnn/resolve/9371e381e3d5581c05a0934a518b14d8aa15698b --output models/image
+```
+
+For video use `--kind video --output models/video`. This pins the model revision and verifies every SHA-256. Downloads resume; installation requires Python 3.12+ standard library, not PyTorch/pnnx. Native inference is Python-free. Complete remote bytes, both package identities and one real-image 73-boundary reference replay were checked. Source conversion remains supported and ordinary CI does not depend on this mirror.
+
 [中文](README.md) · [Architecture](#architecture-and-design) · [Measured results](#measured-results-and-visual-comparisons) · [Tutorial (Chinese)](docs/TUTORIAL.md) · [Source guide](docs/ARCHITECTURE.md) · [ncnn Discussion](https://github.com/Tencent/ncnn/discussions/6991) · [Contributing](CONTRIBUTING.md) · [License](LICENSE)
 
 A native **C++20 / ncnn CPU/Vulkan** port of the official **SeedVR2 3B** image and short-video restoration model. The **standalone CLI, local Web application and installed C++ SDK** share one inference implementation. The tutorial covers pnnx export, custom adaptive window attention, temporal VAE and component-by-component validation.
@@ -10,7 +20,7 @@ Image output long sides reach 512 pixels; video is limited to 17 frames and 128-
 
 The application includes model identity/integrity checks, preflight, progress/cancellation, offline model copying and per-graph device/host weight placement. React / TypeScript / Ant Design is embedded in the native Drogon host; inference needs no Python, Node.js or cloud service. See [first use and offline transfer](docs/FIRST-RUN.md) and [memory-policy measurements](docs/MEMORY-VALIDATION.md).
 
-The [source and validation workflow](docs/wiki/README.md) connects pinned upstream evidence, [design comparisons](docs/wiki/synthesis/design-comparison.md), implementation and measurements. [Converted-model distribution tooling](docs/distribution/README.md) stages the image and video packages in approximately 21.44 GB of deduplicated objects and installs from a local bundle or an explicit HTTPS mirror. A public model mirror and portable prebuilt application are still pending.
+The [source and validation workflow](docs/wiki/README.md) connects pinned upstream evidence, [design comparisons](docs/wiki/synthesis/design-comparison.md), implementation and measurements. [Converted-model distribution tooling](docs/distribution/README.md) stages the image and video packages in approximately 21.44 GB of deduplicated objects and installs from a local bundle or an explicit HTTPS mirror. The public model mirror is available above; the native application is built from source.
 
 ## Build and prepare locally
 
