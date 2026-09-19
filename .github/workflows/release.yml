@@ -91,11 +91,12 @@ jobs:
         shell: pwsh
         run: |
           Invoke-WebRequest -Uri "https://codeload.github.com/CLIUtils/CLI11/tar.gz/cbd58a3696887b34c70949aef21a71735a0c2ad5" -OutFile cli11.tar.gz
-          mkdir .deps\install
           tar -xzf cli11.tar.gz
           cd CLI11-cbd58a3696887b34c70949aef21a71735a0c2ad5
-          cmake -B build -DCMAKE_INSTALL_PREFIX=..\.deps\install
-          cmake --install build
+          $prefix = (Get-Item ..).FullName + "/.deps/install"
+          New-Item -ItemType Directory -Force -Path $prefix | Out-Null
+          cmake -S . -B build -DCMAKE_INSTALL_PREFIX="$prefix"
+          cmake --install build --config Release
       - name: configure
         shell: pwsh
         run: |
