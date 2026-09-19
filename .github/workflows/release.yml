@@ -81,6 +81,8 @@ jobs:
         run: |
           Invoke-WebRequest -Uri "https://sdk.lunarg.com/sdk/download/1.3.290.0/windows/VulkanSDK-1.3.290.0-Installer.exe?Human=true" -OutFile VulkanSDK-Installer.exe
           7z x -aoa ./VulkanSDK-Installer.exe -oVulkanSDK
+      - name: msvc-dev-cmd
+        uses: ilammy/msvc-dev-cmd@v1
       - name: deps
         shell: pwsh
         run: |
