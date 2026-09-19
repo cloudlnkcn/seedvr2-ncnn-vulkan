@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Prepare the pinned, unmodified ncnn dependency in the private build tree."""
 import argparse
+import sys
 import hashlib
 import json
 import subprocess
@@ -64,6 +65,7 @@ def main():
     }
     commands = [
         ['cmake','-S',str(source),'-B',str(build),'-G','Ninja',
+         '-DCMAKE_POLICY_VERSION_MINIMUM=3.5',
          *[f'-D{k}={v}' for k,v in options.items()]],
         ['cmake','--build',str(build),'--parallel',str(args.jobs)],
         ['cmake','--install',str(build)],
@@ -72,7 +74,12 @@ def main():
     print(f'Building pinned ncnn; log: {log_path}', flush=True)
     with log_path.open('w') as log:
         for command in commands:
-            subprocess.run(command, stdout=log, stderr=subprocess.STDOUT, check=True)
+            result = subprocess.run(command, stdout=log, stderr=subprocess.STDOUT)
+            if result.returncode != 0:
+                tail = log_path.read_text(errors='replace').splitlines()[-40:]
+                print('\n'.join(tail), file=sys.stderr, flush=True)
+                raise SystemExit(f'ncnn step failed: {command[0]}')
+
     (prefix/'seedvr2-ncnn-commit.txt').write_text(dep['commit']+'\n')
     print(f'ncnn ready: {prefix}', flush=True)
 
