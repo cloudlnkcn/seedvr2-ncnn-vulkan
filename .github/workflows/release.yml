@@ -89,6 +89,16 @@ jobs:
           $env:VCPKG_DEFAULT_TRIPLET = "x64-windows"
           vcpkg install openssl sqlite3 libjpeg-turbo ffmpeg glslang spirv-tools
           choco install -y pkgconfiglite
+      - name: locate-shader-tools
+        shell: pwsh
+        run: |
+          $glslang = (Get-ChildItem -Recurse "$env:VCPKG_INSTALLATION_ROOT/installed/x64-windows/tools" -Filter glslangValidator.exe | Select-Object -First 1).FullName
+          $spirvval = (Get-ChildItem -Recurse "$env:VCPKG_INSTALLATION_ROOT/installed/x64-windows/tools" -Filter spirv-val.exe | Select-Object -First 1).FullName
+          if (-not $glslang -or -not $spirvval) { throw "shader tools not found under vcpkg tools dir" }
+          "GLSLANG_EXE=$glslang" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "SPIRVVAL_EXE=$spirvval" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "$env:VCPKG_INSTALLATION_ROOT/installed/x64-windows/bin" >> $env:GITHUB_PATH
+          "$((Get-Item $glslang).DirectoryName)" >> $env:GITHUB_PATH
       - name: cli11
         shell: pwsh
         run: |
@@ -107,7 +117,7 @@ jobs:
           $env:CMAKE_PREFIX_PATH = "$env:VCPKG_INSTALLATION_ROOT/installed/x64-windows/share;$env:VCPKG_INSTALLATION_ROOT/installed/x64-windows"
           $env:CMAKE_POLICY_VERSION_MINIMUM = "3.5"
           python3 tools/prepare_engine.py --jobs $env:NUMBER_OF_PROCESSORS
-          cmake -S . -B build -A x64 -DSEEDVR2_BUILD_WEB=OFF "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" "-DCMAKE_PREFIX_PATH=$(Get-Location)/../.deps/install" "-DSEEDVR2_GLSLANG_VALIDATOR=$env:VCPKG_INSTALLATION_ROOT/installed/x64-windows/tools/glslang/glslangValidator.exe" "-DSEEDVR2_SPIRV_VAL=$env:VCPKG_INSTALLATION_ROOT/installed/x64-windows/tools/spirv-tools/spirv-val.exe"
+          cmake -S . -B build -A x64 -DSEEDVR2_BUILD_WEB=OFF "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" "-DCMAKE_PREFIX_PATH=$(Get-Location)/../.deps/install" "-DSEEDVR2_GLSLANG_VALIDATOR=$env:GLSLANG_EXE" "-DSEEDVR2_SPIRV_VAL=$env:SPIRVVAL_EXE"
       - name: build
         shell: pwsh
         run: |
