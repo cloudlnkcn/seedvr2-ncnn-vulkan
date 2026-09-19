@@ -2,7 +2,9 @@
 #include <datareader.h>
 #include <cstring>
 #include <filesystem>
+#include <fstream>
 #include <stdexcept>
+#include <vector>
 #if defined(__linux__)
 #include <fcntl.h>
 #include <sys/mman.h>
@@ -28,7 +30,20 @@ public:
         if (p==MAP_FAILED) {close(fd_);throw std::runtime_error("Read-only weight mapping failed");}
         data_=static_cast<const unsigned char *>(p);
 #else
-        (void)path; throw std::runtime_error("Mapped weight loading is currently supported on Linux only");
+        // Portable fallback: packages are capped at 1 GiB, so a full read is
+        // bounded; mmap stays the Linux fast path.
+        std::error_code ec;
+        size_ = std::filesystem::file_size(path, ec);
+        if (ec || size_ == 0 || size_ > 1024LL * 1024 * 1024) {
+            throw std::runtime_error("Cannot read bounded model weights");
+        }
+        buffer_.resize(size_);
+        std::ifstream in(path, std::ios::binary);
+        if (!in.read(reinterpret_cast<char *>(buffer_.data()),
+                     static_cast<std::streamsize>(size_))) {
+            throw std::runtime_error("Read-only weight load failed");
+        }
+        data_ = buffer_.data();
 #endif
     }
     ~MappedWeights() override {
@@ -53,5 +68,6 @@ private:
     std::size_t size_=0;
     mutable std::size_t position_=0;
     int fd_=-1;
+    std::vector<unsigned char> buffer_;
 };
 } // namespace seedvr2::engine::detail
