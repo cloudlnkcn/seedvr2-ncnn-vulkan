@@ -107,7 +107,7 @@ jobs:
           $env:CMAKE_PREFIX_PATH = "$env:VCPKG_INSTALLATION_ROOT/installed/x64-windows/share;$env:VCPKG_INSTALLATION_ROOT/installed/x64-windows"
           $env:CMAKE_POLICY_VERSION_MINIMUM = "3.5"
           python3 tools/prepare_engine.py --jobs $env:NUMBER_OF_PROCESSORS
-          cmake -S . -B build -A x64 -DSEEDVR2_BUILD_WEB=OFF "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" "-DCMAKE_PREFIX_PATH=$(Get-Location)/../.deps/install" "-DSEEDVR2_GLSLANG_VALIDATOR=$env:VCPKG_INSTALLATION_ROOT/installed/x64-windows/tools/glslang/glslangValidator.exe"
+          cmake -S . -B build -A x64 -DSEEDVR2_BUILD_WEB=OFF "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" "-DCMAKE_PREFIX_PATH=$(Get-Location)/../.deps/install" "-DSEEDVR2_GLSLANG_VALIDATOR=$env:VCPKG_INSTALLATION_ROOT/installed/x64-windows/tools/glslang/glslangValidator.exe" "-DSEEDVR2_SPIRV_VAL=$env:VCPKG_INSTALLATION_ROOT/installed/x64-windows/tools/spirv-tools/spirv-val.exe"
       - name: build
         shell: pwsh
         run: |
