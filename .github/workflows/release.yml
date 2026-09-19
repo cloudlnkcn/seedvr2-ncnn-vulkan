@@ -101,9 +101,9 @@ jobs:
         shell: pwsh
         run: |
           $env:VULKAN_SDK = "$(pwd)/VulkanSDK"
-          $env:PKG_CONFIG_PATH = "$(pwd)/vcpkg_installed/x64-windows/lib/pkgconfig;$(pwd)/vcpkg_installed/x64-windows/share"
+          $env:PKG_CONFIG_PATH = "$env:VCPKG_INSTALLATION_ROOT/installed/x64-windows/lib/pkgconfig;$env:VCPKG_INSTALLATION_ROOT/installed/x64-windows/share/pkgconfig"
           $env:CMAKE_POLICY_VERSION_MINIMUM = "3.5"
-          cmake -S . -B build -A x64 -DSEEDVR2_BUILD_WEB=OFF "-DCMAKE_PREFIX_PATH=$(Get-Location)/../.deps/install"
+          cmake -S . -B build -A x64 -DSEEDVR2_BUILD_WEB=OFF "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" "-DCMAKE_PREFIX_PATH=$(Get-Location)/../.deps/install"
       - name: build
         shell: pwsh
         run: |
