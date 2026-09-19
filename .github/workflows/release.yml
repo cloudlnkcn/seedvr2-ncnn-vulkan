@@ -103,14 +103,12 @@ jobs:
           $env:VULKAN_SDK = "$(pwd)/VulkanSDK"
           $env:PKG_CONFIG_PATH = "$(pwd)/vcpkg_installed/x64-windows/lib/pkgconfig;$(pwd)/vcpkg_installed/x64-windows/share"
           $env:CMAKE_POLICY_VERSION_MINIMUM = "3.5"
-          mkdir build; cd build
-          cmake -A x64 -DSEEDVR2_BUILD_WEB=OFF -DCMAKE_PREFIX_PATH="$(pwd)/../.deps/install" ../src
+          cmake -S . -B build -A x64 -DSEEDVR2_BUILD_WEB=OFF "-DCMAKE_PREFIX_PATH=$(Get-Location)/../.deps/install"
       - name: build
         shell: pwsh
         run: |
-          cd build
-          cmake --build . --config Release -j 2
-          ./Release/seedvr2.exe version
+          cmake --build build --config Release -j $env:NUMBER_OF_PROCESSORS
+          ./build/Release/seedvr2.exe version
 
   release:
     needs: [ubuntu]
