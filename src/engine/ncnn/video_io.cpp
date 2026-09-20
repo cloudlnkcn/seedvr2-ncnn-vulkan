@@ -65,7 +65,7 @@ VideoClip load_video(const std::filesystem::path &path, int limit, const std::fu
     av_dict_set(&options,"format_whitelist","mov,matroska,webm",0);
     av_dict_set(&options,"probesize","1048576",0);
     av_dict_set(&options,"analyzeduration","2000000",0);
-    int status=avformat_open_input(&s.format,std::filesystem::absolute(path).c_str(),nullptr,&options);
+    int status=avformat_open_input(&s.format,std::filesystem::absolute(path).string().c_str(),nullptr,&options);
     av_dict_free(&options);require(status,"Cannot open video");
     require(avformat_find_stream_info(s.format,nullptr),"Cannot inspect video");
     const AVCodec *decoder=nullptr;
@@ -139,7 +139,7 @@ void save_video(const std::filesystem::path &path,const ncnn::Mat &pixels,const 
     if (pixels.dims!=4 || pixels.c!=3 || pixels.elempack!=1 || pixels.elemsize!=4 ||
         pixels.d<static_cast<int>(clip.frames.size()) || clip.frames.size()!=clip.timestamps.size() || clip.frames.empty())
         throw std::runtime_error("Invalid video output tensor");
-    Output s;require(avformat_alloc_output_context2(&s.format,nullptr,"mp4",path.c_str()),"Cannot create MP4");
+    Output s;require(avformat_alloc_output_context2(&s.format,nullptr,"mp4",path.string().c_str()),"Cannot create MP4");
     const auto *encoder=avcodec_find_encoder_by_name("libx264");
     if (!encoder || !s.format || !s.frame || !s.packet) throw std::runtime_error("This FFmpeg build needs the libx264 encoder for browser playback");
     auto *stream=avformat_new_stream(s.format,nullptr);s.codec=avcodec_alloc_context3(encoder);
@@ -153,7 +153,7 @@ void save_video(const std::filesystem::path &path,const ncnn::Mat &pixels,const 
     int code=avcodec_open2(s.codec,encoder,&options);av_dict_free(&options);require(code,"Cannot open H.264 encoder");
     require(avcodec_parameters_from_context(stream->codecpar,s.codec),"Cannot set output parameters");
     stream->time_base=s.codec->time_base;stream->avg_frame_rate=s.codec->framerate;
-    require(avio_open(&s.format->pb,path.c_str(),AVIO_FLAG_WRITE),"Cannot write output video");
+    require(avio_open(&s.format->pb,path.string().c_str(),AVIO_FLAG_WRITE),"Cannot write output video");
     av_dict_set(&options,"movflags","+faststart",0);code=avformat_write_header(s.format,&options);av_dict_free(&options);require(code,"Cannot write video header");
     s.frame->format=s.codec->pix_fmt;s.frame->width=pixels.w;s.frame->height=pixels.h;
     require(av_frame_get_buffer(s.frame,32),"Cannot allocate output frame");
