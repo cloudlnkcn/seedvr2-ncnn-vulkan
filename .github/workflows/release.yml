@@ -122,6 +122,9 @@ jobs:
         run: |
           cmake --build build --config Release -j $env:NUMBER_OF_PROCESSORS
           ./build/Release/seedvr2.exe version
+      - name: install
+        shell: pwsh
+        run: cmake --install build --config Release --prefix dist/rel
       - name: package
         shell: pwsh
         run: |
