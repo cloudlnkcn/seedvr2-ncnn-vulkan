@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Embed compiled SPIR-V words without runtime shader file dependencies."""
+import os
 import struct
 import sys
 from pathlib import Path
@@ -18,4 +19,8 @@ for source in sys.argv[2:]:
     parts.append('};\n')
 parts.append('}\n')
 out.parent.mkdir(parents=True, exist_ok=True)
-out.write_text(''.join(parts))
+# Atomic write: MSBuild runs this custom command from several projects in
+# parallel, and a racing writer must never clobber a file being read.
+tmp = out.with_suffix(out.suffix + f'.tmp{os.getpid()}')
+tmp.write_text(''.join(parts))
+os.replace(tmp, out)
