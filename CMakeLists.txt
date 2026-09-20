@@ -125,6 +125,7 @@ add_library(seedvr2_engine SHARED src/runtime/memory_policy.cpp src/engine/ncnn/
     "${CMAKE_CURRENT_BINARY_DIR}/generated/awa_shaders.hpp" src/engine/ncnn/softmax.cpp)
 add_library(seedvr2::sdk ALIAS seedvr2_engine)
 set_target_properties(seedvr2_engine PROPERTIES OUTPUT_NAME seedvr2 EXPORT_NAME sdk
+    WINDOWS_EXPORT_ALL_SYMBOLS ON
     VERSION ${PROJECT_VERSION} SOVERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
 target_compile_features(seedvr2_engine PUBLIC cxx_std_20)
 target_include_directories(seedvr2_engine PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>" "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
