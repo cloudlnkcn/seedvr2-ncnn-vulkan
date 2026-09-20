@@ -122,6 +122,22 @@ jobs:
         run: |
           cmake --build build --config Release -j $env:NUMBER_OF_PROCESSORS
           ./build/Release/seedvr2.exe version
+      - name: package
+        shell: pwsh
+        run: |
+          $PKG = "seedvr2-ncnn-vulkan-$($env:GITHUB_REF_NAME.Replace('refs/tags/',''))-windows"
+          New-Item -ItemType Directory -Force -Path "dist/$PKG" | Out-Null
+          Copy-Item -Recurse -Force dist/rel/bin,dist/rel/lib,dist/rel/include,dist/rel/share "dist/$PKG/"
+          Copy-Item README.md,LICENSE,NOTICE "dist/$PKG/" -ErrorAction SilentlyContinue
+          Copy-Item "$env:VCPKG_INSTALLATION_ROOT/installed/x64-windows/bin/*.dll" "dist/$PKG/bin/"
+          tar -czf "$PKG.tar.gz" -C dist $PKG
+          sha256sum "$PKG.tar.gz" > "$PKG.tar.gz.sha256"
+      - uses: actions/upload-artifact@v5
+        with:
+          name: seedvr2-windows
+          path: |
+            seedvr2-ncnn-vulkan-*-windows.tar.gz
+            seedvr2-ncnn-vulkan-*-windows.tar.gz.sha256
 
   release:
     needs: [ubuntu, windows]
